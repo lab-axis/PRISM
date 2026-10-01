@@ -1,0 +1,94 @@
+{
+  "collected_at_utc": "2026-10-01T10:41:04.460170+00:00",
+  "node_count": 56,
+  "bea_quarterly_available": [
+    "2005Q1",
+    "2026Q2"
+  ],
+  "bea_annual_gos_available": [
+    1997,
+    2025
+  ],
+  "target_collection_period": [
+    "2005Q1",
+    "2025Q4"
+  ],
+  "target_quarter_count": 84,
+  "qcew_monthly_period": [
+    "2003-01",
+    "2025-12"
+  ],
+  "qcew_month_count": 276,
+  "bea_direct_nodes": 55,
+  "bea_composite_nodes": 1,
+  "qcew_complete_nodes": 56,
+  "history_annual_period": [
+    2003,
+    2025
+  ],
+  "target_release_metadata": "Data\\01_target_data_collection\\processed\\target_release_metadata.csv",
+  "point_in_time_history_raw": "Data\\01_target_data_collection\\processed\\point_in_time_history_raw.csv",
+  "point_in_time_history_audit": "Results\\01_target_data_collection\\point_in_time_history_audit.csv",
+  "point_in_time_history": {
+    "rows": 4480,
+    "period": [
+      "2006Q1",
+      "2025Q4"
+    ],
+    "nodes": 56,
+    "bea_vintages_used": 62,
+    "annual_rows": 2720,
+    "quarterly_rows": 1760,
+    "component_resolution_rows": {
+      "profitability": {
+        "annual": 2720,
+        "quarterly": 1760
+      },
+      "productivity": {
+        "annual": 2720,
+        "quarterly": 1760
+      },
+      "growth": {
+        "annual": 2720,
+        "quarterly": 1760
+      }
+    },
+    "parent_gos_proxy_rows": 816,
+    "employment_sources": {
+      "CES_VINTAGE_EXACT": 3840,
+      "QCEW_FINAL": 560,
+      "CES_VINTAGE_523_AGG_PROXY": 80
+    },
+    "component_definition": {
+      "profitability": "4Q/year-over-year change in GOS-to-gross-output margin",
+      "productivity": "4Q/year-over-year symmetric change in real value added per worker; scale-invariant to chained-dollar rebasing and safe across sign changes",
+      "growth": "4Q/year-over-year real gross-output growth"
+    },
+    "revision_policy": "BEA official archive vintage; exact CES publication-vintage employment where available; QCEW current-final values only after official finalization as fallback; funds/trusts continuous CES 523+525 vintage proxy; each component uses its freshest independently available source period",
+    "status": "PASS"
+  },
+  "employment_target_rule": {
+    "exact_ces_nodes": 48,
+    "exact_ces": "BLS CES current-final NSA employment where an exact publication-vintage industry mapping exists; PIT uses the corresponding historical publication vintage",
+    "qcew_fallback_nodes": 7,
+    "qcew_fallback": "BLS QCEW quarterly-average employment for nodes without an exact CES publication-vintage mapping",
+    "rail_transport": "Exact BLS CES Rail Transportation employment; avoids QCEW railroad exclusion",
+    "funds_trusts": "BLS CES CEU5552300001 quarterly-average 523+525 employment proxy; productivity numerator uses matching BEA securities+funds real VA aggregate"
+  },
+  "required_inputs": {
+    "profitability": [
+      "annual_gos",
+      "current_gross_output",
+      "current_value_added_for_temporal_disaggregation",
+      "4Q/year-over-year change"
+    ],
+    "productivity": [
+      "within-vintage real_value_added per worker 4Q symmetric percentage change",
+      "employment 4Q/year-over-year ratio"
+    ],
+    "growth": [
+      "real_gross_output 4Q/year-over-year growth"
+    ]
+  },
+  "status": "PASS"
+}

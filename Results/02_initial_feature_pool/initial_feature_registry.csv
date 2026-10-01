@@ -1,0 +1,949 @@
+﻿feature_id,base_feature,scope,source,group,safe_lag_quarters,node_fraction,median_time_coverage,overall_coverage,status,target_overlap_control
+qcew_employment,qcew_employment,NODE,BLS QCEW,NODE_LABOR,0,1.0,0.9166666666666666,0.9166666666666667,PASS,TARGET_INGREDIENT_LAGGED_ONLY
+qcew_employment__d1,qcew_employment,NODE,BLS QCEW,NODE_LABOR,0,1.0,0.9047619047619048,0.9047619047619049,PASS,TARGET_INGREDIENT_LAGGED_ONLY
+qcew_employment__d4,qcew_employment,NODE,BLS QCEW,NODE_LABOR,0,1.0,0.8690476190476191,0.8690476190476188,PASS,TARGET_INGREDIENT_LAGGED_ONLY
+qcew_employment__logd1,qcew_employment,NODE,BLS QCEW,NODE_LABOR,0,1.0,0.9047619047619048,0.9047619047619049,PASS,TARGET_INGREDIENT_LAGGED_ONLY
+qcew_employment__logd4,qcew_employment,NODE,BLS QCEW,NODE_LABOR,0,1.0,0.8690476190476191,0.8690476190476188,PASS,TARGET_INGREDIENT_LAGGED_ONLY
+ces_exact_all_employees,ces_exact_all_employees,NODE,BLS CES,NODE_LABOR,0,0.7857142857142857,0.9047619047619048,0.7108843537414966,PASS,NONE
+ces_exact_all_employees__d1,ces_exact_all_employees,NODE,BLS CES,NODE_LABOR,0,0.7857142857142857,0.8928571428571429,0.7015306122448981,PASS,NONE
+ces_exact_all_employees__d4,ces_exact_all_employees,NODE,BLS CES,NODE_LABOR,0,0.7857142857142857,0.8571428571428571,0.6734693877551019,PASS,NONE
+ces_exact_all_employees__logd1,ces_exact_all_employees,NODE,BLS CES,NODE_LABOR,0,0.7857142857142857,0.8928571428571429,0.7015306122448981,PASS,NONE
+ces_exact_all_employees__logd4,ces_exact_all_employees,NODE,BLS CES,NODE_LABOR,0,0.7857142857142857,0.8571428571428571,0.6734693877551019,PASS,NONE
+ces_exact_avg_weekly_hours_all,ces_exact_avg_weekly_hours_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_weekly_hours_all__d1,ces_exact_avg_weekly_hours_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_weekly_hours_all__d4,ces_exact_avg_weekly_hours_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_avg_weekly_hours_all__logd1,ces_exact_avg_weekly_hours_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_weekly_hours_all__logd4,ces_exact_avg_weekly_hours_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_avg_hourly_earnings_all,ces_exact_avg_hourly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_hourly_earnings_all__d1,ces_exact_avg_hourly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_hourly_earnings_all__d4,ces_exact_avg_hourly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_avg_hourly_earnings_all__logd1,ces_exact_avg_hourly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_hourly_earnings_all__logd4,ces_exact_avg_hourly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_prod_nonsup_employees,ces_exact_prod_nonsup_employees,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.9047619047619048,0.6301020408163265,PASS,NONE
+ces_exact_prod_nonsup_employees__d1,ces_exact_prod_nonsup_employees,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_prod_nonsup_employees__d4,ces_exact_prod_nonsup_employees,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_prod_nonsup_employees__logd1,ces_exact_prod_nonsup_employees,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_prod_nonsup_employees__logd4,ces_exact_prod_nonsup_employees,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_weekly_hours_prod_nonsup,ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.9047619047619048,0.6301020408163265,PASS,NONE
+ces_exact_avg_weekly_hours_prod_nonsup__d1,ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_avg_weekly_hours_prod_nonsup__d4,ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_weekly_hours_prod_nonsup__logd1,ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_avg_weekly_hours_prod_nonsup__logd4,ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_hourly_earnings_prod_nonsup,ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.9047619047619048,0.6301020408163265,PASS,NONE
+ces_exact_avg_hourly_earnings_prod_nonsup__d1,ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_avg_hourly_earnings_prod_nonsup__d4,ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_hourly_earnings_prod_nonsup__logd1,ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8928571428571429,0.6218112244897959,PASS,NONE
+ces_exact_avg_hourly_earnings_prod_nonsup__logd4,ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_women_employees,ces_exact_women_employees,NODE,BLS CES,NODE_LABOR,0,0.7678571428571429,0.9047619047619048,0.6947278911564626,PASS,NONE
+ces_exact_women_employees__d1,ces_exact_women_employees,NODE,BLS CES,NODE_LABOR,0,0.7678571428571429,0.8928571428571429,0.6855867346938777,PASS,NONE
+ces_exact_women_employees__d4,ces_exact_women_employees,NODE,BLS CES,NODE_LABOR,0,0.7678571428571429,0.8571428571428571,0.6581632653061223,PASS,NONE
+ces_exact_women_employees__logd1,ces_exact_women_employees,NODE,BLS CES,NODE_LABOR,0,0.7678571428571429,0.8928571428571429,0.6855867346938777,PASS,NONE
+ces_exact_women_employees__logd4,ces_exact_women_employees,NODE,BLS CES,NODE_LABOR,0,0.7678571428571429,0.8571428571428571,0.6581632653061223,PASS,NONE
+ces_exact_avg_weekly_earnings_all,ces_exact_avg_weekly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_avg_weekly_earnings_all__d1,ces_exact_avg_weekly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_weekly_earnings_all__d4,ces_exact_avg_weekly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_avg_weekly_earnings_all__logd1,ces_exact_avg_weekly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_avg_weekly_earnings_all__logd4,ces_exact_avg_weekly_earnings_all,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_aggregate_weekly_hours_index,ces_exact_aggregate_weekly_hours_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_aggregate_weekly_hours_index__d1,ces_exact_aggregate_weekly_hours_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_aggregate_weekly_hours_index__d4,ces_exact_aggregate_weekly_hours_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_aggregate_weekly_hours_index__logd1,ces_exact_aggregate_weekly_hours_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_aggregate_weekly_hours_index__logd4,ces_exact_aggregate_weekly_hours_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_aggregate_weekly_payrolls_index,ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8571428571428571,0.5969387755102041,PASS,NONE
+ces_exact_aggregate_weekly_payrolls_index__d1,ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_aggregate_weekly_payrolls_index__d4,ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ces_exact_aggregate_weekly_payrolls_index__logd1,ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8452380952380952,0.5886479591836735,PASS,NONE
+ces_exact_aggregate_weekly_payrolls_index__logd4,ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES,NODE_LABOR,0,0.6964285714285714,0.8095238095238095,0.5637755102040816,PASS,NONE
+ppi_industry_net_output,ppi_industry_net_output,NODE,BLS PPI,NODE_PRICE,0,0.48214285714285715,0.9761904761904762,0.4545068027210884,PASS,NONE
+ppi_industry_net_output__d1,ppi_industry_net_output,NODE,BLS PPI,NODE_PRICE,0,0.48214285714285715,0.9642857142857143,0.4487670068027211,PASS,NONE
+ppi_industry_net_output__d4,ppi_industry_net_output,NODE,BLS PPI,NODE_PRICE,0,0.48214285714285715,0.9285714285714286,0.43154761904761907,PASS,NONE
+ppi_industry_net_output__logd1,ppi_industry_net_output,NODE,BLS PPI,NODE_PRICE,0,0.48214285714285715,0.9642857142857143,0.4487670068027211,PASS,NONE
+ppi_industry_net_output__logd4,ppi_industry_net_output,NODE,BLS PPI,NODE_PRICE,0,0.48214285714285715,0.9285714285714286,0.43154761904761907,PASS,NONE
+jolts_job_openings_rate,jolts_job_openings_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_job_openings_rate__d1,jolts_job_openings_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_job_openings_rate__d4,jolts_job_openings_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_job_openings_rate__logd1,jolts_job_openings_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_job_openings_rate__logd4,jolts_job_openings_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_job_openings_level,jolts_job_openings_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_job_openings_level__d1,jolts_job_openings_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_job_openings_level__d4,jolts_job_openings_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_job_openings_level__logd1,jolts_job_openings_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_job_openings_level__logd4,jolts_job_openings_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_hires_rate,jolts_hires_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_hires_rate__d1,jolts_hires_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_hires_rate__d4,jolts_hires_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_hires_rate__logd1,jolts_hires_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_hires_rate__logd4,jolts_hires_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_hires_level,jolts_hires_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_hires_level__d1,jolts_hires_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_hires_level__d4,jolts_hires_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_hires_level__logd1,jolts_hires_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_hires_level__logd4,jolts_hires_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_quits_rate,jolts_quits_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_quits_rate__d1,jolts_quits_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_quits_rate__d4,jolts_quits_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_quits_rate__logd1,jolts_quits_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_quits_rate__logd4,jolts_quits_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_quits_level,jolts_quits_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_quits_level__d1,jolts_quits_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_quits_level__d4,jolts_quits_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_quits_level__logd1,jolts_quits_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_quits_level__logd4,jolts_quits_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_layoffs_discharges_rate,jolts_layoffs_discharges_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_layoffs_discharges_rate__d1,jolts_layoffs_discharges_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_layoffs_discharges_rate__d4,jolts_layoffs_discharges_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_layoffs_discharges_rate__logd1,jolts_layoffs_discharges_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_layoffs_discharges_rate__logd4,jolts_layoffs_discharges_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_layoffs_discharges_level,jolts_layoffs_discharges_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_layoffs_discharges_level__d1,jolts_layoffs_discharges_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_layoffs_discharges_level__d4,jolts_layoffs_discharges_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_layoffs_discharges_level__logd1,jolts_layoffs_discharges_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_layoffs_discharges_level__logd4,jolts_layoffs_discharges_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_total_separations_rate,jolts_total_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_total_separations_rate__d1,jolts_total_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_total_separations_rate__d4,jolts_total_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_total_separations_rate__logd1,jolts_total_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_total_separations_rate__logd4,jolts_total_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_total_separations_level,jolts_total_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_total_separations_level__d1,jolts_total_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_total_separations_level__d4,jolts_total_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_total_separations_level__logd1,jolts_total_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_total_separations_level__logd4,jolts_total_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_other_separations_rate,jolts_other_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_other_separations_rate__d1,jolts_other_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_other_separations_rate__d4,jolts_other_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_other_separations_rate__logd1,jolts_other_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_other_separations_rate__logd4,jolts_other_separations_rate,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_other_separations_level,jolts_other_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+jolts_other_separations_level__d1,jolts_other_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_other_separations_level__d4,jolts_other_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+jolts_other_separations_level__logd1,jolts_other_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809524,PASS,NONE
+jolts_other_separations_level__logd4,jolts_other_separations_level,NODE,BLS JOLTS,NODE_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_cpi_all_items,bls_cpi_all_items,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_cpi_all_items__d1,bls_cpi_all_items,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_cpi_all_items__d4,bls_cpi_all_items,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_cpi_all_items__logd1,bls_cpi_all_items,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_cpi_all_items__logd4,bls_cpi_all_items,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_labor_force,bls_civilian_labor_force,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_civilian_labor_force__d1,bls_civilian_labor_force,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_labor_force__d4,bls_civilian_labor_force,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_labor_force__logd1,bls_civilian_labor_force,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_labor_force__logd4,bls_civilian_labor_force,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_labor_force_participation,bls_labor_force_participation,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_labor_force_participation__d1,bls_labor_force_participation,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_labor_force_participation__d4,bls_labor_force_participation,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_labor_force_participation__logd1,bls_labor_force_participation,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_labor_force_participation__logd4,bls_labor_force_participation,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_employment,bls_civilian_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_civilian_employment__d1,bls_civilian_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_employment__d4,bls_civilian_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_employment__logd1,bls_civilian_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_employment__logd4,bls_civilian_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_employment_population_ratio,bls_employment_population_ratio,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_employment_population_ratio__d1,bls_employment_population_ratio,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_employment_population_ratio__d4,bls_employment_population_ratio,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_employment_population_ratio__logd1,bls_employment_population_ratio,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_employment_population_ratio__logd4,bls_employment_population_ratio,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_unemployment,bls_civilian_unemployment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_civilian_unemployment__d1,bls_civilian_unemployment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_unemployment__d4,bls_civilian_unemployment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_civilian_unemployment__logd1,bls_civilian_unemployment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_civilian_unemployment__logd4,bls_civilian_unemployment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_u6_underutilization_rate,bls_u6_underutilization_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_u6_underutilization_rate__d1,bls_u6_underutilization_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_u6_underutilization_rate__d4,bls_u6_underutilization_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_u6_underutilization_rate__logd1,bls_u6_underutilization_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_u6_underutilization_rate__logd4,bls_u6_underutilization_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_unemployment_rate,bls_unemployment_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9880952380952381,0.9880952380952381,PASS,NONE
+bls_unemployment_rate__d1,bls_unemployment_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_unemployment_rate__d4,bls_unemployment_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_unemployment_rate__logd1,bls_unemployment_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_unemployment_rate__logd4,bls_unemployment_rate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+bls_total_nonfarm_employment,bls_total_nonfarm_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+bls_total_nonfarm_employment__d1,bls_total_nonfarm_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+bls_total_nonfarm_employment__d4,bls_total_nonfarm_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_total_nonfarm_employment__logd1,bls_total_nonfarm_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+bls_total_nonfarm_employment__logd4,bls_total_nonfarm_employment,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_private_avg_weekly_hours,bls_private_avg_weekly_hours,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_private_avg_weekly_hours__d1,bls_private_avg_weekly_hours,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_avg_weekly_hours__d4,bls_private_avg_weekly_hours,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_avg_weekly_hours__logd1,bls_private_avg_weekly_hours,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_avg_weekly_hours__logd4,bls_private_avg_weekly_hours,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_avg_hourly_earnings,bls_private_avg_hourly_earnings,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_private_avg_hourly_earnings__d1,bls_private_avg_hourly_earnings,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_avg_hourly_earnings__d4,bls_private_avg_hourly_earnings,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_avg_hourly_earnings__logd1,bls_private_avg_hourly_earnings,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_avg_hourly_earnings__logd4,bls_private_avg_hourly_earnings,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_aggregate_weekly_hours_index,bls_private_aggregate_weekly_hours_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_private_aggregate_weekly_hours_index__d1,bls_private_aggregate_weekly_hours_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_aggregate_weekly_hours_index__d4,bls_private_aggregate_weekly_hours_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_aggregate_weekly_hours_index__logd1,bls_private_aggregate_weekly_hours_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_aggregate_weekly_hours_index__logd4,bls_private_aggregate_weekly_hours_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_aggregate_weekly_payrolls_index,bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+bls_private_aggregate_weekly_payrolls_index__d1,bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_aggregate_weekly_payrolls_index__d4,bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_private_aggregate_weekly_payrolls_index__logd1,bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+bls_private_aggregate_weekly_payrolls_index__logd4,bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+bls_ppi_all_commodities,bls_ppi_all_commodities,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_ppi_all_commodities__d1,bls_ppi_all_commodities,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_all_commodities__d4,bls_ppi_all_commodities,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_ppi_all_commodities__logd1,bls_ppi_all_commodities,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_all_commodities__logd4,bls_ppi_all_commodities,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_ppi_final_demand,bls_ppi_final_demand,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.75,0.75,PASS,NONE
+bls_ppi_final_demand__d1,bls_ppi_final_demand,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand__d4,bls_ppi_final_demand,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand__logd1,bls_ppi_final_demand,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand__logd4,bls_ppi_final_demand,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand_goods,bls_ppi_final_demand_goods,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.75,0.75,PASS,NONE
+bls_ppi_final_demand_goods__d1,bls_ppi_final_demand_goods,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand_goods__d4,bls_ppi_final_demand_goods,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand_goods__logd1,bls_ppi_final_demand_goods,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand_goods__logd4,bls_ppi_final_demand_goods,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand_services,bls_ppi_final_demand_services,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.75,0.75,PASS,NONE
+bls_ppi_final_demand_services__d1,bls_ppi_final_demand_services,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand_services__d4,bls_ppi_final_demand_services,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand_services__logd1,bls_ppi_final_demand_services,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7380952380952381,0.7380952380952381,PASS,NONE
+bls_ppi_final_demand_services__logd4,bls_ppi_final_demand_services,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_ppi_final_demand_less_food_energy,bls_ppi_final_demand_less_food_energy,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7261904761904762,0.7261904761904762,PASS,NONE
+bls_ppi_final_demand_less_food_energy__d1,bls_ppi_final_demand_less_food_energy,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_ppi_final_demand_less_food_energy__d4,bls_ppi_final_demand_less_food_energy,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.6785714285714286,0.6785714285714286,PASS,NONE
+bls_ppi_final_demand_less_food_energy__logd1,bls_ppi_final_demand_less_food_energy,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_ppi_final_demand_less_food_energy__logd4,bls_ppi_final_demand_less_food_energy,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.6785714285714286,0.6785714285714286,PASS,NONE
+bls_ppi_processed_goods_intermediate,bls_ppi_processed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_ppi_processed_goods_intermediate__d1,bls_ppi_processed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_processed_goods_intermediate__d4,bls_ppi_processed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_ppi_processed_goods_intermediate__logd1,bls_ppi_processed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_processed_goods_intermediate__logd4,bls_ppi_processed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_ppi_unprocessed_goods_intermediate,bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9761904761904762,0.9761904761904762,PASS,NONE
+bls_ppi_unprocessed_goods_intermediate__d1,bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_unprocessed_goods_intermediate__d4,bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_ppi_unprocessed_goods_intermediate__logd1,bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+bls_ppi_unprocessed_goods_intermediate__logd4,bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS,MACRO_PRICE_LABOR,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+bls_jolts_job_openings_rate,bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_job_openings_rate__d1,bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_job_openings_rate__d4,bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_job_openings_rate__logd1,bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_job_openings_rate__logd4,bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_job_openings_level,bls_jolts_job_openings_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_job_openings_level__d1,bls_jolts_job_openings_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_job_openings_level__d4,bls_jolts_job_openings_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_job_openings_level__logd1,bls_jolts_job_openings_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_job_openings_level__logd4,bls_jolts_job_openings_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_hires_rate,bls_jolts_hires_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_hires_rate__d1,bls_jolts_hires_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_hires_rate__d4,bls_jolts_hires_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_hires_rate__logd1,bls_jolts_hires_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_hires_rate__logd4,bls_jolts_hires_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_hires_level,bls_jolts_hires_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_hires_level__d1,bls_jolts_hires_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_hires_level__d4,bls_jolts_hires_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_hires_level__logd1,bls_jolts_hires_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_hires_level__logd4,bls_jolts_hires_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_quits_rate,bls_jolts_quits_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_quits_rate__d1,bls_jolts_quits_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_quits_rate__d4,bls_jolts_quits_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_quits_rate__logd1,bls_jolts_quits_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_quits_rate__logd4,bls_jolts_quits_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_quits_level,bls_jolts_quits_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_quits_level__d1,bls_jolts_quits_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_quits_level__d4,bls_jolts_quits_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_quits_level__logd1,bls_jolts_quits_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_quits_level__logd4,bls_jolts_quits_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_layoffs_discharges_rate,bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_layoffs_discharges_rate__d1,bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_layoffs_discharges_rate__d4,bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_layoffs_discharges_rate__logd1,bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_layoffs_discharges_rate__logd4,bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_layoffs_discharges_level,bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_layoffs_discharges_level__d1,bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_layoffs_discharges_level__d4,bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_layoffs_discharges_level__logd1,bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_layoffs_discharges_level__logd4,bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_total_separations_rate,bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_total_separations_rate__d1,bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_total_separations_rate__d4,bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_total_separations_rate__logd1,bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_total_separations_rate__logd4,bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_total_separations_level,bls_jolts_total_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_total_separations_level__d1,bls_jolts_total_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_total_separations_level__d4,bls_jolts_total_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_total_separations_level__logd1,bls_jolts_total_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_total_separations_level__logd4,bls_jolts_total_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_other_separations_rate,bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_other_separations_rate__d1,bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_other_separations_rate__d4,bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_other_separations_rate__logd1,bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_other_separations_rate__logd4,bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_other_separations_level,bls_jolts_other_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_other_separations_level__d1,bls_jolts_other_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_other_separations_level__d4,bls_jolts_other_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_other_separations_level__logd1,bls_jolts_other_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_other_separations_level__logd4,bls_jolts_other_separations_level,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_unemployed_per_opening_rate,bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7142857142857143,0.7142857142857143,PASS,NONE
+bls_jolts_unemployed_per_opening_rate__d1,bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_unemployed_per_opening_rate__d4,bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+bls_jolts_unemployed_per_opening_rate__logd1,bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.7023809523809523,0.7023809523809523,PASS,NONE
+bls_jolts_unemployed_per_opening_rate__logd4,bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS,MACRO_LABOR_DEMAND,0,1.0,0.6666666666666666,0.6666666666666666,PASS,NONE
+nyfed_effr,nyfed_effr,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+nyfed_effr__d1,nyfed_effr,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+nyfed_effr__d4,nyfed_effr,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+nyfed_effr__logd1,nyfed_effr,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+nyfed_effr__logd4,nyfed_effr,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+nyfed_target_lower,nyfed_target_lower,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+nyfed_target_lower__d1,nyfed_target_lower,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9404761904761905,0.9404761904761905,PASS,NONE
+nyfed_target_lower__d4,nyfed_target_lower,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+nyfed_target_upper,nyfed_target_upper,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.7738095238095238,0.7738095238095238,PASS,NONE
+nyfed_target_upper__d1,nyfed_target_upper,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.7619047619047619,0.7619047619047619,PASS,NONE
+nyfed_target_upper__d4,nyfed_target_upper,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.7261904761904762,0.7261904761904762,PASS,NONE
+nyfed_target_upper__logd1,nyfed_target_upper,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.7619047619047619,0.7619047619047619,PASS,NONE
+nyfed_target_upper__logd4,nyfed_target_upper,GLOBAL,NY Fed,MONETARY_POLICY,0,1.0,0.7261904761904762,0.7261904761904762,PASS,NONE
+market_sp500_level,market_sp500_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sp500_level__d1,market_sp500_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sp500_level__d4,market_sp500_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sp500_level__logd1,market_sp500_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sp500_level__logd4,market_sp500_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sp500_qret,market_sp500_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sp500_qret__d1,market_sp500_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sp500_qret__d4,market_sp500_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sp500_vol,market_sp500_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sp500_vol__d1,market_sp500_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sp500_vol__d4,market_sp500_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sp500_vol__logd1,market_sp500_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sp500_vol__logd4,market_sp500_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dow_level,market_dow_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dow_level__d1,market_dow_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dow_level__d4,market_dow_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dow_level__logd1,market_dow_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dow_level__logd4,market_dow_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dow_qret,market_dow_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dow_qret__d1,market_dow_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dow_qret__d4,market_dow_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dow_vol,market_dow_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dow_vol__d1,market_dow_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dow_vol__d4,market_dow_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dow_vol__logd1,market_dow_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dow_vol__logd4,market_dow_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_nasdaq_level,market_nasdaq_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_nasdaq_level__d1,market_nasdaq_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_nasdaq_level__d4,market_nasdaq_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_nasdaq_level__logd1,market_nasdaq_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_nasdaq_level__logd4,market_nasdaq_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_nasdaq_qret,market_nasdaq_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_nasdaq_qret__d1,market_nasdaq_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_nasdaq_qret__d4,market_nasdaq_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_nasdaq_vol,market_nasdaq_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_nasdaq_vol__d1,market_nasdaq_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_nasdaq_vol__d4,market_nasdaq_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_nasdaq_vol__logd1,market_nasdaq_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_nasdaq_vol__logd4,market_nasdaq_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_russell2000_level,market_russell2000_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_russell2000_level__d1,market_russell2000_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_russell2000_level__d4,market_russell2000_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_russell2000_level__logd1,market_russell2000_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_russell2000_level__logd4,market_russell2000_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_russell2000_qret,market_russell2000_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_russell2000_qret__d1,market_russell2000_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_russell2000_qret__d4,market_russell2000_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_russell2000_vol,market_russell2000_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_russell2000_vol__d1,market_russell2000_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_russell2000_vol__d4,market_russell2000_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_russell2000_vol__logd1,market_russell2000_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_russell2000_vol__logd4,market_russell2000_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_vix_level,market_vix_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_vix_level__d1,market_vix_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_vix_level__d4,market_vix_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_vix_level__logd1,market_vix_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_vix_level__logd4,market_vix_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_vix_qret,market_vix_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_vix_qret__d1,market_vix_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_vix_qret__d4,market_vix_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_vix_vol,market_vix_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_vix_vol__d1,market_vix_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_vix_vol__d4,market_vix_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_vix_vol__logd1,market_vix_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_vix_vol__logd4,market_vix_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_13w_level,market_treasury_13w_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_13w_level__d1,market_treasury_13w_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_13w_level__d4,market_treasury_13w_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_13w_level__logd1,market_treasury_13w_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_13w_level__logd4,market_treasury_13w_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_13w_qret,market_treasury_13w_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_13w_qret__d1,market_treasury_13w_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_13w_qret__d4,market_treasury_13w_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_13w_vol,market_treasury_13w_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_13w_vol__d1,market_treasury_13w_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_13w_vol__d4,market_treasury_13w_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_13w_vol__logd1,market_treasury_13w_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_13w_vol__logd4,market_treasury_13w_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_5y_level,market_treasury_5y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_5y_level__d1,market_treasury_5y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_5y_level__d4,market_treasury_5y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_5y_level__logd1,market_treasury_5y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_5y_level__logd4,market_treasury_5y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_5y_qret,market_treasury_5y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_5y_qret__d1,market_treasury_5y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_5y_qret__d4,market_treasury_5y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_5y_vol,market_treasury_5y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_5y_vol__d1,market_treasury_5y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_5y_vol__d4,market_treasury_5y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_5y_vol__logd1,market_treasury_5y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_5y_vol__logd4,market_treasury_5y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_10y_level,market_treasury_10y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_10y_level__d1,market_treasury_10y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_10y_level__d4,market_treasury_10y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_10y_level__logd1,market_treasury_10y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_10y_level__logd4,market_treasury_10y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_10y_qret,market_treasury_10y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_10y_qret__d1,market_treasury_10y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_10y_qret__d4,market_treasury_10y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_10y_vol,market_treasury_10y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_10y_vol__d1,market_treasury_10y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_10y_vol__d4,market_treasury_10y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_10y_vol__logd1,market_treasury_10y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_10y_vol__logd4,market_treasury_10y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_30y_level,market_treasury_30y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_30y_level__d1,market_treasury_30y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_30y_level__d4,market_treasury_30y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_30y_level__logd1,market_treasury_30y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_30y_level__logd4,market_treasury_30y_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_30y_qret,market_treasury_30y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_30y_qret__d1,market_treasury_30y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_30y_qret__d4,market_treasury_30y_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_30y_vol,market_treasury_30y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_treasury_30y_vol__d1,market_treasury_30y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_30y_vol__d4,market_treasury_30y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_treasury_30y_vol__logd1,market_treasury_30y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_treasury_30y_vol__logd4,market_treasury_30y_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dollar_index_level,market_dollar_index_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dollar_index_level__d1,market_dollar_index_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dollar_index_level__d4,market_dollar_index_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dollar_index_level__logd1,market_dollar_index_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dollar_index_level__logd4,market_dollar_index_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dollar_index_qret,market_dollar_index_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dollar_index_qret__d1,market_dollar_index_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dollar_index_qret__d4,market_dollar_index_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dollar_index_vol,market_dollar_index_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_dollar_index_vol__d1,market_dollar_index_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dollar_index_vol__d4,market_dollar_index_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_dollar_index_vol__logd1,market_dollar_index_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_dollar_index_vol__logd4,market_dollar_index_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_eurusd_level,market_eurusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_eurusd_level__d1,market_eurusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_eurusd_level__d4,market_eurusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_eurusd_level__logd1,market_eurusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_eurusd_level__logd4,market_eurusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_eurusd_qret,market_eurusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_eurusd_qret__d1,market_eurusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_eurusd_qret__d4,market_eurusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_eurusd_vol,market_eurusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_eurusd_vol__d1,market_eurusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_eurusd_vol__d4,market_eurusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_eurusd_vol__logd1,market_eurusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_eurusd_vol__logd4,market_eurusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_usdjpy_level,market_usdjpy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_usdjpy_level__d1,market_usdjpy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_usdjpy_level__d4,market_usdjpy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_usdjpy_level__logd1,market_usdjpy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_usdjpy_level__logd4,market_usdjpy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_usdjpy_qret,market_usdjpy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_usdjpy_qret__d1,market_usdjpy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_usdjpy_qret__d4,market_usdjpy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_usdjpy_vol,market_usdjpy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_usdjpy_vol__d1,market_usdjpy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_usdjpy_vol__d4,market_usdjpy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_usdjpy_vol__logd1,market_usdjpy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_usdjpy_vol__logd4,market_usdjpy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gbpusd_level,market_gbpusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gbpusd_level__d1,market_gbpusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gbpusd_level__d4,market_gbpusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gbpusd_level__logd1,market_gbpusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gbpusd_level__logd4,market_gbpusd_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gbpusd_qret,market_gbpusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gbpusd_qret__d1,market_gbpusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gbpusd_qret__d4,market_gbpusd_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gbpusd_vol,market_gbpusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gbpusd_vol__d1,market_gbpusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gbpusd_vol__d4,market_gbpusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gbpusd_vol__logd1,market_gbpusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gbpusd_vol__logd4,market_gbpusd_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wti_crude_level,market_wti_crude_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wti_crude_level__d1,market_wti_crude_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wti_crude_level__d4,market_wti_crude_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wti_crude_level__logd1,market_wti_crude_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wti_crude_level__logd4,market_wti_crude_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wti_crude_qret,market_wti_crude_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wti_crude_qret__d1,market_wti_crude_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wti_crude_qret__d4,market_wti_crude_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wti_crude_vol,market_wti_crude_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wti_crude_vol__d1,market_wti_crude_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wti_crude_vol__d4,market_wti_crude_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wti_crude_vol__logd1,market_wti_crude_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wti_crude_vol__logd4,market_wti_crude_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_natural_gas_level,market_natural_gas_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_natural_gas_level__d1,market_natural_gas_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_natural_gas_level__d4,market_natural_gas_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_natural_gas_level__logd1,market_natural_gas_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_natural_gas_level__logd4,market_natural_gas_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_natural_gas_qret,market_natural_gas_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_natural_gas_qret__d1,market_natural_gas_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_natural_gas_qret__d4,market_natural_gas_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_natural_gas_vol,market_natural_gas_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_natural_gas_vol__d1,market_natural_gas_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_natural_gas_vol__d4,market_natural_gas_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_natural_gas_vol__logd1,market_natural_gas_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_natural_gas_vol__logd4,market_natural_gas_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_copper_level,market_copper_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_copper_level__d1,market_copper_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_copper_level__d4,market_copper_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_copper_level__logd1,market_copper_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_copper_level__logd4,market_copper_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_copper_qret,market_copper_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_copper_qret__d1,market_copper_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_copper_qret__d4,market_copper_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_copper_vol,market_copper_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_copper_vol__d1,market_copper_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_copper_vol__d4,market_copper_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_copper_vol__logd1,market_copper_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_copper_vol__logd4,market_copper_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gold_level,market_gold_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gold_level__d1,market_gold_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gold_level__d4,market_gold_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gold_level__logd1,market_gold_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gold_level__logd4,market_gold_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gold_qret,market_gold_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gold_qret__d1,market_gold_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gold_qret__d4,market_gold_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gold_vol,market_gold_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_gold_vol__d1,market_gold_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gold_vol__d4,market_gold_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_gold_vol__logd1,market_gold_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_gold_vol__logd4,market_gold_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_silver_level,market_silver_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_silver_level__d1,market_silver_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_silver_level__d4,market_silver_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_silver_level__logd1,market_silver_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_silver_level__logd4,market_silver_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_silver_qret,market_silver_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_silver_qret__d1,market_silver_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_silver_qret__d4,market_silver_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_silver_vol,market_silver_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_silver_vol__d1,market_silver_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_silver_vol__d4,market_silver_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_silver_vol__logd1,market_silver_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_silver_vol__logd4,market_silver_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_corn_level,market_corn_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_corn_level__d1,market_corn_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_corn_level__d4,market_corn_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_corn_level__logd1,market_corn_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_corn_level__logd4,market_corn_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_corn_qret,market_corn_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_corn_qret__d1,market_corn_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_corn_qret__d4,market_corn_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_corn_vol,market_corn_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_corn_vol__d1,market_corn_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_corn_vol__d4,market_corn_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_corn_vol__logd1,market_corn_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_corn_vol__logd4,market_corn_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wheat_level,market_wheat_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wheat_level__d1,market_wheat_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wheat_level__d4,market_wheat_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wheat_level__logd1,market_wheat_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wheat_level__logd4,market_wheat_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wheat_qret,market_wheat_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wheat_qret__d1,market_wheat_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wheat_qret__d4,market_wheat_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wheat_vol,market_wheat_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_wheat_vol__d1,market_wheat_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wheat_vol__d4,market_wheat_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_wheat_vol__logd1,market_wheat_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_wheat_vol__logd4,market_wheat_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_energy_level,market_sector_energy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_energy_level__d1,market_sector_energy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_energy_level__d4,market_sector_energy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_energy_level__logd1,market_sector_energy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_energy_level__logd4,market_sector_energy_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_energy_qret,market_sector_energy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_energy_qret__d1,market_sector_energy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_energy_qret__d4,market_sector_energy_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_energy_vol,market_sector_energy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_energy_vol__d1,market_sector_energy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_energy_vol__d4,market_sector_energy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_energy_vol__logd1,market_sector_energy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_energy_vol__logd4,market_sector_energy_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_materials_level,market_sector_materials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_materials_level__d1,market_sector_materials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_materials_level__d4,market_sector_materials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_materials_level__logd1,market_sector_materials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_materials_level__logd4,market_sector_materials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_materials_qret,market_sector_materials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_materials_qret__d1,market_sector_materials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_materials_qret__d4,market_sector_materials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_materials_vol,market_sector_materials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_materials_vol__d1,market_sector_materials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_materials_vol__d4,market_sector_materials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_materials_vol__logd1,market_sector_materials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_materials_vol__logd4,market_sector_materials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_industrials_level,market_sector_industrials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_industrials_level__d1,market_sector_industrials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_industrials_level__d4,market_sector_industrials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_industrials_level__logd1,market_sector_industrials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_industrials_level__logd4,market_sector_industrials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_industrials_qret,market_sector_industrials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_industrials_qret__d1,market_sector_industrials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_industrials_qret__d4,market_sector_industrials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_industrials_vol,market_sector_industrials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_industrials_vol__d1,market_sector_industrials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_industrials_vol__d4,market_sector_industrials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_industrials_vol__logd1,market_sector_industrials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_industrials_vol__logd4,market_sector_industrials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_discretionary_level,market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_discretionary_level__d1,market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_discretionary_level__d4,market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_discretionary_level__logd1,market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_discretionary_level__logd4,market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_discretionary_qret,market_sector_consumer_discretionary_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_discretionary_qret__d1,market_sector_consumer_discretionary_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_discretionary_qret__d4,market_sector_consumer_discretionary_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_discretionary_vol,market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_discretionary_vol__d1,market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_discretionary_vol__d4,market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_discretionary_vol__logd1,market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_discretionary_vol__logd4,market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_staples_level,market_sector_consumer_staples_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_staples_level__d1,market_sector_consumer_staples_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_staples_level__d4,market_sector_consumer_staples_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_staples_level__logd1,market_sector_consumer_staples_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_staples_level__logd4,market_sector_consumer_staples_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_staples_qret,market_sector_consumer_staples_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_staples_qret__d1,market_sector_consumer_staples_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_staples_qret__d4,market_sector_consumer_staples_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_staples_vol,market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_consumer_staples_vol__d1,market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_staples_vol__d4,market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_consumer_staples_vol__logd1,market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_consumer_staples_vol__logd4,market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_healthcare_level,market_sector_healthcare_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_healthcare_level__d1,market_sector_healthcare_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_healthcare_level__d4,market_sector_healthcare_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_healthcare_level__logd1,market_sector_healthcare_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_healthcare_level__logd4,market_sector_healthcare_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_healthcare_qret,market_sector_healthcare_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_healthcare_qret__d1,market_sector_healthcare_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_healthcare_qret__d4,market_sector_healthcare_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_healthcare_vol,market_sector_healthcare_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_healthcare_vol__d1,market_sector_healthcare_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_healthcare_vol__d4,market_sector_healthcare_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_healthcare_vol__logd1,market_sector_healthcare_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_healthcare_vol__logd4,market_sector_healthcare_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_financials_level,market_sector_financials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_financials_level__d1,market_sector_financials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_financials_level__d4,market_sector_financials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_financials_level__logd1,market_sector_financials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_financials_level__logd4,market_sector_financials_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_financials_qret,market_sector_financials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_financials_qret__d1,market_sector_financials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_financials_qret__d4,market_sector_financials_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_financials_vol,market_sector_financials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_financials_vol__d1,market_sector_financials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_financials_vol__d4,market_sector_financials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_financials_vol__logd1,market_sector_financials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_financials_vol__logd4,market_sector_financials_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_technology_level,market_sector_technology_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_technology_level__d1,market_sector_technology_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_technology_level__d4,market_sector_technology_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_technology_level__logd1,market_sector_technology_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_technology_level__logd4,market_sector_technology_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_technology_qret,market_sector_technology_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_technology_qret__d1,market_sector_technology_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_technology_qret__d4,market_sector_technology_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_technology_vol,market_sector_technology_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_technology_vol__d1,market_sector_technology_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_technology_vol__d4,market_sector_technology_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_technology_vol__logd1,market_sector_technology_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_technology_vol__logd4,market_sector_technology_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_utilities_level,market_sector_utilities_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_utilities_level__d1,market_sector_utilities_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_utilities_level__d4,market_sector_utilities_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_utilities_level__logd1,market_sector_utilities_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_utilities_level__logd4,market_sector_utilities_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_utilities_qret,market_sector_utilities_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_utilities_qret__d1,market_sector_utilities_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_utilities_qret__d4,market_sector_utilities_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_utilities_vol,market_sector_utilities_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_utilities_vol__d1,market_sector_utilities_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_utilities_vol__d4,market_sector_utilities_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_utilities_vol__logd1,market_sector_utilities_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_utilities_vol__logd4,market_sector_utilities_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_real_estate_level,market_sector_real_estate_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_real_estate_level__d1,market_sector_real_estate_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_real_estate_level__d4,market_sector_real_estate_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_real_estate_level__logd1,market_sector_real_estate_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_real_estate_level__logd4,market_sector_real_estate_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_real_estate_qret,market_sector_real_estate_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_real_estate_qret__d1,market_sector_real_estate_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_real_estate_qret__d4,market_sector_real_estate_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_real_estate_vol,market_sector_real_estate_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_sector_real_estate_vol__d1,market_sector_real_estate_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_real_estate_vol__d4,market_sector_real_estate_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_sector_real_estate_vol__logd1,market_sector_real_estate_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_sector_real_estate_vol__logd4,market_sector_real_estate_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_reit_market_level,market_reit_market_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_reit_market_level__d1,market_reit_market_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_reit_market_level__d4,market_reit_market_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_reit_market_level__logd1,market_reit_market_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_reit_market_level__logd4,market_reit_market_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_reit_market_qret,market_reit_market_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_reit_market_qret__d1,market_reit_market_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_reit_market_qret__d4,market_reit_market_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_reit_market_vol,market_reit_market_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_reit_market_vol__d1,market_reit_market_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_reit_market_vol__d4,market_reit_market_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_reit_market_vol__logd1,market_reit_market_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_reit_market_vol__logd4,market_reit_market_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_high_yield_credit_level,market_high_yield_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_high_yield_credit_level__d1,market_high_yield_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+market_high_yield_credit_level__d4,market_high_yield_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+market_high_yield_credit_level__logd1,market_high_yield_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+market_high_yield_credit_level__logd4,market_high_yield_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+market_high_yield_credit_qret,market_high_yield_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_high_yield_credit_qret__d1,market_high_yield_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+market_high_yield_credit_qret__d4,market_high_yield_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+market_high_yield_credit_vol,market_high_yield_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_high_yield_credit_vol__d1,market_high_yield_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+market_high_yield_credit_vol__d4,market_high_yield_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+market_high_yield_credit_vol__logd1,market_high_yield_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8452380952380952,0.8452380952380952,PASS,NONE
+market_high_yield_credit_vol__logd4,market_high_yield_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8095238095238095,0.8095238095238095,PASS,NONE
+market_investment_grade_credit_level,market_investment_grade_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_investment_grade_credit_level__d1,market_investment_grade_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_investment_grade_credit_level__d4,market_investment_grade_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_investment_grade_credit_level__logd1,market_investment_grade_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_investment_grade_credit_level__logd4,market_investment_grade_credit_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_investment_grade_credit_qret,market_investment_grade_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_investment_grade_credit_qret__d1,market_investment_grade_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_investment_grade_credit_qret__d4,market_investment_grade_credit_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_investment_grade_credit_vol,market_investment_grade_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_investment_grade_credit_vol__d1,market_investment_grade_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_investment_grade_credit_vol__d4,market_investment_grade_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_investment_grade_credit_vol__logd1,market_investment_grade_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_investment_grade_credit_vol__logd4,market_investment_grade_credit_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_long_treasury_level,market_long_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_long_treasury_level__d1,market_long_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_long_treasury_level__d4,market_long_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_long_treasury_level__logd1,market_long_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_long_treasury_level__logd4,market_long_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_long_treasury_qret,market_long_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_long_treasury_qret__d1,market_long_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_long_treasury_qret__d4,market_long_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_long_treasury_vol,market_long_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_long_treasury_vol__d1,market_long_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_long_treasury_vol__d4,market_long_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_long_treasury_vol__logd1,market_long_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_long_treasury_vol__logd4,market_long_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_short_treasury_level,market_short_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_short_treasury_level__d1,market_short_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_short_treasury_level__d4,market_short_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_short_treasury_level__logd1,market_short_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_short_treasury_level__logd4,market_short_treasury_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_short_treasury_qret,market_short_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_short_treasury_qret__d1,market_short_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_short_treasury_qret__d4,market_short_treasury_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_short_treasury_vol,market_short_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_short_treasury_vol__d1,market_short_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_short_treasury_vol__d4,market_short_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_short_treasury_vol__logd1,market_short_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_short_treasury_vol__logd4,market_short_treasury_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_tips_level,market_tips_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_tips_level__d1,market_tips_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_tips_level__d4,market_tips_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_tips_level__logd1,market_tips_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_tips_level__logd4,market_tips_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_tips_qret,market_tips_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_tips_qret__d1,market_tips_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_tips_qret__d4,market_tips_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_tips_vol,market_tips_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_tips_vol__d1,market_tips_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_tips_vol__d4,market_tips_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_tips_vol__logd1,market_tips_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_tips_vol__logd4,market_tips_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_retail_industry_level,market_retail_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_retail_industry_level__d1,market_retail_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_retail_industry_level__d4,market_retail_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_retail_industry_level__logd1,market_retail_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_retail_industry_level__logd4,market_retail_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_retail_industry_qret,market_retail_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_retail_industry_qret__d1,market_retail_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_retail_industry_qret__d4,market_retail_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_retail_industry_vol,market_retail_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_retail_industry_vol__d1,market_retail_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_retail_industry_vol__d4,market_retail_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_retail_industry_vol__logd1,market_retail_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_retail_industry_vol__logd4,market_retail_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_transportation_industry_level,market_transportation_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_transportation_industry_level__d1,market_transportation_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_transportation_industry_level__d4,market_transportation_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_transportation_industry_level__logd1,market_transportation_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_transportation_industry_level__logd4,market_transportation_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_transportation_industry_qret,market_transportation_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_transportation_industry_qret__d1,market_transportation_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_transportation_industry_qret__d4,market_transportation_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_transportation_industry_vol,market_transportation_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_transportation_industry_vol__d1,market_transportation_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_transportation_industry_vol__d4,market_transportation_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_transportation_industry_vol__logd1,market_transportation_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_transportation_industry_vol__logd4,market_transportation_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_aerospace_defense_industry_level,market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_aerospace_defense_industry_level__d1,market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_aerospace_defense_industry_level__d4,market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_aerospace_defense_industry_level__logd1,market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_aerospace_defense_industry_level__logd4,market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_aerospace_defense_industry_qret,market_aerospace_defense_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_aerospace_defense_industry_qret__d1,market_aerospace_defense_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_aerospace_defense_industry_qret__d4,market_aerospace_defense_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_aerospace_defense_industry_vol,market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_aerospace_defense_industry_vol__d1,market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_aerospace_defense_industry_vol__d4,market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_aerospace_defense_industry_vol__logd1,market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_aerospace_defense_industry_vol__logd4,market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_semiconductor_industry_level,market_semiconductor_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_semiconductor_industry_level__d1,market_semiconductor_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_semiconductor_industry_level__d4,market_semiconductor_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_semiconductor_industry_level__logd1,market_semiconductor_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_semiconductor_industry_level__logd4,market_semiconductor_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_semiconductor_industry_qret,market_semiconductor_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_semiconductor_industry_qret__d1,market_semiconductor_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_semiconductor_industry_qret__d4,market_semiconductor_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_semiconductor_industry_vol,market_semiconductor_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_semiconductor_industry_vol__d1,market_semiconductor_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_semiconductor_industry_vol__d4,market_semiconductor_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_semiconductor_industry_vol__logd1,market_semiconductor_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_semiconductor_industry_vol__logd4,market_semiconductor_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_biotech_industry_level,market_biotech_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_biotech_industry_level__d1,market_biotech_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_biotech_industry_level__d4,market_biotech_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_biotech_industry_level__logd1,market_biotech_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_biotech_industry_level__logd4,market_biotech_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_biotech_industry_qret,market_biotech_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_biotech_industry_qret__d1,market_biotech_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_biotech_industry_qret__d4,market_biotech_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_biotech_industry_vol,market_biotech_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_biotech_industry_vol__d1,market_biotech_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_biotech_industry_vol__d4,market_biotech_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_biotech_industry_vol__logd1,market_biotech_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_biotech_industry_vol__logd4,market_biotech_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_homebuilders_industry_level,market_homebuilders_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_homebuilders_industry_level__d1,market_homebuilders_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_homebuilders_industry_level__d4,market_homebuilders_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8690476190476191,0.8690476190476191,PASS,NONE
+market_homebuilders_industry_level__logd1,market_homebuilders_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_homebuilders_industry_level__logd4,market_homebuilders_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8690476190476191,0.8690476190476191,PASS,NONE
+market_homebuilders_industry_qret,market_homebuilders_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_homebuilders_industry_qret__d1,market_homebuilders_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_homebuilders_industry_qret__d4,market_homebuilders_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8690476190476191,0.8690476190476191,PASS,NONE
+market_homebuilders_industry_vol,market_homebuilders_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_homebuilders_industry_vol__d1,market_homebuilders_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_homebuilders_industry_vol__d4,market_homebuilders_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8690476190476191,0.8690476190476191,PASS,NONE
+market_homebuilders_industry_vol__logd1,market_homebuilders_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_homebuilders_industry_vol__logd4,market_homebuilders_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8690476190476191,0.8690476190476191,PASS,NONE
+market_regional_banks_industry_level,market_regional_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_regional_banks_industry_level__d1,market_regional_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_regional_banks_industry_level__d4,market_regional_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_regional_banks_industry_level__logd1,market_regional_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_regional_banks_industry_level__logd4,market_regional_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_regional_banks_industry_qret,market_regional_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_regional_banks_industry_qret__d1,market_regional_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_regional_banks_industry_qret__d4,market_regional_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_regional_banks_industry_vol,market_regional_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_regional_banks_industry_vol__d1,market_regional_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_regional_banks_industry_vol__d4,market_regional_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_regional_banks_industry_vol__logd1,market_regional_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_regional_banks_industry_vol__logd4,market_regional_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_banks_industry_level,market_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_banks_industry_level__d1,market_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_banks_industry_level__d4,market_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_banks_industry_level__logd1,market_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_banks_industry_level__logd4,market_banks_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_banks_industry_qret,market_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_banks_industry_qret__d1,market_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_banks_industry_qret__d4,market_banks_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_banks_industry_vol,market_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_banks_industry_vol__d1,market_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_banks_industry_vol__d4,market_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_banks_industry_vol__logd1,market_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_banks_industry_vol__logd4,market_banks_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_metals_mining_industry_level,market_metals_mining_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_metals_mining_industry_level__d1,market_metals_mining_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_metals_mining_industry_level__d4,market_metals_mining_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_metals_mining_industry_level__logd1,market_metals_mining_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_metals_mining_industry_level__logd4,market_metals_mining_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_metals_mining_industry_qret,market_metals_mining_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_metals_mining_industry_qret__d1,market_metals_mining_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_metals_mining_industry_qret__d4,market_metals_mining_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_metals_mining_industry_vol,market_metals_mining_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_metals_mining_industry_vol__d1,market_metals_mining_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_metals_mining_industry_vol__d4,market_metals_mining_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_metals_mining_industry_vol__logd1,market_metals_mining_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_metals_mining_industry_vol__logd4,market_metals_mining_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_gas_exploration_industry_level,market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_oil_gas_exploration_industry_level__d1,market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_oil_gas_exploration_industry_level__d4,market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_gas_exploration_industry_level__logd1,market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_oil_gas_exploration_industry_level__logd4,market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_gas_exploration_industry_qret,market_oil_gas_exploration_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_oil_gas_exploration_industry_qret__d1,market_oil_gas_exploration_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_oil_gas_exploration_industry_qret__d4,market_oil_gas_exploration_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_gas_exploration_industry_vol,market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_oil_gas_exploration_industry_vol__d1,market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_oil_gas_exploration_industry_vol__d4,market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_gas_exploration_industry_vol__logd1,market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_oil_gas_exploration_industry_vol__logd4,market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_oil_services_industry_level,market_oil_services_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_oil_services_industry_level__d1,market_oil_services_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_oil_services_industry_level__d4,market_oil_services_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_oil_services_industry_level__logd1,market_oil_services_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_oil_services_industry_level__logd4,market_oil_services_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_oil_services_industry_qret,market_oil_services_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_oil_services_industry_qret__d1,market_oil_services_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_oil_services_industry_qret__d4,market_oil_services_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_oil_services_industry_vol,market_oil_services_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9642857142857143,0.9642857142857143,PASS,NONE
+market_oil_services_industry_vol__d1,market_oil_services_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_oil_services_industry_vol__d4,market_oil_services_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_oil_services_industry_vol__logd1,market_oil_services_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9523809523809523,0.9523809523809523,PASS,NONE
+market_oil_services_industry_vol__logd4,market_oil_services_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_pharmaceutical_industry_level,market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_pharmaceutical_industry_level__d1,market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_pharmaceutical_industry_level__d4,market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_pharmaceutical_industry_level__logd1,market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_pharmaceutical_industry_level__logd4,market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_pharmaceutical_industry_qret,market_pharmaceutical_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_pharmaceutical_industry_qret__d1,market_pharmaceutical_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_pharmaceutical_industry_qret__d4,market_pharmaceutical_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_pharmaceutical_industry_vol,market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_pharmaceutical_industry_vol__d1,market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_pharmaceutical_industry_vol__d4,market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_pharmaceutical_industry_vol__logd1,market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_pharmaceutical_industry_vol__logd4,market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_broker_dealers_industry_level,market_broker_dealers_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_broker_dealers_industry_level__d1,market_broker_dealers_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_broker_dealers_industry_level__d4,market_broker_dealers_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_broker_dealers_industry_level__logd1,market_broker_dealers_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_broker_dealers_industry_level__logd4,market_broker_dealers_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_broker_dealers_industry_qret,market_broker_dealers_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_broker_dealers_industry_qret__d1,market_broker_dealers_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_broker_dealers_industry_qret__d4,market_broker_dealers_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_broker_dealers_industry_vol,market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9047619047619048,0.9047619047619048,PASS,NONE
+market_broker_dealers_industry_vol__d1,market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_broker_dealers_industry_vol__d4,market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_broker_dealers_industry_vol__logd1,market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8928571428571429,0.8928571428571429,PASS,NONE
+market_broker_dealers_industry_vol__logd4,market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8571428571428571,0.8571428571428571,PASS,NONE
+market_insurance_industry_level,market_insurance_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_insurance_industry_level__d1,market_insurance_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_insurance_industry_level__d4,market_insurance_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_insurance_industry_level__logd1,market_insurance_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_insurance_industry_level__logd4,market_insurance_industry_level,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_insurance_industry_qret,market_insurance_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_insurance_industry_qret__d1,market_insurance_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_insurance_industry_qret__d4,market_insurance_industry_qret,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_insurance_industry_vol,market_insurance_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9285714285714286,0.9285714285714286,PASS,NONE
+market_insurance_industry_vol__d1,market_insurance_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_insurance_industry_vol__d4,market_insurance_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE
+market_insurance_industry_vol__logd1,market_insurance_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.9166666666666666,0.9166666666666666,PASS,NONE
+market_insurance_industry_vol__logd4,market_insurance_industry_vol,GLOBAL,Yahoo Finance,MARKET_FINANCIAL_COMMODITY,0,1.0,0.8809523809523809,0.8809523809523809,PASS,NONE

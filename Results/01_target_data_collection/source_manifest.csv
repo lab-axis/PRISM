@@ -1,0 +1,8 @@
+﻿source,dataset,url,path,bytes,sha256
+BEA,GDP by Industry - Value Added,https://apps.bea.gov/industry/Release/XLS/GDPxInd/ValueAdded.xlsx,Data\01_target_data_collection\raw\BEA\ValueAdded.xlsx,822351,737628be9c44bbb49c2a9ec5c9c7c8d843cf849aa6f0e46024a02f0875818b74
+BEA,GDP by Industry - Gross Output,https://apps.bea.gov/industry/Release/XLS/GDPxInd/GrossOutput.xlsx,Data\01_target_data_collection\raw\BEA\GrossOutput.xlsx,506819,a5a88e808bd88c5b48d7c1f572acb4d9b113d0d753828ed8b45d8800c1eb1f46
+BLS,QCEW monthly employment,https://api.bls.gov/publicAPI/v2/timeseries/data/,Data\01_target_data_collection\raw\BLS\qcew_monthly_employment_2003_2025.json,544000,a3c6c14ce4a5b543dbacd35c093db03f83e96c0658a9a27772ac095b4f8538e2
+BLS,"CES Rail Transportation all employees, NSA (CEU4348200001)",https://download.bls.gov/pub/time.series/ce/ce.data.0.AllCESSeries,Data\01_target_data_collection\raw\BLS\rail_transport_ces_nsa_2003_2025.csv,9017,b3d4c758731fe16c0769990e2f0f6ea3bed4f2144a5b29e0a854b00e6bef2c99
+BLS,"CES Securities/Investments + Funds/Trusts aggregate, all employees, NSA (CEU5552300001)",https://download.bls.gov/pub/time.series/ce/ce.data.0.AllCESSeries,Data\01_target_data_collection\raw\BLS\funds_trusts_ces_nsa_2003_2025.csv,9074,38c0a79272af68152cb4ebffddd44b44a1c420211a5efbf40efa29ab517c5d4a
+BLS,CES all-employees publication-vintage archive (cesvinall.zip),https://www.bls.gov/web/empsit/cesvinall.zip,Data\01_target_data_collection\raw\BLS\cesvinall.zip,3095848,c8a0d98cecd10d1ed35097d75a9c07344c2f15abb472d9d0164a2a164e4ab9fc
+BLS,CES industry metadata used for exact node mapping,https://download.bls.gov/pub/time.series/ce/ce.industry,Data\01_target_data_collection\raw\BLS\ce.industry,59620,bc33f23d9aa18442da1d5ac581ada1da7786606fd7b0bc025778d28df6223c60

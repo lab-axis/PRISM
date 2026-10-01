@@ -1,0 +1,57 @@
+﻿node_key,bea_rows,bea_mapping,qcew_naics,qcew_aggregation
+oil_gas_extraction,Oil and gas extraction,DIRECT,211,DIRECT
+mining_except_oil_gas,"Mining, except oil and gas",DIRECT,212,DIRECT
+support_mining,Support activities for mining,DIRECT,213,DIRECT
+utilities,Utilities,DIRECT,22,DIRECT
+construction,Construction,DIRECT,23,DIRECT
+wood_products,Wood products,DIRECT,321,DIRECT
+nonmetallic_mineral,Nonmetallic mineral products,DIRECT,327,DIRECT
+primary_metals,Primary metals,DIRECT,331,DIRECT
+fabricated_metal,Fabricated metal products,DIRECT,332,DIRECT
+machinery,Machinery,DIRECT,333,DIRECT
+computer_electronic,Computer and electronic products,DIRECT,334,DIRECT
+electrical_equipment,"Electrical equipment, appliances, and components",DIRECT,335,DIRECT
+motor_vehicles,"Motor vehicles, bodies and trailers, and parts",DIRECT,3361;3362;3363,SUM
+other_transport_equipment,Other transportation equipment,DIRECT,3364;3365;3366;3369,SUM
+furniture,Furniture and related products,DIRECT,337,DIRECT
+misc_manufacturing,Miscellaneous manufacturing,DIRECT,339,DIRECT
+food_beverage_tobacco,Food and beverage and tobacco products,DIRECT,311;312,SUM
+textiles,Textile mills and textile product mills,DIRECT,313;314,SUM
+apparel_leather,Apparel and leather and allied products,DIRECT,315;316,SUM
+paper,Paper products,DIRECT,322,DIRECT
+printing,Printing and related support activities,DIRECT,323,DIRECT
+petroleum_coal,Petroleum and coal products,DIRECT,324,DIRECT
+chemicals,Chemical products,DIRECT,325,DIRECT
+plastics_rubber,Plastics and rubber products,DIRECT,326,DIRECT
+wholesale,Wholesale trade,DIRECT,42,DIRECT
+retail,Retail trade,DIRECT,44-45,DIRECT
+air_transport,Air transportation,DIRECT,481,DIRECT
+rail_transport,Rail transportation,DIRECT,482,DIRECT
+water_transport,Water transportation,DIRECT,483,DIRECT
+truck_transport,Truck transportation,DIRECT,484,DIRECT
+transit_ground,Transit and ground passenger transportation,DIRECT,485,DIRECT
+pipeline,Pipeline transportation,DIRECT,486,DIRECT
+other_transport_support,Other transportation and support activities,DIRECT,487;488,SUM
+warehousing,Warehousing and storage,DIRECT,493,DIRECT
+information,Information,DIRECT,51,DIRECT
+credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",DIRECT,521;522,SUM
+securities,"Securities, commodity contracts, and investments",DIRECT,523,DIRECT
+insurance,Insurance carriers and related activities,DIRECT,524,DIRECT
+funds_trusts,"Funds, trusts, and other financial vehicles",DIRECT,525,DIRECT
+real_estate,Real estate,DIRECT,531,DIRECT
+rental_leasing,Rental and leasing services and lessors of intangible assets,DIRECT,532;533,SUM
+legal,Legal services,DIRECT,5411,DIRECT
+computer_systems,Computer systems design and related services,DIRECT,5415,DIRECT
+misc_professional,"Miscellaneous professional, scientific, and technical services",DIRECT,5412;5413;5414;5416;5417;5418;5419,SUM
+management_companies,Management of companies and enterprises,DIRECT,55,DIRECT
+admin_support,Administrative and support services,DIRECT,561,DIRECT
+waste_remediation,Waste management and remediation services,DIRECT,562,DIRECT
+education,Educational services,DIRECT,61,DIRECT
+ambulatory_health,Ambulatory health care services,DIRECT,621,DIRECT
+hospitals_nursing,Hospitals + Nursing and residential care facilities,COMPOSITE_SUM,622;623,SUM
+social_assistance,Social assistance,DIRECT,624,DIRECT
+performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",DIRECT,711;712,SUM
+amusement_recreation,"Amusements, gambling, and recreation industries",DIRECT,713,DIRECT
+accommodation,Accommodation,DIRECT,721,DIRECT
+food_services,Food services and drinking places,DIRECT,722,DIRECT
+other_services,"Other services, except government",DIRECT,81,DIRECT

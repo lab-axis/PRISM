@@ -1,0 +1,211 @@
+﻿base_feature,scope,source
+qcew_employment,NODE,BLS QCEW
+ces_exact_all_employees,NODE,BLS CES
+ces_exact_avg_weekly_hours_all,NODE,BLS CES
+ces_exact_avg_hourly_earnings_all,NODE,BLS CES
+ces_exact_prod_nonsup_employees,NODE,BLS CES
+ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS CES
+ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS CES
+ces_exact_women_employees,NODE,BLS CES
+ces_exact_avg_weekly_earnings_all,NODE,BLS CES
+ces_exact_aggregate_weekly_hours_index,NODE,BLS CES
+ces_exact_aggregate_weekly_payrolls_index,NODE,BLS CES
+ppi_industry_net_output,NODE,BLS PPI
+jolts_job_openings_rate,NODE,BLS JOLTS
+jolts_job_openings_level,NODE,BLS JOLTS
+jolts_hires_rate,NODE,BLS JOLTS
+jolts_hires_level,NODE,BLS JOLTS
+jolts_quits_rate,NODE,BLS JOLTS
+jolts_quits_level,NODE,BLS JOLTS
+jolts_layoffs_discharges_rate,NODE,BLS JOLTS
+jolts_layoffs_discharges_level,NODE,BLS JOLTS
+jolts_total_separations_rate,NODE,BLS JOLTS
+jolts_total_separations_level,NODE,BLS JOLTS
+jolts_other_separations_rate,NODE,BLS JOLTS
+jolts_other_separations_level,NODE,BLS JOLTS
+bls_cpi_all_items,GLOBAL,BLS
+bls_civilian_labor_force,GLOBAL,BLS
+bls_labor_force_participation,GLOBAL,BLS
+bls_civilian_employment,GLOBAL,BLS
+bls_employment_population_ratio,GLOBAL,BLS
+bls_civilian_unemployment,GLOBAL,BLS
+bls_u6_underutilization_rate,GLOBAL,BLS
+bls_unemployment_rate,GLOBAL,BLS
+bls_total_nonfarm_employment,GLOBAL,BLS
+bls_private_avg_weekly_hours,GLOBAL,BLS
+bls_private_avg_hourly_earnings,GLOBAL,BLS
+bls_private_aggregate_weekly_hours_index,GLOBAL,BLS
+bls_private_aggregate_weekly_payrolls_index,GLOBAL,BLS
+bls_ppi_all_commodities,GLOBAL,BLS
+bls_ppi_final_demand,GLOBAL,BLS
+bls_ppi_final_demand_goods,GLOBAL,BLS
+bls_ppi_final_demand_services,GLOBAL,BLS
+bls_ppi_final_demand_less_food_energy,GLOBAL,BLS
+bls_ppi_processed_goods_intermediate,GLOBAL,BLS
+bls_ppi_unprocessed_goods_intermediate,GLOBAL,BLS
+bls_jolts_job_openings_rate,GLOBAL,BLS JOLTS
+bls_jolts_job_openings_level,GLOBAL,BLS JOLTS
+bls_jolts_hires_rate,GLOBAL,BLS JOLTS
+bls_jolts_hires_level,GLOBAL,BLS JOLTS
+bls_jolts_quits_rate,GLOBAL,BLS JOLTS
+bls_jolts_quits_level,GLOBAL,BLS JOLTS
+bls_jolts_layoffs_discharges_rate,GLOBAL,BLS JOLTS
+bls_jolts_layoffs_discharges_level,GLOBAL,BLS JOLTS
+bls_jolts_total_separations_rate,GLOBAL,BLS JOLTS
+bls_jolts_total_separations_level,GLOBAL,BLS JOLTS
+bls_jolts_other_separations_rate,GLOBAL,BLS JOLTS
+bls_jolts_other_separations_level,GLOBAL,BLS JOLTS
+bls_jolts_unemployed_per_opening_rate,GLOBAL,BLS JOLTS
+nyfed_effr,GLOBAL,NY Fed
+nyfed_target_lower,GLOBAL,NY Fed
+nyfed_target_upper,GLOBAL,NY Fed
+market_sp500_level,GLOBAL,Yahoo Finance
+market_sp500_qret,GLOBAL,Yahoo Finance
+market_sp500_vol,GLOBAL,Yahoo Finance
+market_dow_level,GLOBAL,Yahoo Finance
+market_dow_qret,GLOBAL,Yahoo Finance
+market_dow_vol,GLOBAL,Yahoo Finance
+market_nasdaq_level,GLOBAL,Yahoo Finance
+market_nasdaq_qret,GLOBAL,Yahoo Finance
+market_nasdaq_vol,GLOBAL,Yahoo Finance
+market_russell2000_level,GLOBAL,Yahoo Finance
+market_russell2000_qret,GLOBAL,Yahoo Finance
+market_russell2000_vol,GLOBAL,Yahoo Finance
+market_vix_level,GLOBAL,Yahoo Finance
+market_vix_qret,GLOBAL,Yahoo Finance
+market_vix_vol,GLOBAL,Yahoo Finance
+market_treasury_13w_level,GLOBAL,Yahoo Finance
+market_treasury_13w_qret,GLOBAL,Yahoo Finance
+market_treasury_13w_vol,GLOBAL,Yahoo Finance
+market_treasury_5y_level,GLOBAL,Yahoo Finance
+market_treasury_5y_qret,GLOBAL,Yahoo Finance
+market_treasury_5y_vol,GLOBAL,Yahoo Finance
+market_treasury_10y_level,GLOBAL,Yahoo Finance
+market_treasury_10y_qret,GLOBAL,Yahoo Finance
+market_treasury_10y_vol,GLOBAL,Yahoo Finance
+market_treasury_30y_level,GLOBAL,Yahoo Finance
+market_treasury_30y_qret,GLOBAL,Yahoo Finance
+market_treasury_30y_vol,GLOBAL,Yahoo Finance
+market_dollar_index_level,GLOBAL,Yahoo Finance
+market_dollar_index_qret,GLOBAL,Yahoo Finance
+market_dollar_index_vol,GLOBAL,Yahoo Finance
+market_eurusd_level,GLOBAL,Yahoo Finance
+market_eurusd_qret,GLOBAL,Yahoo Finance
+market_eurusd_vol,GLOBAL,Yahoo Finance
+market_usdjpy_level,GLOBAL,Yahoo Finance
+market_usdjpy_qret,GLOBAL,Yahoo Finance
+market_usdjpy_vol,GLOBAL,Yahoo Finance
+market_gbpusd_level,GLOBAL,Yahoo Finance
+market_gbpusd_qret,GLOBAL,Yahoo Finance
+market_gbpusd_vol,GLOBAL,Yahoo Finance
+market_wti_crude_level,GLOBAL,Yahoo Finance
+market_wti_crude_qret,GLOBAL,Yahoo Finance
+market_wti_crude_vol,GLOBAL,Yahoo Finance
+market_natural_gas_level,GLOBAL,Yahoo Finance
+market_natural_gas_qret,GLOBAL,Yahoo Finance
+market_natural_gas_vol,GLOBAL,Yahoo Finance
+market_copper_level,GLOBAL,Yahoo Finance
+market_copper_qret,GLOBAL,Yahoo Finance
+market_copper_vol,GLOBAL,Yahoo Finance
+market_gold_level,GLOBAL,Yahoo Finance
+market_gold_qret,GLOBAL,Yahoo Finance
+market_gold_vol,GLOBAL,Yahoo Finance
+market_silver_level,GLOBAL,Yahoo Finance
+market_silver_qret,GLOBAL,Yahoo Finance
+market_silver_vol,GLOBAL,Yahoo Finance
+market_corn_level,GLOBAL,Yahoo Finance
+market_corn_qret,GLOBAL,Yahoo Finance
+market_corn_vol,GLOBAL,Yahoo Finance
+market_wheat_level,GLOBAL,Yahoo Finance
+market_wheat_qret,GLOBAL,Yahoo Finance
+market_wheat_vol,GLOBAL,Yahoo Finance
+market_sector_energy_level,GLOBAL,Yahoo Finance
+market_sector_energy_qret,GLOBAL,Yahoo Finance
+market_sector_energy_vol,GLOBAL,Yahoo Finance
+market_sector_materials_level,GLOBAL,Yahoo Finance
+market_sector_materials_qret,GLOBAL,Yahoo Finance
+market_sector_materials_vol,GLOBAL,Yahoo Finance
+market_sector_industrials_level,GLOBAL,Yahoo Finance
+market_sector_industrials_qret,GLOBAL,Yahoo Finance
+market_sector_industrials_vol,GLOBAL,Yahoo Finance
+market_sector_consumer_discretionary_level,GLOBAL,Yahoo Finance
+market_sector_consumer_discretionary_qret,GLOBAL,Yahoo Finance
+market_sector_consumer_discretionary_vol,GLOBAL,Yahoo Finance
+market_sector_consumer_staples_level,GLOBAL,Yahoo Finance
+market_sector_consumer_staples_qret,GLOBAL,Yahoo Finance
+market_sector_consumer_staples_vol,GLOBAL,Yahoo Finance
+market_sector_healthcare_level,GLOBAL,Yahoo Finance
+market_sector_healthcare_qret,GLOBAL,Yahoo Finance
+market_sector_healthcare_vol,GLOBAL,Yahoo Finance
+market_sector_financials_level,GLOBAL,Yahoo Finance
+market_sector_financials_qret,GLOBAL,Yahoo Finance
+market_sector_financials_vol,GLOBAL,Yahoo Finance
+market_sector_technology_level,GLOBAL,Yahoo Finance
+market_sector_technology_qret,GLOBAL,Yahoo Finance
+market_sector_technology_vol,GLOBAL,Yahoo Finance
+market_sector_utilities_level,GLOBAL,Yahoo Finance
+market_sector_utilities_qret,GLOBAL,Yahoo Finance
+market_sector_utilities_vol,GLOBAL,Yahoo Finance
+market_sector_real_estate_level,GLOBAL,Yahoo Finance
+market_sector_real_estate_qret,GLOBAL,Yahoo Finance
+market_sector_real_estate_vol,GLOBAL,Yahoo Finance
+market_reit_market_level,GLOBAL,Yahoo Finance
+market_reit_market_qret,GLOBAL,Yahoo Finance
+market_reit_market_vol,GLOBAL,Yahoo Finance
+market_high_yield_credit_level,GLOBAL,Yahoo Finance
+market_high_yield_credit_qret,GLOBAL,Yahoo Finance
+market_high_yield_credit_vol,GLOBAL,Yahoo Finance
+market_investment_grade_credit_level,GLOBAL,Yahoo Finance
+market_investment_grade_credit_qret,GLOBAL,Yahoo Finance
+market_investment_grade_credit_vol,GLOBAL,Yahoo Finance
+market_long_treasury_level,GLOBAL,Yahoo Finance
+market_long_treasury_qret,GLOBAL,Yahoo Finance
+market_long_treasury_vol,GLOBAL,Yahoo Finance
+market_short_treasury_level,GLOBAL,Yahoo Finance
+market_short_treasury_qret,GLOBAL,Yahoo Finance
+market_short_treasury_vol,GLOBAL,Yahoo Finance
+market_tips_level,GLOBAL,Yahoo Finance
+market_tips_qret,GLOBAL,Yahoo Finance
+market_tips_vol,GLOBAL,Yahoo Finance
+market_retail_industry_level,GLOBAL,Yahoo Finance
+market_retail_industry_qret,GLOBAL,Yahoo Finance
+market_retail_industry_vol,GLOBAL,Yahoo Finance
+market_transportation_industry_level,GLOBAL,Yahoo Finance
+market_transportation_industry_qret,GLOBAL,Yahoo Finance
+market_transportation_industry_vol,GLOBAL,Yahoo Finance
+market_aerospace_defense_industry_level,GLOBAL,Yahoo Finance
+market_aerospace_defense_industry_qret,GLOBAL,Yahoo Finance
+market_aerospace_defense_industry_vol,GLOBAL,Yahoo Finance
+market_semiconductor_industry_level,GLOBAL,Yahoo Finance
+market_semiconductor_industry_qret,GLOBAL,Yahoo Finance
+market_semiconductor_industry_vol,GLOBAL,Yahoo Finance
+market_biotech_industry_level,GLOBAL,Yahoo Finance
+market_biotech_industry_qret,GLOBAL,Yahoo Finance
+market_biotech_industry_vol,GLOBAL,Yahoo Finance
+market_homebuilders_industry_level,GLOBAL,Yahoo Finance
+market_homebuilders_industry_qret,GLOBAL,Yahoo Finance
+market_homebuilders_industry_vol,GLOBAL,Yahoo Finance
+market_regional_banks_industry_level,GLOBAL,Yahoo Finance
+market_regional_banks_industry_qret,GLOBAL,Yahoo Finance
+market_regional_banks_industry_vol,GLOBAL,Yahoo Finance
+market_banks_industry_level,GLOBAL,Yahoo Finance
+market_banks_industry_qret,GLOBAL,Yahoo Finance
+market_banks_industry_vol,GLOBAL,Yahoo Finance
+market_metals_mining_industry_level,GLOBAL,Yahoo Finance
+market_metals_mining_industry_qret,GLOBAL,Yahoo Finance
+market_metals_mining_industry_vol,GLOBAL,Yahoo Finance
+market_oil_gas_exploration_industry_level,GLOBAL,Yahoo Finance
+market_oil_gas_exploration_industry_qret,GLOBAL,Yahoo Finance
+market_oil_gas_exploration_industry_vol,GLOBAL,Yahoo Finance
+market_oil_services_industry_level,GLOBAL,Yahoo Finance
+market_oil_services_industry_qret,GLOBAL,Yahoo Finance
+market_oil_services_industry_vol,GLOBAL,Yahoo Finance
+market_pharmaceutical_industry_level,GLOBAL,Yahoo Finance
+market_pharmaceutical_industry_qret,GLOBAL,Yahoo Finance
+market_pharmaceutical_industry_vol,GLOBAL,Yahoo Finance
+market_broker_dealers_industry_level,GLOBAL,Yahoo Finance
+market_broker_dealers_industry_qret,GLOBAL,Yahoo Finance
+market_broker_dealers_industry_vol,GLOBAL,Yahoo Finance
+market_insurance_industry_level,GLOBAL,Yahoo Finance
+market_insurance_industry_qret,GLOBAL,Yahoo Finance
+market_insurance_industry_vol,GLOBAL,Yahoo Finance

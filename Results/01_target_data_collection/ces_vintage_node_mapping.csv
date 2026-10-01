@@ -1,0 +1,57 @@
+﻿node_key,node_name,mapping_mode,component_count,ces_industry_code,ces_publication_code,ces_industry_name,vintage_filename,vintage_file_exists,used_for_target_employment
+oil_gas_extraction,Oil and gas extraction,NAICS_EXACT,1,10211000,102110,Oil and gas extraction,tri_102110_NSA.csv,True,True
+mining_except_oil_gas,"Mining, except oil and gas",NAICS_EXACT,1,10212000,102120,Mining (except oil and gas),tri_102120_NSA.csv,True,True
+support_mining,Support activities for mining,NAICS_EXACT,1,10213000,102130,Support activities for mining,tri_102130_NSA.csv,True,True
+utilities,Utilities,NAICS_EXACT,1,44220000,442200,Utilities,tri_442200_NSA.csv,True,True
+construction,Construction,NAICS_EXACT,1,20000000,200000,Construction,tri_200000_NSA.csv,True,True
+wood_products,Wood products,NAICS_EXACT,1,31321000,313210,Wood product manufacturing,tri_313210_NSA.csv,True,True
+nonmetallic_mineral,Nonmetallic mineral products,NAICS_EXACT,1,31327000,313270,Nonmetallic mineral product manufacturing,tri_313270_NSA.csv,True,True
+primary_metals,Primary metals,NAICS_EXACT,1,31331000,313310,Primary metal manufacturing,tri_313310_NSA.csv,True,True
+fabricated_metal,Fabricated metal products,NAICS_EXACT,1,31332000,313320,Fabricated metal product manufacturing,tri_313320_NSA.csv,True,True
+machinery,Machinery,NAICS_EXACT,1,31333000,313330,Machinery manufacturing,tri_313330_NSA.csv,True,True
+computer_electronic,Computer and electronic products,NAICS_EXACT,1,31334000,313340,Computer and electronic product manufacturing,tri_313340_NSA.csv,True,True
+electrical_equipment,"Electrical equipment, appliances, and components",NAICS_EXACT,1,31335000,313350,"Electrical equipment, appliance, and component manufacturing",tri_313350_NSA.csv,True,True
+motor_vehicles,"Motor vehicles, bodies and trailers, and parts",NAICS_EXACT,1,31336001,313360,Motor vehicles and parts,tri_313360_NSA.csv,True,True
+other_transport_equipment,Other transportation equipment,NONE,0,,,,,False,False
+furniture,Furniture and related products,NAICS_EXACT,1,31337000,313370,Furniture and related product manufacturing,tri_313370_NSA.csv,True,True
+misc_manufacturing,Miscellaneous manufacturing,NAICS_EXACT,1,31339000,313390,Miscellaneous manufacturing,tri_313390_NSA.csv,True,True
+food_beverage_tobacco,Food and beverage and tobacco products,NONE,0,,,,,False,False
+textiles,Textile mills and textile product mills,NAICS_EXACT_COMPOSITE,2,32313000;32314000,323130;323140,Textile mills;Textile product mills,tri_323130_NSA.csv;tri_323140_NSA.csv,True,True
+apparel_leather,Apparel and leather and allied products,NONE,0,,,,,False,False
+paper,Paper products,NAICS_EXACT,1,32322000,323220,Paper manufacturing,tri_323220_NSA.csv,True,True
+printing,Printing and related support activities,NAICS_EXACT,1,32323000,323230,Printing and related support activities,tri_323230_NSA.csv,True,True
+petroleum_coal,Petroleum and coal products,NAICS_EXACT,1,32324000,323240,Petroleum and coal products manufacturing,tri_323240_NSA.csv,True,True
+chemicals,Chemical products,NAICS_EXACT,1,32325000,323250,Chemical manufacturing,tri_323250_NSA.csv,True,True
+plastics_rubber,Plastics and rubber products,NAICS_EXACT,1,32326000,323260,Plastics and rubber products manufacturing,tri_323260_NSA.csv,True,True
+wholesale,Wholesale trade,NAICS_EXACT,1,41420000,414200,Wholesale trade,tri_414200_NSA.csv,True,True
+retail,Retail trade,NAME_FALLBACK,1,42000000,420000,Retail trade,tri_420000_NSA.csv,True,True
+air_transport,Air transportation,NAICS_EXACT,1,43481000,434810,Air transportation,tri_434810_NSA.csv,True,True
+rail_transport,Rail transportation,NAICS_EXACT,1,43482000,434820,Rail transportation,tri_434820_NSA.csv,True,True
+water_transport,Water transportation,NAICS_EXACT,1,43483000,434830,Water transportation,tri_434830_NSA.csv,True,True
+truck_transport,Truck transportation,NAICS_EXACT,1,43484000,434840,Truck transportation,tri_434840_NSA.csv,True,True
+transit_ground,Transit and ground passenger transportation,NAICS_EXACT,1,43485000,434850,Transit and ground passenger transportation,tri_434850_NSA.csv,True,True
+pipeline,Pipeline transportation,NAICS_EXACT,1,43486000,434860,Pipeline transportation,tri_434860_NSA.csv,True,True
+other_transport_support,Other transportation and support activities,NAICS_EXACT_COMPOSITE,2,43487000;43488000,434870;434880,Scenic and sightseeing transportation;Support activities for transportation,tri_434870_NSA.csv;tri_434880_NSA.csv,True,True
+warehousing,Warehousing and storage,NAICS_EXACT,1,43493000,434930,Warehousing and storage,tri_434930_NSA.csv,True,True
+information,Information,NAICS_EXACT,1,50000000,500000,Information,tri_500000_NSA.csv,True,True
+credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",NAICS_EXACT_COMPOSITE,2,55521000;55522000,555210;555220,Monetary authorities-central bank;Credit intermediation and related activities,tri_555210_NSA.csv;tri_555220_NSA.csv,True,True
+securities,"Securities, commodity contracts, and investments",NONE,0,,,,,False,False
+insurance,Insurance carriers and related activities,NAICS_EXACT,1,55524000,555240,Insurance carriers and related activities,tri_555240_NSA.csv,True,True
+funds_trusts,"Funds, trusts, and other financial vehicles",NONE,0,,,,,False,False
+real_estate,Real estate,NAICS_EXACT,1,55531000,555310,Real estate,tri_555310_NSA.csv,True,True
+rental_leasing,Rental and leasing services and lessors of intangible assets,NAICS_EXACT_COMPOSITE,2,55532000;55533000,555320;555330,Rental and leasing services;Lessors of nonfinancial intangible assets (except copyrighted works),tri_555320_NSA.csv;tri_555330_NSA.csv,True,True
+legal,Legal services,NONE,0,,,,,False,False
+computer_systems,Computer systems design and related services,NONE,0,,,,,False,False
+misc_professional,"Miscellaneous professional, scientific, and technical services",NONE,0,,,,,False,False
+management_companies,Management of companies and enterprises,NAICS_EXACT,1,60550000,605500,Management of companies and enterprises,tri_605500_NSA.csv,True,True
+admin_support,Administrative and support services,NAICS_EXACT,1,60561000,605610,Administrative and support services,tri_605610_NSA.csv,True,True
+waste_remediation,Waste management and remediation services,NAICS_EXACT,1,60562000,605620,Waste management and remediation services,tri_605620_NSA.csv,True,True
+education,Educational services,NAICS_EXACT,1,65610000,656100,Private educational services,tri_656100_NSA.csv,True,True
+ambulatory_health,Ambulatory health care services,NAICS_EXACT,1,65621000,656210,Ambulatory health care services,tri_656210_NSA.csv,True,True
+hospitals_nursing,"Hospitals, nursing and residential care facilities",NAICS_EXACT_COMPOSITE,2,65622000;65623000,656220;656230,Hospitals;Nursing and residential care facilities,tri_656220_NSA.csv;tri_656230_NSA.csv,True,True
+social_assistance,Social assistance,NAICS_EXACT,1,65624000,656240,Social assistance,tri_656240_NSA.csv,True,True
+performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",NAICS_EXACT_COMPOSITE,2,70711000;70712000,707110;707120,"Performing arts, spectator sports, and related industries;Museums, historical sites, and similar institutions",tri_707110_NSA.csv;tri_707120_NSA.csv,True,True
+amusement_recreation,"Amusements, gambling, and recreation industries",NAICS_EXACT,1,70713000,707130,"Amusement, gambling, and recreation industries",tri_707130_NSA.csv,True,True
+accommodation,Accommodation,NAICS_EXACT,1,70721000,707210,Accommodation,tri_707210_NSA.csv,True,True
+food_services,Food services and drinking places,NAICS_EXACT,1,70722000,707220,Food services and drinking places,tri_707220_NSA.csv,True,True
+other_services,"Other services, except government",NAICS_EXACT,1,80000000,800000,Other services,tri_800000_NSA.csv,True,True

@@ -1,0 +1,1177 @@
+﻿year,node_key,node_name,gross_operating_surplus
+2005,oil_gas_extraction,Oil and gas extraction,117464
+2005,mining_except_oil_gas,"Mining, except oil and gas",24590
+2005,support_mining,Support activities for mining,10144
+2005,utilities,Utilities,97996
+2005,construction,Construction,256070
+2005,wood_products,Wood products,9204
+2005,nonmetallic_mineral,Nonmetallic mineral products,19464
+2005,primary_metals,Primary metals,23518
+2005,fabricated_metal,Fabricated metal products,38882
+2005,machinery,Machinery,36094
+2005,computer_electronic,Computer and electronic products,81809
+2005,electrical_equipment,"Electrical equipment, appliances, and components",12911
+2005,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",57758
+2005,other_transport_equipment,Other transportation equipment,30681
+2005,furniture,Furniture and related products,9688
+2005,misc_manufacturing,Miscellaneous manufacturing,23417
+2005,food_beverage_tobacco,Food and beverage and tobacco products,77572
+2005,textiles,Textile mills and textile product mills,4438
+2005,apparel_leather,Apparel and leather and allied products,2208
+2005,paper,Paper products,18650
+2005,printing,Printing and related support activities,10990
+2005,petroleum_coal,Petroleum and coal products,125428
+2005,chemicals,Chemical products,133852
+2005,plastics_rubber,Plastics and rubber products,21163
+2005,wholesale,Wholesale trade,211588
+2005,retail,Retail trade,194607
+2005,air_transport,Air transportation,9578
+2005,rail_transport,Rail transportation,10786
+2005,water_transport,Water transportation,4008
+2005,truck_transport,Truck transportation,43541
+2005,transit_ground,Transit and ground passenger transportation,9866
+2005,pipeline,Pipeline transportation,4590
+2005,other_transport_support,Other transportation and support activities,28769
+2005,warehousing,Warehousing and storage,9722
+2005,information,Information,352058
+2005,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",204329
+2005,securities,"Securities, commodity contracts, and investments",27609
+2005,insurance,Insurance carriers and related activities,155292
+2005,funds_trusts,"Funds, trusts, and other financial vehicles",17051
+2005,real_estate,Real estate,1248696
+2005,rental_leasing,Rental and leasing services and lessors of intangible assets,103347
+2005,legal,Legal services,70635
+2005,computer_systems,Computer systems design and related services,17458
+2005,misc_professional,"Miscellaneous professional, scientific, and technical services",172783
+2005,management_companies,Management of companies and enterprises,21865
+2005,admin_support,Administrative and support services,84333
+2005,waste_remediation,Waste management and remediation services,12484
+2005,education,Educational services,21887
+2005,ambulatory_health,Ambulatory health care services,84300
+2005,hospitals_nursing,"Hospitals, nursing and residential care facilities",33452
+2005,social_assistance,Social assistance,11766
+2005,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",28252
+2005,amusement_recreation,"Amusements, gambling, and recreation industries",13090
+2005,accommodation,Accommodation,35320
+2005,food_services,Food services and drinking places,52240
+2005,other_services,"Other services, except government",85616
+2006,oil_gas_extraction,Oil and gas extraction,133299
+2006,mining_except_oil_gas,"Mining, except oil and gas",31883
+2006,support_mining,Support activities for mining,21046
+2006,utilities,Utilities,117842
+2006,construction,Construction,267533
+2006,wood_products,Wood products,6155
+2006,nonmetallic_mineral,Nonmetallic mineral products,20013
+2006,primary_metals,Primary metals,28647
+2006,fabricated_metal,Fabricated metal products,38902
+2006,machinery,Machinery,39655
+2006,computer_electronic,Computer and electronic products,88090
+2006,electrical_equipment,"Electrical equipment, appliances, and components",20022
+2006,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",55739
+2006,other_transport_equipment,Other transportation equipment,32432
+2006,furniture,Furniture and related products,10139
+2006,misc_manufacturing,Miscellaneous manufacturing,25977
+2006,food_beverage_tobacco,Food and beverage and tobacco products,91229
+2006,textiles,Textile mills and textile product mills,4646
+2006,apparel_leather,Apparel and leather and allied products,1581
+2006,paper,Paper products,25144
+2006,printing,Printing and related support activities,13014
+2006,petroleum_coal,Petroleum and coal products,122061
+2006,chemicals,Chemical products,163348
+2006,plastics_rubber,Plastics and rubber products,21486
+2006,wholesale,Wholesale trade,233475
+2006,retail,Retail trade,198722
+2006,air_transport,Air transportation,16138
+2006,rail_transport,Rail transportation,13931
+2006,water_transport,Water transportation,7578
+2006,truck_transport,Truck transportation,48015
+2006,transit_ground,Transit and ground passenger transportation,11332
+2006,pipeline,Pipeline transportation,4923
+2006,other_transport_support,Other transportation and support activities,32565
+2006,warehousing,Warehousing and storage,11666
+2006,information,Information,354579
+2006,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",207918
+2006,securities,"Securities, commodity contracts, and investments",35929
+2006,insurance,Insurance carriers and related activities,168571
+2006,funds_trusts,"Funds, trusts, and other financial vehicles",16616
+2006,real_estate,Real estate,1266603
+2006,rental_leasing,Rental and leasing services and lessors of intangible assets,125289
+2006,legal,Legal services,76286
+2006,computer_systems,Computer systems design and related services,18345
+2006,misc_professional,"Miscellaneous professional, scientific, and technical services",178198
+2006,management_companies,Management of companies and enterprises,22414
+2006,admin_support,Administrative and support services,88661
+2006,waste_remediation,Waste management and remediation services,9297
+2006,education,Educational services,23906
+2006,ambulatory_health,Ambulatory health care services,88879
+2006,hospitals_nursing,"Hospitals, nursing and residential care facilities",35666
+2006,social_assistance,Social assistance,13519
+2006,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",30760
+2006,amusement_recreation,"Amusements, gambling, and recreation industries",13200
+2006,accommodation,Accommodation,38759
+2006,food_services,Food services and drinking places,55556
+2006,other_services,"Other services, except government",89535
+2007,oil_gas_extraction,Oil and gas extraction,155784
+2007,mining_except_oil_gas,"Mining, except oil and gas",37218
+2007,support_mining,Support activities for mining,24868
+2007,utilities,Utilities,117430
+2007,construction,Construction,267492
+2007,wood_products,Wood products,4750
+2007,nonmetallic_mineral,Nonmetallic mineral products,19277
+2007,primary_metals,Primary metals,29869
+2007,fabricated_metal,Fabricated metal products,43331
+2007,machinery,Machinery,43681
+2007,computer_electronic,Computer and electronic products,89745
+2007,electrical_equipment,"Electrical equipment, appliances, and components",18137
+2007,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",49588
+2007,other_transport_equipment,Other transportation equipment,46274
+2007,furniture,Furniture and related products,8312
+2007,misc_manufacturing,Miscellaneous manufacturing,25665
+2007,food_beverage_tobacco,Food and beverage and tobacco products,88381
+2007,textiles,Textile mills and textile product mills,4182
+2007,apparel_leather,Apparel and leather and allied products,875
+2007,paper,Paper products,22547
+2007,printing,Printing and related support activities,13487
+2007,petroleum_coal,Petroleum and coal products,136413
+2007,chemicals,Chemical products,172535
+2007,plastics_rubber,Plastics and rubber products,21193
+2007,wholesale,Wholesale trade,254444
+2007,retail,Retail trade,182084
+2007,air_transport,Air transportation,16483
+2007,rail_transport,Rail transportation,13432
+2007,water_transport,Water transportation,8270
+2007,truck_transport,Truck transportation,43381
+2007,transit_ground,Transit and ground passenger transportation,10966
+2007,pipeline,Pipeline transportation,6547
+2007,other_transport_support,Other transportation and support activities,23971
+2007,warehousing,Warehousing and storage,9429
+2007,information,Information,399041
+2007,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",182019
+2007,securities,"Securities, commodity contracts, and investments",-15346
+2007,insurance,Insurance carriers and related activities,194378
+2007,funds_trusts,"Funds, trusts, and other financial vehicles",8870
+2007,real_estate,Real estate,1397523
+2007,rental_leasing,Rental and leasing services and lessors of intangible assets,119134
+2007,legal,Legal services,86196
+2007,computer_systems,Computer systems design and related services,23012
+2007,misc_professional,"Miscellaneous professional, scientific, and technical services",186136
+2007,management_companies,Management of companies and enterprises,23515
+2007,admin_support,Administrative and support services,99128
+2007,waste_remediation,Waste management and remediation services,12257
+2007,education,Educational services,24325
+2007,ambulatory_health,Ambulatory health care services,88949
+2007,hospitals_nursing,"Hospitals, nursing and residential care facilities",36345
+2007,social_assistance,Social assistance,13341
+2007,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",29998
+2007,amusement_recreation,"Amusements, gambling, and recreation industries",15411
+2007,accommodation,Accommodation,41774
+2007,food_services,Food services and drinking places,49878
+2007,other_services,"Other services, except government",82223
+2008,oil_gas_extraction,Oil and gas extraction,208789
+2008,mining_except_oil_gas,"Mining, except oil and gas",38911
+2008,support_mining,Support activities for mining,29814
+2008,utilities,Utilities,122186
+2008,construction,Construction,207539
+2008,wood_products,Wood products,3668
+2008,nonmetallic_mineral,Nonmetallic mineral products,15661
+2008,primary_metals,Primary metals,33557
+2008,fabricated_metal,Fabricated metal products,39820
+2008,machinery,Machinery,44349
+2008,computer_electronic,Computer and electronic products,94598
+2008,electrical_equipment,"Electrical equipment, appliances, and components",23645
+2008,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",23697
+2008,other_transport_equipment,Other transportation equipment,44060
+2008,furniture,Furniture and related products,5271
+2008,misc_manufacturing,Miscellaneous manufacturing,28416
+2008,food_beverage_tobacco,Food and beverage and tobacco products,92182
+2008,textiles,Textile mills and textile product mills,3690
+2008,apparel_leather,Apparel and leather and allied products,807
+2008,paper,Paper products,18380
+2008,printing,Printing and related support activities,12077
+2008,petroleum_coal,Petroleum and coal products,135683
+2008,chemicals,Chemical products,168779
+2008,plastics_rubber,Plastics and rubber products,14385
+2008,wholesale,Wholesale trade,275298
+2008,retail,Retail trade,172044
+2008,air_transport,Air transportation,13744
+2008,rail_transport,Rail transportation,17182
+2008,water_transport,Water transportation,9868
+2008,truck_transport,Truck transportation,42032
+2008,transit_ground,Transit and ground passenger transportation,12259
+2008,pipeline,Pipeline transportation,9497
+2008,other_transport_support,Other transportation and support activities,28154
+2008,warehousing,Warehousing and storage,12635
+2008,information,Information,441381
+2008,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",200453
+2008,securities,"Securities, commodity contracts, and investments",-122457
+2008,insurance,Insurance carriers and related activities,132749
+2008,funds_trusts,"Funds, trusts, and other financial vehicles",4894
+2008,real_estate,Real estate,1484477
+2008,rental_leasing,Rental and leasing services and lessors of intangible assets,133889
+2008,legal,Legal services,111655
+2008,computer_systems,Computer systems design and related services,28049
+2008,misc_professional,"Miscellaneous professional, scientific, and technical services",219511
+2008,management_companies,Management of companies and enterprises,26084
+2008,admin_support,Administrative and support services,102695
+2008,waste_remediation,Waste management and remediation services,12527
+2008,education,Educational services,31545
+2008,ambulatory_health,Ambulatory health care services,106904
+2008,hospitals_nursing,"Hospitals, nursing and residential care facilities",48512
+2008,social_assistance,Social assistance,13906
+2008,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",33780
+2008,amusement_recreation,"Amusements, gambling, and recreation industries",13422
+2008,accommodation,Accommodation,37944
+2008,food_services,Food services and drinking places,50449
+2008,other_services,"Other services, except government",72668
+2009,oil_gas_extraction,Oil and gas extraction,123087
+2009,mining_except_oil_gas,"Mining, except oil and gas",41175
+2009,support_mining,Support activities for mining,16905
+2009,utilities,Utilities,136135
+2009,construction,Construction,189759
+2009,wood_products,Wood products,4188
+2009,nonmetallic_mineral,Nonmetallic mineral products,14761
+2009,primary_metals,Primary metals,13084
+2009,fabricated_metal,Fabricated metal products,37175
+2009,machinery,Machinery,41271
+2009,computer_electronic,Computer and electronic products,92632
+2009,electrical_equipment,"Electrical equipment, appliances, and components",21250
+2009,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",-3100
+2009,other_transport_equipment,Other transportation equipment,48174
+2009,furniture,Furniture and related products,4690
+2009,misc_manufacturing,Miscellaneous manufacturing,36203
+2009,food_beverage_tobacco,Food and beverage and tobacco products,122295
+2009,textiles,Textile mills and textile product mills,3559
+2009,apparel_leather,Apparel and leather and allied products,969
+2009,paper,Paper products,28894
+2009,printing,Printing and related support activities,11502
+2009,petroleum_coal,Petroleum and coal products,91298
+2009,chemicals,Chemical products,192556
+2009,plastics_rubber,Plastics and rubber products,24458
+2009,wholesale,Wholesale trade,268893
+2009,retail,Retail trade,192260
+2009,air_transport,Air transportation,19577
+2009,rail_transport,Rail transportation,14816
+2009,water_transport,Water transportation,9448
+2009,truck_transport,Truck transportation,37977
+2009,transit_ground,Transit and ground passenger transportation,12961
+2009,pipeline,Pipeline transportation,7543
+2009,other_transport_support,Other transportation and support activities,22432
+2009,warehousing,Warehousing and storage,12119
+2009,information,Information,425992
+2009,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",208278
+2009,securities,"Securities, commodity contracts, and investments",10758
+2009,insurance,Insurance carriers and related activities,155964
+2009,funds_trusts,"Funds, trusts, and other financial vehicles",371
+2009,real_estate,Real estate,1484973
+2009,rental_leasing,Rental and leasing services and lessors of intangible assets,121172
+2009,legal,Legal services,94117
+2009,computer_systems,Computer systems design and related services,37775
+2009,misc_professional,"Miscellaneous professional, scientific, and technical services",207000
+2009,management_companies,Management of companies and enterprises,28746
+2009,admin_support,Administrative and support services,99426
+2009,waste_remediation,Waste management and remediation services,14361
+2009,education,Educational services,40742
+2009,ambulatory_health,Ambulatory health care services,118069
+2009,hospitals_nursing,"Hospitals, nursing and residential care facilities",61106
+2009,social_assistance,Social assistance,12836
+2009,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",37656
+2009,amusement_recreation,"Amusements, gambling, and recreation industries",13144
+2009,accommodation,Accommodation,28236
+2009,food_services,Food services and drinking places,60006
+2009,other_services,"Other services, except government",73703
+2010,oil_gas_extraction,Oil and gas extraction,135273
+2010,mining_except_oil_gas,"Mining, except oil and gas",47865
+2010,support_mining,Support activities for mining,21072
+2010,utilities,Utilities,154915
+2010,construction,Construction,174794
+2010,wood_products,Wood products,6782
+2010,nonmetallic_mineral,Nonmetallic mineral products,14747
+2010,primary_metals,Primary metals,21866
+2010,fabricated_metal,Fabricated metal products,39400
+2010,machinery,Machinery,48875
+2010,computer_electronic,Computer and electronic products,98060
+2010,electrical_equipment,"Electrical equipment, appliances, and components",21387
+2010,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",37313
+2010,other_transport_equipment,Other transportation equipment,51913
+2010,furniture,Furniture and related products,4763
+2010,misc_manufacturing,Miscellaneous manufacturing,37760
+2010,food_beverage_tobacco,Food and beverage and tobacco products,103938
+2010,textiles,Textile mills and textile product mills,3975
+2010,apparel_leather,Apparel and leather and allied products,1701
+2010,paper,Paper products,25669
+2010,printing,Printing and related support activities,12555
+2010,petroleum_coal,Petroleum and coal products,104520
+2010,chemicals,Chemical products,205931
+2010,plastics_rubber,Plastics and rubber products,24320
+2010,wholesale,Wholesale trade,305176
+2010,retail,Retail trade,206407
+2010,air_transport,Air transportation,31864
+2010,rail_transport,Rail transportation,16502
+2010,water_transport,Water transportation,8146
+2010,truck_transport,Truck transportation,40905
+2010,transit_ground,Transit and ground passenger transportation,14400
+2010,pipeline,Pipeline transportation,12630
+2010,other_transport_support,Other transportation and support activities,26462
+2010,warehousing,Warehousing and storage,11806
+2010,information,Information,462019
+2010,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",216410
+2010,securities,"Securities, commodity contracts, and investments",-459
+2010,insurance,Insurance carriers and related activities,157859
+2010,funds_trusts,"Funds, trusts, and other financial vehicles",2184
+2010,real_estate,Real estate,1547846
+2010,rental_leasing,Rental and leasing services and lessors of intangible assets,118591
+2010,legal,Legal services,87590
+2010,computer_systems,Computer systems design and related services,42512
+2010,misc_professional,"Miscellaneous professional, scientific, and technical services",228705
+2010,management_companies,Management of companies and enterprises,29915
+2010,admin_support,Administrative and support services,104496
+2010,waste_remediation,Waste management and remediation services,17153
+2010,education,Educational services,45699
+2010,ambulatory_health,Ambulatory health care services,125310
+2010,hospitals_nursing,"Hospitals, nursing and residential care facilities",62164
+2010,social_assistance,Social assistance,11750
+2010,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",40309
+2010,amusement_recreation,"Amusements, gambling, and recreation industries",17171
+2010,accommodation,Accommodation,30867
+2010,food_services,Food services and drinking places,63694
+2010,other_services,"Other services, except government",78736
+2011,oil_gas_extraction,Oil and gas extraction,158593
+2011,mining_except_oil_gas,"Mining, except oil and gas",52550
+2011,support_mining,Support activities for mining,28707
+2011,utilities,Utilities,159377
+2011,construction,Construction,171119
+2011,wood_products,Wood products,6758
+2011,nonmetallic_mineral,Nonmetallic mineral products,14941
+2011,primary_metals,Primary metals,30596
+2011,fabricated_metal,Fabricated metal products,40558
+2011,machinery,Machinery,58274
+2011,computer_electronic,Computer and electronic products,91408
+2011,electrical_equipment,"Electrical equipment, appliances, and components",17708
+2011,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",49048
+2011,other_transport_equipment,Other transportation equipment,55666
+2011,furniture,Furniture and related products,4762
+2011,misc_manufacturing,Miscellaneous manufacturing,33929
+2011,food_beverage_tobacco,Food and beverage and tobacco products,90965
+2011,textiles,Textile mills and textile product mills,3452
+2011,apparel_leather,Apparel and leather and allied products,1689
+2011,paper,Paper products,22885
+2011,printing,Printing and related support activities,12046
+2011,petroleum_coal,Petroleum and coal products,139097
+2011,chemicals,Chemical products,205073
+2011,plastics_rubber,Plastics and rubber products,23579
+2011,wholesale,Wholesale trade,313670
+2011,retail,Retail trade,200952
+2011,air_transport,Air transportation,28971
+2011,rail_transport,Rail transportation,16518
+2011,water_transport,Water transportation,7223
+2011,truck_transport,Truck transportation,43709
+2011,transit_ground,Transit and ground passenger transportation,16307
+2011,pipeline,Pipeline transportation,13395
+2011,other_transport_support,Other transportation and support activities,27843
+2011,warehousing,Warehousing and storage,11361
+2011,information,Information,457808
+2011,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",247246
+2011,securities,"Securities, commodity contracts, and investments",-34246
+2011,insurance,Insurance carriers and related activities,157345
+2011,funds_trusts,"Funds, trusts, and other financial vehicles",696
+2011,real_estate,Real estate,1602414
+2011,rental_leasing,Rental and leasing services and lessors of intangible assets,119716
+2011,legal,Legal services,94276
+2011,computer_systems,Computer systems design and related services,48288
+2011,misc_professional,"Miscellaneous professional, scientific, and technical services",232419
+2011,management_companies,Management of companies and enterprises,31816
+2011,admin_support,Administrative and support services,106553
+2011,waste_remediation,Waste management and remediation services,16130
+2011,education,Educational services,45665
+2011,ambulatory_health,Ambulatory health care services,131699
+2011,hospitals_nursing,"Hospitals, nursing and residential care facilities",65023
+2011,social_assistance,Social assistance,10581
+2011,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",44082
+2011,amusement_recreation,"Amusements, gambling, and recreation industries",17129
+2011,accommodation,Accommodation,36354
+2011,food_services,Food services and drinking places,65022
+2011,other_services,"Other services, except government",75943
+2012,oil_gas_extraction,Oil and gas extraction,158149
+2012,mining_except_oil_gas,"Mining, except oil and gas",42136
+2012,support_mining,Support activities for mining,29666
+2012,utilities,Utilities,152289
+2012,construction,Construction,181584
+2012,wood_products,Wood products,8501
+2012,nonmetallic_mineral,Nonmetallic mineral products,18044
+2012,primary_metals,Primary metals,32191
+2012,fabricated_metal,Fabricated metal products,44857
+2012,machinery,Machinery,61206
+2012,computer_electronic,Computer and electronic products,90185
+2012,electrical_equipment,"Electrical equipment, appliances, and components",19990
+2012,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",55987
+2012,other_transport_equipment,Other transportation equipment,53105
+2012,furniture,Furniture and related products,4739
+2012,misc_manufacturing,Miscellaneous manufacturing,33531
+2012,food_beverage_tobacco,Food and beverage and tobacco products,97107
+2012,textiles,Textile mills and textile product mills,4213
+2012,apparel_leather,Apparel and leather and allied products,1555
+2012,paper,Paper products,22296
+2012,printing,Printing and related support activities,12085
+2012,petroleum_coal,Petroleum and coal products,138308
+2012,chemicals,Chemical products,200682
+2012,plastics_rubber,Plastics and rubber products,27138
+2012,wholesale,Wholesale trade,347713
+2012,retail,Retail trade,218792
+2012,air_transport,Air transportation,30503
+2012,rail_transport,Rail transportation,17402
+2012,water_transport,Water transportation,6376
+2012,truck_transport,Truck transportation,45686
+2012,transit_ground,Transit and ground passenger transportation,17734
+2012,pipeline,Pipeline transportation,16049
+2012,other_transport_support,Other transportation and support activities,25629
+2012,warehousing,Warehousing and storage,10961
+2012,information,Information,445866
+2012,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",292926
+2012,securities,"Securities, commodity contracts, and investments",24659
+2012,insurance,Insurance carriers and related activities,167887
+2012,funds_trusts,"Funds, trusts, and other financial vehicles",8705
+2012,real_estate,Real estate,1646175
+2012,rental_leasing,Rental and leasing services and lessors of intangible assets,126792
+2012,legal,Legal services,91158
+2012,computer_systems,Computer systems design and related services,55487
+2012,misc_professional,"Miscellaneous professional, scientific, and technical services",241280
+2012,management_companies,Management of companies and enterprises,34354
+2012,admin_support,Administrative and support services,107296
+2012,waste_remediation,Waste management and remediation services,15541
+2012,education,Educational services,44856
+2012,ambulatory_health,Ambulatory health care services,131026
+2012,hospitals_nursing,"Hospitals, nursing and residential care facilities",67340
+2012,social_assistance,Social assistance,9469
+2012,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",50239
+2012,amusement_recreation,"Amusements, gambling, and recreation industries",18002
+2012,accommodation,Accommodation,38846
+2012,food_services,Food services and drinking places,67129
+2012,other_services,"Other services, except government",78800
+2013,oil_gas_extraction,Oil and gas extraction,182292
+2013,mining_except_oil_gas,"Mining, except oil and gas",36605
+2013,support_mining,Support activities for mining,34224
+2013,utilities,Utilities,155992
+2013,construction,Construction,198996
+2013,wood_products,Wood products,11810
+2013,nonmetallic_mineral,Nonmetallic mineral products,21438
+2013,primary_metals,Primary metals,29470
+2013,fabricated_metal,Fabricated metal products,46279
+2013,machinery,Machinery,65150
+2013,computer_electronic,Computer and electronic products,92253
+2013,electrical_equipment,"Electrical equipment, appliances, and components",23761
+2013,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",60969
+2013,other_transport_equipment,Other transportation equipment,57008
+2013,furniture,Furniture and related products,5616
+2013,misc_manufacturing,Miscellaneous manufacturing,29621
+2013,food_beverage_tobacco,Food and beverage and tobacco products,104515
+2013,textiles,Textile mills and textile product mills,4614
+2013,apparel_leather,Apparel and leather and allied products,1761
+2013,paper,Paper products,25510
+2013,printing,Printing and related support activities,12880
+2013,petroleum_coal,Petroleum and coal products,124628
+2013,chemicals,Chemical products,210929
+2013,plastics_rubber,Plastics and rubber products,27095
+2013,wholesale,Wholesale trade,373197
+2013,retail,Retail trade,248279
+2013,air_transport,Air transportation,31191
+2013,rail_transport,Rail transportation,19959
+2013,water_transport,Water transportation,9269
+2013,truck_transport,Truck transportation,48077
+2013,transit_ground,Transit and ground passenger transportation,18369
+2013,pipeline,Pipeline transportation,18192
+2013,other_transport_support,Other transportation and support activities,27939
+2013,warehousing,Warehousing and storage,9845
+2013,information,Information,502209
+2013,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",274857
+2013,securities,"Securities, commodity contracts, and investments",39237
+2013,insurance,Insurance carriers and related activities,143562
+2013,funds_trusts,"Funds, trusts, and other financial vehicles",7169
+2013,real_estate,Real estate,1724513
+2013,rental_leasing,Rental and leasing services and lessors of intangible assets,132698
+2013,legal,Legal services,90366
+2013,computer_systems,Computer systems design and related services,53622
+2013,misc_professional,"Miscellaneous professional, scientific, and technical services",235877
+2013,management_companies,Management of companies and enterprises,36077
+2013,admin_support,Administrative and support services,109491
+2013,waste_remediation,Waste management and remediation services,15458
+2013,education,Educational services,43680
+2013,ambulatory_health,Ambulatory health care services,132760
+2013,hospitals_nursing,"Hospitals, nursing and residential care facilities",68671
+2013,social_assistance,Social assistance,10222
+2013,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",50492
+2013,amusement_recreation,"Amusements, gambling, and recreation industries",19086
+2013,accommodation,Accommodation,44612
+2013,food_services,Food services and drinking places,68843
+2013,other_services,"Other services, except government",82860
+2014,oil_gas_extraction,Oil and gas extraction,192135
+2014,mining_except_oil_gas,"Mining, except oil and gas",32460
+2014,support_mining,Support activities for mining,46411
+2014,utilities,Utilities,165154
+2014,construction,Construction,219173
+2014,wood_products,Wood products,10286
+2014,nonmetallic_mineral,Nonmetallic mineral products,21623
+2014,primary_metals,Primary metals,30318
+2014,fabricated_metal,Fabricated metal products,43423
+2014,machinery,Machinery,62297
+2014,computer_electronic,Computer and electronic products,91189
+2014,electrical_equipment,"Electrical equipment, appliances, and components",18959
+2014,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",65029
+2014,other_transport_equipment,Other transportation equipment,60638
+2014,furniture,Furniture and related products,6300
+2014,misc_manufacturing,Miscellaneous manufacturing,28585
+2014,food_beverage_tobacco,Food and beverage and tobacco products,111211
+2014,textiles,Textile mills and textile product mills,5001
+2014,apparel_leather,Apparel and leather and allied products,1282
+2014,paper,Paper products,25571
+2014,printing,Printing and related support activities,12664
+2014,petroleum_coal,Petroleum and coal products,125244
+2014,chemicals,Chemical products,210624
+2014,plastics_rubber,Plastics and rubber products,22978
+2014,wholesale,Wholesale trade,394667
+2014,retail,Retail trade,259125
+2014,air_transport,Air transportation,36152
+2014,rail_transport,Rail transportation,21799
+2014,water_transport,Water transportation,8894
+2014,truck_transport,Truck transportation,57802
+2014,transit_ground,Transit and ground passenger transportation,19720
+2014,pipeline,Pipeline transportation,20838
+2014,other_transport_support,Other transportation and support activities,29686
+2014,warehousing,Warehousing and storage,8413
+2014,information,Information,495529
+2014,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",323974
+2014,securities,"Securities, commodity contracts, and investments",-476
+2014,insurance,Insurance carriers and related activities,224811
+2014,funds_trusts,"Funds, trusts, and other financial vehicles",10038
+2014,real_estate,Real estate,1763106
+2014,rental_leasing,Rental and leasing services and lessors of intangible assets,134179
+2014,legal,Legal services,95320
+2014,computer_systems,Computer systems design and related services,48077
+2014,misc_professional,"Miscellaneous professional, scientific, and technical services",244604
+2014,management_companies,Management of companies and enterprises,36536
+2014,admin_support,Administrative and support services,112880
+2014,waste_remediation,Waste management and remediation services,16725
+2014,education,Educational services,41921
+2014,ambulatory_health,Ambulatory health care services,133384
+2014,hospitals_nursing,"Hospitals, nursing and residential care facilities",73653
+2014,social_assistance,Social assistance,10395
+2014,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",54123
+2014,amusement_recreation,"Amusements, gambling, and recreation industries",18439
+2014,accommodation,Accommodation,46807
+2014,food_services,Food services and drinking places,71766
+2014,other_services,"Other services, except government",91464
+2015,oil_gas_extraction,Oil and gas extraction,80457
+2015,mining_except_oil_gas,"Mining, except oil and gas",24852
+2015,support_mining,Support activities for mining,25373
+2015,utilities,Utilities,164121
+2015,construction,Construction,247932
+2015,wood_products,Wood products,10346
+2015,nonmetallic_mineral,Nonmetallic mineral products,24493
+2015,primary_metals,Primary metals,26432
+2015,fabricated_metal,Fabricated metal products,43898
+2015,machinery,Machinery,50789
+2015,computer_electronic,Computer and electronic products,96381
+2015,electrical_equipment,"Electrical equipment, appliances, and components",25853
+2015,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",73418
+2015,other_transport_equipment,Other transportation equipment,67773
+2015,furniture,Furniture and related products,7788
+2015,misc_manufacturing,Miscellaneous manufacturing,24699
+2015,food_beverage_tobacco,Food and beverage and tobacco products,133168
+2015,textiles,Textile mills and textile product mills,5094
+2015,apparel_leather,Apparel and leather and allied products,1253
+2015,paper,Paper products,28102
+2015,printing,Printing and related support activities,13578
+2015,petroleum_coal,Petroleum and coal products,107962
+2015,chemicals,Chemical products,206674
+2015,plastics_rubber,Plastics and rubber products,32186
+2015,wholesale,Wholesale trade,428799
+2015,retail,Retail trade,291408
+2015,air_transport,Air transportation,44006
+2015,rail_transport,Rail transportation,21730
+2015,water_transport,Water transportation,8490
+2015,truck_transport,Truck transportation,65311
+2015,transit_ground,Transit and ground passenger transportation,19764
+2015,pipeline,Pipeline transportation,26774
+2015,other_transport_support,Other transportation and support activities,34371
+2015,warehousing,Warehousing and storage,7106
+2015,information,Information,539293
+2015,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",331723
+2015,securities,"Securities, commodity contracts, and investments",-1199
+2015,insurance,Insurance carriers and related activities,276062
+2015,funds_trusts,"Funds, trusts, and other financial vehicles",6523
+2015,real_estate,Real estate,1798145
+2015,rental_leasing,Rental and leasing services and lessors of intangible assets,144166
+2015,legal,Legal services,104278
+2015,computer_systems,Computer systems design and related services,46119
+2015,misc_professional,"Miscellaneous professional, scientific, and technical services",255066
+2015,management_companies,Management of companies and enterprises,36198
+2015,admin_support,Administrative and support services,112301
+2015,waste_remediation,Waste management and remediation services,17613
+2015,education,Educational services,42609
+2015,ambulatory_health,Ambulatory health care services,139386
+2015,hospitals_nursing,"Hospitals, nursing and residential care facilities",80955
+2015,social_assistance,Social assistance,11187
+2015,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",51242
+2015,amusement_recreation,"Amusements, gambling, and recreation industries",19787
+2015,accommodation,Accommodation,58536
+2015,food_services,Food services and drinking places,80958
+2015,other_services,"Other services, except government",95802
+2016,oil_gas_extraction,Oil and gas extraction,66924
+2016,mining_except_oil_gas,"Mining, except oil and gas",23523
+2016,support_mining,Support activities for mining,9530
+2016,utilities,Utilities,161997
+2016,construction,Construction,281407
+2016,wood_products,Wood products,11891
+2016,nonmetallic_mineral,Nonmetallic mineral products,25547
+2016,primary_metals,Primary metals,24468
+2016,fabricated_metal,Fabricated metal products,42960
+2016,machinery,Machinery,44996
+2016,computer_electronic,Computer and electronic products,89892
+2016,electrical_equipment,"Electrical equipment, appliances, and components",20108
+2016,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",79904
+2016,other_transport_equipment,Other transportation equipment,66906
+2016,furniture,Furniture and related products,7916
+2016,misc_manufacturing,Miscellaneous manufacturing,30510
+2016,food_beverage_tobacco,Food and beverage and tobacco products,132952
+2016,textiles,Textile mills and textile product mills,5566
+2016,apparel_leather,Apparel and leather and allied products,1285
+2016,paper,Paper products,27052
+2016,printing,Printing and related support activities,14258
+2016,petroleum_coal,Petroleum and coal products,52369
+2016,chemicals,Chemical products,226979
+2016,plastics_rubber,Plastics and rubber products,32170
+2016,wholesale,Wholesale trade,419161
+2016,retail,Retail trade,323313
+2016,air_transport,Air transportation,47691
+2016,rail_transport,Rail transportation,20096
+2016,water_transport,Water transportation,6482
+2016,truck_transport,Truck transportation,67962
+2016,transit_ground,Transit and ground passenger transportation,18906
+2016,pipeline,Pipeline transportation,28893
+2016,other_transport_support,Other transportation and support activities,35790
+2016,warehousing,Warehousing and storage,7415
+2016,information,Information,589707
+2016,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",355717
+2016,securities,"Securities, commodity contracts, and investments",24311
+2016,insurance,Insurance carriers and related activities,290793
+2016,funds_trusts,"Funds, trusts, and other financial vehicles",5093
+2016,real_estate,Real estate,1855909
+2016,rental_leasing,Rental and leasing services and lessors of intangible assets,153356
+2016,legal,Legal services,115456
+2016,computer_systems,Computer systems design and related services,55076
+2016,misc_professional,"Miscellaneous professional, scientific, and technical services",250258
+2016,management_companies,Management of companies and enterprises,35892
+2016,admin_support,Administrative and support services,119557
+2016,waste_remediation,Waste management and remediation services,16917
+2016,education,Educational services,43866
+2016,ambulatory_health,Ambulatory health care services,151858
+2016,hospitals_nursing,"Hospitals, nursing and residential care facilities",84206
+2016,social_assistance,Social assistance,11879
+2016,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",55369
+2016,amusement_recreation,"Amusements, gambling, and recreation industries",20240
+2016,accommodation,Accommodation,58873
+2016,food_services,Food services and drinking places,85572
+2016,other_services,"Other services, except government",98355
+2017,oil_gas_extraction,Oil and gas extraction,100192
+2017,mining_except_oil_gas,"Mining, except oil and gas",29480
+2017,support_mining,Support activities for mining,21720
+2017,utilities,Utilities,170362
+2017,construction,Construction,309683
+2017,wood_products,Wood products,12656
+2017,nonmetallic_mineral,Nonmetallic mineral products,27458
+2017,primary_metals,Primary metals,25463
+2017,fabricated_metal,Fabricated metal products,41922
+2017,machinery,Machinery,49184
+2017,computer_electronic,Computer and electronic products,89654
+2017,electrical_equipment,"Electrical equipment, appliances, and components",20200
+2017,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",80095
+2017,other_transport_equipment,Other transportation equipment,69205
+2017,furniture,Furniture and related products,6521
+2017,misc_manufacturing,Miscellaneous manufacturing,31013
+2017,food_beverage_tobacco,Food and beverage and tobacco products,131740
+2017,textiles,Textile mills and textile product mills,4401
+2017,apparel_leather,Apparel and leather and allied products,1268
+2017,paper,Paper products,23688
+2017,printing,Printing and related support activities,13598
+2017,petroleum_coal,Petroleum and coal products,87231
+2017,chemicals,Chemical products,224706
+2017,plastics_rubber,Plastics and rubber products,28068
+2017,wholesale,Wholesale trade,419837
+2017,retail,Retail trade,339634
+2017,air_transport,Air transportation,46346
+2017,rail_transport,Rail transportation,22481
+2017,water_transport,Water transportation,5828
+2017,truck_transport,Truck transportation,77160
+2017,transit_ground,Transit and ground passenger transportation,19576
+2017,pipeline,Pipeline transportation,30054
+2017,other_transport_support,Other transportation and support activities,36336
+2017,warehousing,Warehousing and storage,6319
+2017,information,Information,602678
+2017,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",366083
+2017,securities,"Securities, commodity contracts, and investments",26611
+2017,insurance,Insurance carriers and related activities,267302
+2017,funds_trusts,"Funds, trusts, and other financial vehicles",4036
+2017,real_estate,Real estate,1937377
+2017,rental_leasing,Rental and leasing services and lessors of intangible assets,154996
+2017,legal,Legal services,118269
+2017,computer_systems,Computer systems design and related services,54929
+2017,misc_professional,"Miscellaneous professional, scientific, and technical services",258783
+2017,management_companies,Management of companies and enterprises,36459
+2017,admin_support,Administrative and support services,130141
+2017,waste_remediation,Waste management and remediation services,19317
+2017,education,Educational services,43929
+2017,ambulatory_health,Ambulatory health care services,154882
+2017,hospitals_nursing,"Hospitals, nursing and residential care facilities",85477
+2017,social_assistance,Social assistance,11965
+2017,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",58667
+2017,amusement_recreation,"Amusements, gambling, and recreation industries",19224
+2017,accommodation,Accommodation,63036
+2017,food_services,Food services and drinking places,86471
+2017,other_services,"Other services, except government",103985
+2018,oil_gas_extraction,Oil and gas extraction,123471
+2018,mining_except_oil_gas,"Mining, except oil and gas",27488
+2018,support_mining,Support activities for mining,33630
+2018,utilities,Utilities,171814
+2018,construction,Construction,320092
+2018,wood_products,Wood products,12574
+2018,nonmetallic_mineral,Nonmetallic mineral products,27039
+2018,primary_metals,Primary metals,31214
+2018,fabricated_metal,Fabricated metal products,42970
+2018,machinery,Machinery,50624
+2018,computer_electronic,Computer and electronic products,92954
+2018,electrical_equipment,"Electrical equipment, appliances, and components",21111
+2018,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",77509
+2018,other_transport_equipment,Other transportation equipment,72978
+2018,furniture,Furniture and related products,6937
+2018,misc_manufacturing,Miscellaneous manufacturing,33356
+2018,food_beverage_tobacco,Food and beverage and tobacco products,123680
+2018,textiles,Textile mills and textile product mills,3437
+2018,apparel_leather,Apparel and leather and allied products,1259
+2018,paper,Paper products,27076
+2018,printing,Printing and related support activities,14143
+2018,petroleum_coal,Petroleum and coal products,130258
+2018,chemicals,Chemical products,272202
+2018,plastics_rubber,Plastics and rubber products,29323
+2018,wholesale,Wholesale trade,429129
+2018,retail,Retail trade,353265
+2018,air_transport,Air transportation,43845
+2018,rail_transport,Rail transportation,23734
+2018,water_transport,Water transportation,7213
+2018,truck_transport,Truck transportation,83374
+2018,transit_ground,Transit and ground passenger transportation,19484
+2018,pipeline,Pipeline transportation,32617
+2018,other_transport_support,Other transportation and support activities,38046
+2018,warehousing,Warehousing and storage,6943
+2018,information,Information,602364
+2018,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",392632
+2018,securities,"Securities, commodity contracts, and investments",28734
+2018,insurance,Insurance carriers and related activities,263349
+2018,funds_trusts,"Funds, trusts, and other financial vehicles",-2278
+2018,real_estate,Real estate,2062070
+2018,rental_leasing,Rental and leasing services and lessors of intangible assets,166179
+2018,legal,Legal services,122441
+2018,computer_systems,Computer systems design and related services,65324
+2018,misc_professional,"Miscellaneous professional, scientific, and technical services",274120
+2018,management_companies,Management of companies and enterprises,37166
+2018,admin_support,Administrative and support services,139156
+2018,waste_remediation,Waste management and remediation services,20384
+2018,education,Educational services,45286
+2018,ambulatory_health,Ambulatory health care services,153401
+2018,hospitals_nursing,"Hospitals, nursing and residential care facilities",87998
+2018,social_assistance,Social assistance,12029
+2018,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",63521
+2018,amusement_recreation,"Amusements, gambling, and recreation industries",19230
+2018,accommodation,Accommodation,66564
+2018,food_services,Food services and drinking places,86969
+2018,other_services,"Other services, except government",109803
+2019,oil_gas_extraction,Oil and gas extraction,105857
+2019,mining_except_oil_gas,"Mining, except oil and gas",28247
+2019,support_mining,Support activities for mining,29379
+2019,utilities,Utilities,177081
+2019,construction,Construction,343185
+2019,wood_products,Wood products,11329
+2019,nonmetallic_mineral,Nonmetallic mineral products,29530
+2019,primary_metals,Primary metals,30633
+2019,fabricated_metal,Fabricated metal products,47924
+2019,machinery,Machinery,55063
+2019,computer_electronic,Computer and electronic products,95971
+2019,electrical_equipment,"Electrical equipment, appliances, and components",20796
+2019,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",77377
+2019,other_transport_equipment,Other transportation equipment,74937
+2019,furniture,Furniture and related products,7532
+2019,misc_manufacturing,Miscellaneous manufacturing,31553
+2019,food_beverage_tobacco,Food and beverage and tobacco products,122142
+2019,textiles,Textile mills and textile product mills,3672
+2019,apparel_leather,Apparel and leather and allied products,1662
+2019,paper,Paper products,28294
+2019,printing,Printing and related support activities,14040
+2019,petroleum_coal,Petroleum and coal products,118117
+2019,chemicals,Chemical products,245253
+2019,plastics_rubber,Plastics and rubber products,31735
+2019,wholesale,Wholesale trade,457185
+2019,retail,Retail trade,370028
+2019,air_transport,Air transportation,48721
+2019,rail_transport,Rail transportation,23079
+2019,water_transport,Water transportation,6570
+2019,truck_transport,Truck transportation,81974
+2019,transit_ground,Transit and ground passenger transportation,20902
+2019,pipeline,Pipeline transportation,26489
+2019,other_transport_support,Other transportation and support activities,38717
+2019,warehousing,Warehousing and storage,7581
+2019,information,Information,678764
+2019,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",429555
+2019,securities,"Securities, commodity contracts, and investments",12303
+2019,insurance,Insurance carriers and related activities,298463
+2019,funds_trusts,"Funds, trusts, and other financial vehicles",-1843
+2019,real_estate,Real estate,2143982
+2019,rental_leasing,Rental and leasing services and lessors of intangible assets,177843
+2019,legal,Legal services,128486
+2019,computer_systems,Computer systems design and related services,61585
+2019,misc_professional,"Miscellaneous professional, scientific, and technical services",289782
+2019,management_companies,Management of companies and enterprises,38144
+2019,admin_support,Administrative and support services,144126
+2019,waste_remediation,Waste management and remediation services,20512
+2019,education,Educational services,46497
+2019,ambulatory_health,Ambulatory health care services,165928
+2019,hospitals_nursing,"Hospitals, nursing and residential care facilities",91176
+2019,social_assistance,Social assistance,12809
+2019,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",65325
+2019,amusement_recreation,"Amusements, gambling, and recreation industries",21159
+2019,accommodation,Accommodation,70262
+2019,food_services,Food services and drinking places,96070
+2019,other_services,"Other services, except government",114230
+2020,oil_gas_extraction,Oil and gas extraction,43691
+2020,mining_except_oil_gas,"Mining, except oil and gas",35531
+2020,support_mining,Support activities for mining,17231
+2020,utilities,Utilities,186140
+2020,construction,Construction,415267
+2020,wood_products,Wood products,18664
+2020,nonmetallic_mineral,Nonmetallic mineral products,32624
+2020,primary_metals,Primary metals,24178
+2020,fabricated_metal,Fabricated metal products,52949
+2020,machinery,Machinery,56851
+2020,computer_electronic,Computer and electronic products,97993
+2020,electrical_equipment,"Electrical equipment, appliances, and components",20927
+2020,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",68238
+2020,other_transport_equipment,Other transportation equipment,59567
+2020,furniture,Furniture and related products,9410
+2020,misc_manufacturing,Miscellaneous manufacturing,38098
+2020,food_beverage_tobacco,Food and beverage and tobacco products,143748
+2020,textiles,Textile mills and textile product mills,4644
+2020,apparel_leather,Apparel and leather and allied products,3461
+2020,paper,Paper products,32109
+2020,printing,Printing and related support activities,13818
+2020,petroleum_coal,Petroleum and coal products,37620
+2020,chemicals,Chemical products,264813
+2020,plastics_rubber,Plastics and rubber products,29997
+2020,wholesale,Wholesale trade,510391
+2020,retail,Retail trade,455260
+2020,air_transport,Air transportation,12684
+2020,rail_transport,Rail transportation,23338
+2020,water_transport,Water transportation,4928
+2020,truck_transport,Truck transportation,91674
+2020,transit_ground,Transit and ground passenger transportation,17850
+2020,pipeline,Pipeline transportation,26145
+2020,other_transport_support,Other transportation and support activities,56845
+2020,warehousing,Warehousing and storage,4859
+2020,information,Information,702438
+2020,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",434743
+2020,securities,"Securities, commodity contracts, and investments",33619
+2020,insurance,Insurance carriers and related activities,274397
+2020,funds_trusts,"Funds, trusts, and other financial vehicles",-2542
+2020,real_estate,Real estate,2257257
+2020,rental_leasing,Rental and leasing services and lessors of intangible assets,189222
+2020,legal,Legal services,135394
+2020,computer_systems,Computer systems design and related services,68867
+2020,misc_professional,"Miscellaneous professional, scientific, and technical services",313101
+2020,management_companies,Management of companies and enterprises,38565
+2020,admin_support,Administrative and support services,151740
+2020,waste_remediation,Waste management and remediation services,23596
+2020,education,Educational services,34509
+2020,ambulatory_health,Ambulatory health care services,197595
+2020,hospitals_nursing,"Hospitals, nursing and residential care facilities",99145
+2020,social_assistance,Social assistance,15430
+2020,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",42177
+2020,amusement_recreation,"Amusements, gambling, and recreation industries",11693
+2020,accommodation,Accommodation,38750
+2020,food_services,Food services and drinking places,111424
+2020,other_services,"Other services, except government",111485
+2021,oil_gas_extraction,Oil and gas extraction,160582
+2021,mining_except_oil_gas,"Mining, except oil and gas",43234
+2021,support_mining,Support activities for mining,18798
+2021,utilities,Utilities,228491
+2021,construction,Construction,400864
+2021,wood_products,Wood products,31908
+2021,nonmetallic_mineral,Nonmetallic mineral products,33857
+2021,primary_metals,Primary metals,37455
+2021,fabricated_metal,Fabricated metal products,43003
+2021,machinery,Machinery,55905
+2021,computer_electronic,Computer and electronic products,101010
+2021,electrical_equipment,"Electrical equipment, appliances, and components",21220
+2021,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",62049
+2021,other_transport_equipment,Other transportation equipment,69301
+2021,furniture,Furniture and related products,7514
+2021,misc_manufacturing,Miscellaneous manufacturing,37940
+2021,food_beverage_tobacco,Food and beverage and tobacco products,147887
+2021,textiles,Textile mills and textile product mills,4526
+2021,apparel_leather,Apparel and leather and allied products,4493
+2021,paper,Paper products,30498
+2021,printing,Printing and related support activities,15621
+2021,petroleum_coal,Petroleum and coal products,124996
+2021,chemicals,Chemical products,329991
+2021,plastics_rubber,Plastics and rubber products,27520
+2021,wholesale,Wholesale trade,515149
+2021,retail,Retail trade,538507
+2021,air_transport,Air transportation,39448
+2021,rail_transport,Rail transportation,28131
+2021,water_transport,Water transportation,11962
+2021,truck_transport,Truck transportation,109419
+2021,transit_ground,Transit and ground passenger transportation,23585
+2021,pipeline,Pipeline transportation,29599
+2021,other_transport_support,Other transportation and support activities,69417
+2021,warehousing,Warehousing and storage,5754
+2021,information,Information,747373
+2021,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",476588
+2021,securities,"Securities, commodity contracts, and investments",40031
+2021,insurance,Insurance carriers and related activities,282872
+2021,funds_trusts,"Funds, trusts, and other financial vehicles",18074
+2021,real_estate,Real estate,2420972
+2021,rental_leasing,Rental and leasing services and lessors of intangible assets,219541
+2021,legal,Legal services,149743
+2021,computer_systems,Computer systems design and related services,55871
+2021,misc_professional,"Miscellaneous professional, scientific, and technical services",346507
+2021,management_companies,Management of companies and enterprises,39511
+2021,admin_support,Administrative and support services,167404
+2021,waste_remediation,Waste management and remediation services,26802
+2021,education,Educational services,37866
+2021,ambulatory_health,Ambulatory health care services,209947
+2021,hospitals_nursing,"Hospitals, nursing and residential care facilities",105512
+2021,social_assistance,Social assistance,23813
+2021,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",63668
+2021,amusement_recreation,"Amusements, gambling, and recreation industries",22279
+2021,accommodation,Accommodation,76218
+2021,food_services,Food services and drinking places,191259
+2021,other_services,"Other services, except government",133140
+2022,oil_gas_extraction,Oil and gas extraction,249877
+2022,mining_except_oil_gas,"Mining, except oil and gas",46097
+2022,support_mining,Support activities for mining,28849
+2022,utilities,Utilities,269266
+2022,construction,Construction,404521
+2022,wood_products,Wood products,32315
+2022,nonmetallic_mineral,Nonmetallic mineral products,34250
+2022,primary_metals,Primary metals,43870
+2022,fabricated_metal,Fabricated metal products,54642
+2022,machinery,Machinery,60610
+2022,computer_electronic,Computer and electronic products,101321
+2022,electrical_equipment,"Electrical equipment, appliances, and components",26549
+2022,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",74373
+2022,other_transport_equipment,Other transportation equipment,66598
+2022,furniture,Furniture and related products,8260
+2022,misc_manufacturing,Miscellaneous manufacturing,33443
+2022,food_beverage_tobacco,Food and beverage and tobacco products,122187
+2022,textiles,Textile mills and textile product mills,3005
+2022,apparel_leather,Apparel and leather and allied products,3379
+2022,paper,Paper products,33379
+2022,printing,Printing and related support activities,13662
+2022,petroleum_coal,Petroleum and coal products,205424
+2022,chemicals,Chemical products,361676
+2022,plastics_rubber,Plastics and rubber products,33808
+2022,wholesale,Wholesale trade,597164
+2022,retail,Retail trade,536742
+2022,air_transport,Air transportation,48449
+2022,rail_transport,Rail transportation,29245
+2022,water_transport,Water transportation,11638
+2022,truck_transport,Truck transportation,120531
+2022,transit_ground,Transit and ground passenger transportation,26321
+2022,pipeline,Pipeline transportation,30172
+2022,other_transport_support,Other transportation and support activities,76494
+2022,warehousing,Warehousing and storage,4804
+2022,information,Information,798214
+2022,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",542722
+2022,securities,"Securities, commodity contracts, and investments",14421
+2022,insurance,Insurance carriers and related activities,319523
+2022,funds_trusts,"Funds, trusts, and other financial vehicles",11041
+2022,real_estate,Real estate,2666533
+2022,rental_leasing,Rental and leasing services and lessors of intangible assets,241199
+2022,legal,Legal services,153592
+2022,computer_systems,Computer systems design and related services,50905
+2022,misc_professional,"Miscellaneous professional, scientific, and technical services",360796
+2022,management_companies,Management of companies and enterprises,43117
+2022,admin_support,Administrative and support services,176813
+2022,waste_remediation,Waste management and remediation services,28296
+2022,education,Educational services,40800
+2022,ambulatory_health,Ambulatory health care services,182788
+2022,hospitals_nursing,"Hospitals, nursing and residential care facilities",98607
+2022,social_assistance,Social assistance,16555
+2022,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",68179
+2022,amusement_recreation,"Amusements, gambling, and recreation industries",21509
+2022,accommodation,Accommodation,83416
+2022,food_services,Food services and drinking places,106974
+2022,other_services,"Other services, except government",125380
+2023,oil_gas_extraction,Oil and gas extraction,201406
+2023,mining_except_oil_gas,"Mining, except oil and gas",46695
+2023,support_mining,Support activities for mining,30911
+2023,utilities,Utilities,298337
+2023,construction,Construction,451677
+2023,wood_products,Wood products,23947
+2023,nonmetallic_mineral,Nonmetallic mineral products,44221
+2023,primary_metals,Primary metals,40955
+2023,fabricated_metal,Fabricated metal products,67406
+2023,machinery,Machinery,92382
+2023,computer_electronic,Computer and electronic products,93149
+2023,electrical_equipment,"Electrical equipment, appliances, and components",34097
+2023,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",88134
+2023,other_transport_equipment,Other transportation equipment,68413
+2023,furniture,Furniture and related products,8993
+2023,misc_manufacturing,Miscellaneous manufacturing,41767
+2023,food_beverage_tobacco,Food and beverage and tobacco products,180832
+2023,textiles,Textile mills and textile product mills,3993
+2023,apparel_leather,Apparel and leather and allied products,3540
+2023,paper,Paper products,32965
+2023,printing,Printing and related support activities,14481
+2023,petroleum_coal,Petroleum and coal products,168226
+2023,chemicals,Chemical products,340164
+2023,plastics_rubber,Plastics and rubber products,35559
+2023,wholesale,Wholesale trade,682786
+2023,retail,Retail trade,574747
+2023,air_transport,Air transportation,55739
+2023,rail_transport,Rail transportation,28909
+2023,water_transport,Water transportation,13906
+2023,truck_transport,Truck transportation,105613
+2023,transit_ground,Transit and ground passenger transportation,27257
+2023,pipeline,Pipeline transportation,31934
+2023,other_transport_support,Other transportation and support activities,68487
+2023,warehousing,Warehousing and storage,5141
+2023,information,Information,902629
+2023,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",704274
+2023,securities,"Securities, commodity contracts, and investments",28412
+2023,insurance,Insurance carriers and related activities,385736
+2023,funds_trusts,"Funds, trusts, and other financial vehicles",6066
+2023,real_estate,Real estate,2919811
+2023,rental_leasing,Rental and leasing services and lessors of intangible assets,237620
+2023,legal,Legal services,165600
+2023,computer_systems,Computer systems design and related services,66747
+2023,misc_professional,"Miscellaneous professional, scientific, and technical services",392063
+2023,management_companies,Management of companies and enterprises,45964
+2023,admin_support,Administrative and support services,181291
+2023,waste_remediation,Waste management and remediation services,32599
+2023,education,Educational services,43758
+2023,ambulatory_health,Ambulatory health care services,206353
+2023,hospitals_nursing,"Hospitals, nursing and residential care facilities",107994
+2023,social_assistance,Social assistance,17082
+2023,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",62946
+2023,amusement_recreation,"Amusements, gambling, and recreation industries",22517
+2023,accommodation,Accommodation,89837
+2023,food_services,Food services and drinking places,136016
+2023,other_services,"Other services, except government",129225
+2024,oil_gas_extraction,Oil and gas extraction,186939
+2024,mining_except_oil_gas,"Mining, except oil and gas",45656
+2024,support_mining,Support activities for mining,28452
+2024,utilities,Utilities,284280
+2024,construction,Construction,488094
+2024,wood_products,Wood products,22088
+2024,nonmetallic_mineral,Nonmetallic mineral products,43604
+2024,primary_metals,Primary metals,33797
+2024,fabricated_metal,Fabricated metal products,62384
+2024,machinery,Machinery,93047
+2024,computer_electronic,Computer and electronic products,94376
+2024,electrical_equipment,"Electrical equipment, appliances, and components",34655
+2024,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",86436
+2024,other_transport_equipment,Other transportation equipment,67006
+2024,furniture,Furniture and related products,9006
+2024,misc_manufacturing,Miscellaneous manufacturing,43670
+2024,food_beverage_tobacco,Food and beverage and tobacco products,205784
+2024,textiles,Textile mills and textile product mills,3818
+2024,apparel_leather,Apparel and leather and allied products,3741
+2024,paper,Paper products,29998
+2024,printing,Printing and related support activities,14368
+2024,petroleum_coal,Petroleum and coal products,144401
+2024,chemicals,Chemical products,386919
+2024,plastics_rubber,Plastics and rubber products,30345
+2024,wholesale,Wholesale trade,698518
+2024,retail,Retail trade,598349
+2024,air_transport,Air transportation,52085
+2024,rail_transport,Rail transportation,28910
+2024,water_transport,Water transportation,14301
+2024,truck_transport,Truck transportation,103927
+2024,transit_ground,Transit and ground passenger transportation,35254
+2024,pipeline,Pipeline transportation,32773
+2024,other_transport_support,Other transportation and support activities,67550
+2024,warehousing,Warehousing and storage,5395
+2024,information,Information,988644
+2024,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",757846
+2024,securities,"Securities, commodity contracts, and investments",57804
+2024,insurance,Insurance carriers and related activities,416959
+2024,funds_trusts,"Funds, trusts, and other financial vehicles",2307
+2024,real_estate,Real estate,3122979
+2024,rental_leasing,Rental and leasing services and lessors of intangible assets,246270
+2024,legal,Legal services,183390
+2024,computer_systems,Computer systems design and related services,72506
+2024,misc_professional,"Miscellaneous professional, scientific, and technical services",419631
+2024,management_companies,Management of companies and enterprises,48075
+2024,admin_support,Administrative and support services,192802
+2024,waste_remediation,Waste management and remediation services,35136
+2024,education,Educational services,50193
+2024,ambulatory_health,Ambulatory health care services,229160
+2024,hospitals_nursing,"Hospitals, nursing and residential care facilities",119331
+2024,social_assistance,Social assistance,19954
+2024,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",68568
+2024,amusement_recreation,"Amusements, gambling, and recreation industries",24286
+2024,accommodation,Accommodation,91705
+2024,food_services,Food services and drinking places,143305
+2024,other_services,"Other services, except government",140185
+2025,oil_gas_extraction,Oil and gas extraction,171357
+2025,mining_except_oil_gas,"Mining, except oil and gas",49978
+2025,support_mining,Support activities for mining,27324
+2025,utilities,Utilities,305812
+2025,construction,Construction,470032
+2025,wood_products,Wood products,21832
+2025,nonmetallic_mineral,Nonmetallic mineral products,42378
+2025,primary_metals,Primary metals,31643
+2025,fabricated_metal,Fabricated metal products,60249
+2025,machinery,Machinery,91510
+2025,computer_electronic,Computer and electronic products,107923
+2025,electrical_equipment,"Electrical equipment, appliances, and components",35355
+2025,motor_vehicles,"Motor vehicles, bodies and trailers, and parts",79776
+2025,other_transport_equipment,Other transportation equipment,82252
+2025,furniture,Furniture and related products,8987
+2025,misc_manufacturing,Miscellaneous manufacturing,42638
+2025,food_beverage_tobacco,Food and beverage and tobacco products,191309
+2025,textiles,Textile mills and textile product mills,3775
+2025,apparel_leather,Apparel and leather and allied products,3680
+2025,paper,Paper products,30571
+2025,printing,Printing and related support activities,14470
+2025,petroleum_coal,Petroleum and coal products,117936
+2025,chemicals,Chemical products,410997
+2025,plastics_rubber,Plastics and rubber products,28635
+2025,wholesale,Wholesale trade,677284
+2025,retail,Retail trade,605084
+2025,air_transport,Air transportation,54234
+2025,rail_transport,Rail transportation,28887
+2025,water_transport,Water transportation,14021
+2025,truck_transport,Truck transportation,106839
+2025,transit_ground,Transit and ground passenger transportation,38514
+2025,pipeline,Pipeline transportation,35385
+2025,other_transport_support,Other transportation and support activities,70004
+2025,warehousing,Warehousing and storage,5687
+2025,information,Information,1062216
+2025,credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities",834283
+2025,securities,"Securities, commodity contracts, and investments",82108
+2025,insurance,Insurance carriers and related activities,482564
+2025,funds_trusts,"Funds, trusts, and other financial vehicles",6093
+2025,real_estate,Real estate,3314945
+2025,rental_leasing,Rental and leasing services and lessors of intangible assets,264481
+2025,legal,Legal services,201606
+2025,computer_systems,Computer systems design and related services,80697
+2025,misc_professional,"Miscellaneous professional, scientific, and technical services",438165
+2025,management_companies,Management of companies and enterprises,50417
+2025,admin_support,Administrative and support services,202250
+2025,waste_remediation,Waste management and remediation services,36557
+2025,education,Educational services,51552
+2025,ambulatory_health,Ambulatory health care services,244170
+2025,hospitals_nursing,"Hospitals, nursing and residential care facilities",127272
+2025,social_assistance,Social assistance,20935
+2025,performing_arts_museums,"Performing arts, spectator sports, museums, and related activities",74002
+2025,amusement_recreation,"Amusements, gambling, and recreation industries",25338
+2025,accommodation,Accommodation,93255
+2025,food_services,Food services and drinking places,142273
+2025,other_services,"Other services, except government",140060

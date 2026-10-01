@@ -1,0 +1,3 @@
+﻿node_key,default_source,replacement_source,reason,formula_changed
+rail_transport,BLS QCEW NAICS 482,"BLS CES CEU4348200001, Rail Transportation all employees, NSA",QCEW structurally excludes railroad workers covered by the railroad unemployment insurance system,False
+funds_trusts,BLS QCEW NAICS 525,"BLS CES CEU5552300001, Securities/Investments + Funds/Trusts aggregate all employees, NSA",BLS 2013 reclassification breaks standalone NAICS 525 employment; use the continuous 523+525 CES aggregate and match the productivity numerator to the same BEA aggregate,False
