@@ -1,0 +1,35 @@
+{
+  "source_type": "official_BLS_data_snapshot",
+  "snapshots_copied_once_from_repository_commit": "e95e200660503c7d9e5b01320703a03e6dfc796e",
+  "runtime_git_dependency": false,
+  "files": {
+    "Data/02_initial_feature_pool/raw_latest/metadata/ce.series": {
+      "sha256": "205d0d4b63e5456fc08963c5f9c15fd182d0fa4a7c9c61e54e8c2c35a41b673b",
+      "bytes": 3919874,
+      "source_url": "https://download.bls.gov/pub/time.series/ce/ce.series",
+      "original_repository_file": "Data/02_initial_feature_pool/raw/BLS/ce.series",
+      "kind": "BLS native reference catalog"
+    },
+    "Data/02_initial_feature_pool/raw_latest/metadata/ce.industry": {
+      "sha256": "829033b7a623b0030c952d1bb0d485541b5b4aefefa045332db22e08c9a00ab8",
+      "bytes": 57918,
+      "source_url": "https://download.bls.gov/pub/time.series/ce/ce.industry",
+      "original_repository_file": "Data/02_initial_feature_pool/raw/BLS/ce.industry",
+      "kind": "BLS native reference catalog"
+    },
+    "Data/02_initial_feature_pool/raw_latest/metadata/jt.series": {
+      "sha256": "c8423b38812650cf8686265ef776b8a23bcee6f8a98ec02a3f046b412ebbccf2",
+      "bytes": 156741,
+      "source_url": "https://download.bls.gov/pub/time.series/jt/jt.series",
+      "original_repository_file": "Data/02_initial_feature_pool/raw/BLS/jt.series",
+      "kind": "BLS native reference catalog"
+    },
+    "Data/02_initial_feature_pool/raw_latest/metadata/pc.series": {
+      "sha256": "b9885bb502f1e32cb060123ab74e5b13dfbcb0df40c143ed64e2bc436829c5c9",
+      "bytes": 848710,
+      "source_url": "https://download.bls.gov/pub/time.series/pc/pc.series",
+      "original_repository_file": "Data/02_initial_feature_pool/raw/BLS/pc.series",
+      "kind": "BLS native reference catalog"
+    }
+  }
+}

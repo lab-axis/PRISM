@@ -1,20 +1,23 @@
 {
-  "generated_at_utc": "2026-10-01T10:46:34.270252+00:00",
+  "status": "PASS",
+  "policy": "LATEST_OFFICIAL_VALUES_ONLY",
+  "publication_vintage_reconstruction": false,
+  "automatic_feature_expansion": false,
+  "derived_feature_count": 0,
   "period": [
     "2005Q1",
     "2025Q4"
   ],
   "quarters": 84,
   "nodes": 56,
-  "base_feature_candidates": 210,
-  "node_base_candidates": 24,
-  "global_base_candidates": 186,
-  "node_model_channels_pass": 120,
-  "global_model_channels_pass": 828,
-  "total_initial_model_channels": 948,
-  "minimum_time_coverage": 0.7,
-  "minimum_node_fraction_for_partial_node_feature": 0.4,
-  "registry_pass_rows": 948,
-  "availability_alignment": "point-in-time/revision-safe: unadjusted final series where possible; finalization-gated CES/PPI/JOLTS/QCEW; raw market Close; no fixed quarter lags",
-  "status": "PASS"
+  "node_features": 24,
+  "global_features": 91,
+  "total_original_features": 115,
+  "coverage_counts": {
+    "OBSERVED": 102528,
+    "NOT_PUBLISHED_FOR_INDUSTRY": 16800,
+    "NOT_YET_PUBLISHED": 1198,
+    "OFFICIALLY_NOT_COLLECTED": 14
+  },
+  "unresolved_published_source_gaps": 0
 }

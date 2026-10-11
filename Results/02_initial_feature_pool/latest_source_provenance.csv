@@ -1,0 +1,9 @@
+﻿source,series_requested,series_obtained,native_observations,origin
+ces_industry,394,394,109658,portable_official_source_cache
+ppi_industry,27,27,7627,portable_official_source_cache
+jolts,204,204,60996,portable_official_source_cache
+cpi,7,7,1948,portable_official_source_cache+current_FRED_CPI
+cps,7,7,2086,portable_official_source_cache
+national_ces,5,5,1327,portable_official_source_cache
+ppi_commodities,1,1,299,portable_official_source_cache
+ppi_final_demand,6,6,1432,portable_official_source_cache

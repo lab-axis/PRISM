@@ -1,4 +1,4 @@
-﻿source,base_feature,node_key,series_id
+﻿source,feature_id,node_key,series_id
 BLS CES,ces_exact_all_employees,oil_gas_extraction,CEU1021100001
 BLS CES,ces_exact_all_employees,mining_except_oil_gas,CEU1021200001
 BLS CES,ces_exact_all_employees,support_mining,CEU1021300001
@@ -20,7 +20,6 @@ BLS CES,ces_exact_all_employees,petroleum_coal,CEU3232400001
 BLS CES,ces_exact_all_employees,chemicals,CEU3232500001
 BLS CES,ces_exact_all_employees,plastics_rubber,CEU3232600001
 BLS CES,ces_exact_all_employees,wholesale,CEU4142000001
-BLS CES,ces_exact_all_employees,retail,CEU4200000001
 BLS CES,ces_exact_all_employees,air_transport,CEU4348100001
 BLS CES,ces_exact_all_employees,rail_transport,CEU4348200001
 BLS CES,ces_exact_all_employees,water_transport,CEU4348300001
@@ -63,7 +62,6 @@ BLS CES,ces_exact_avg_weekly_hours_all,printing,CEU3232300002
 BLS CES,ces_exact_avg_weekly_hours_all,chemicals,CEU3232500002
 BLS CES,ces_exact_avg_weekly_hours_all,plastics_rubber,CEU3232600002
 BLS CES,ces_exact_avg_weekly_hours_all,wholesale,CEU4142000002
-BLS CES,ces_exact_avg_weekly_hours_all,retail,CEU4200000002
 BLS CES,ces_exact_avg_weekly_hours_all,air_transport,CEU4348100002
 BLS CES,ces_exact_avg_weekly_hours_all,truck_transport,CEU4348400002
 BLS CES,ces_exact_avg_weekly_hours_all,transit_ground,CEU4348500002
@@ -102,7 +100,6 @@ BLS CES,ces_exact_avg_hourly_earnings_all,printing,CEU3232300003
 BLS CES,ces_exact_avg_hourly_earnings_all,chemicals,CEU3232500003
 BLS CES,ces_exact_avg_hourly_earnings_all,plastics_rubber,CEU3232600003
 BLS CES,ces_exact_avg_hourly_earnings_all,wholesale,CEU4142000003
-BLS CES,ces_exact_avg_hourly_earnings_all,retail,CEU4200000003
 BLS CES,ces_exact_avg_hourly_earnings_all,air_transport,CEU4348100003
 BLS CES,ces_exact_avg_hourly_earnings_all,truck_transport,CEU4348400003
 BLS CES,ces_exact_avg_hourly_earnings_all,transit_ground,CEU4348500003
@@ -141,7 +138,6 @@ BLS CES,ces_exact_prod_nonsup_employees,printing,CEU3232300006
 BLS CES,ces_exact_prod_nonsup_employees,chemicals,CEU3232500006
 BLS CES,ces_exact_prod_nonsup_employees,plastics_rubber,CEU3232600006
 BLS CES,ces_exact_prod_nonsup_employees,wholesale,CEU4142000006
-BLS CES,ces_exact_prod_nonsup_employees,retail,CEU4200000006
 BLS CES,ces_exact_prod_nonsup_employees,air_transport,CEU4348100006
 BLS CES,ces_exact_prod_nonsup_employees,truck_transport,CEU4348400006
 BLS CES,ces_exact_prod_nonsup_employees,transit_ground,CEU4348500006
@@ -180,7 +176,6 @@ BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,printing,CEU3232300007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,chemicals,CEU3232500007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,plastics_rubber,CEU3232600007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,wholesale,CEU4142000007
-BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,retail,CEU4200000007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,air_transport,CEU4348100007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,truck_transport,CEU4348400007
 BLS CES,ces_exact_avg_weekly_hours_prod_nonsup,transit_ground,CEU4348500007
@@ -219,7 +214,6 @@ BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,printing,CEU3232300008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,chemicals,CEU3232500008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,plastics_rubber,CEU3232600008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,wholesale,CEU4142000008
-BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,retail,CEU4200000008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,air_transport,CEU4348100008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,truck_transport,CEU4348400008
 BLS CES,ces_exact_avg_hourly_earnings_prod_nonsup,transit_ground,CEU4348500008
@@ -259,7 +253,6 @@ BLS CES,ces_exact_women_employees,petroleum_coal,CEU3232400010
 BLS CES,ces_exact_women_employees,chemicals,CEU3232500010
 BLS CES,ces_exact_women_employees,plastics_rubber,CEU3232600010
 BLS CES,ces_exact_women_employees,wholesale,CEU4142000010
-BLS CES,ces_exact_women_employees,retail,CEU4200000010
 BLS CES,ces_exact_women_employees,air_transport,CEU4348100010
 BLS CES,ces_exact_women_employees,water_transport,CEU4348300010
 BLS CES,ces_exact_women_employees,truck_transport,CEU4348400010
@@ -301,7 +294,6 @@ BLS CES,ces_exact_avg_weekly_earnings_all,printing,CEU3232300011
 BLS CES,ces_exact_avg_weekly_earnings_all,chemicals,CEU3232500011
 BLS CES,ces_exact_avg_weekly_earnings_all,plastics_rubber,CEU3232600011
 BLS CES,ces_exact_avg_weekly_earnings_all,wholesale,CEU4142000011
-BLS CES,ces_exact_avg_weekly_earnings_all,retail,CEU4200000011
 BLS CES,ces_exact_avg_weekly_earnings_all,air_transport,CEU4348100011
 BLS CES,ces_exact_avg_weekly_earnings_all,truck_transport,CEU4348400011
 BLS CES,ces_exact_avg_weekly_earnings_all,transit_ground,CEU4348500011
@@ -340,7 +332,6 @@ BLS CES,ces_exact_aggregate_weekly_hours_index,printing,CEU3232300016
 BLS CES,ces_exact_aggregate_weekly_hours_index,chemicals,CEU3232500016
 BLS CES,ces_exact_aggregate_weekly_hours_index,plastics_rubber,CEU3232600016
 BLS CES,ces_exact_aggregate_weekly_hours_index,wholesale,CEU4142000016
-BLS CES,ces_exact_aggregate_weekly_hours_index,retail,CEU4200000016
 BLS CES,ces_exact_aggregate_weekly_hours_index,air_transport,CEU4348100016
 BLS CES,ces_exact_aggregate_weekly_hours_index,truck_transport,CEU4348400016
 BLS CES,ces_exact_aggregate_weekly_hours_index,transit_ground,CEU4348500016
@@ -379,7 +370,6 @@ BLS CES,ces_exact_aggregate_weekly_payrolls_index,printing,CEU3232300017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,chemicals,CEU3232500017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,plastics_rubber,CEU3232600017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,wholesale,CEU4142000017
-BLS CES,ces_exact_aggregate_weekly_payrolls_index,retail,CEU4200000017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,air_transport,CEU4348100017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,truck_transport,CEU4348400017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,transit_ground,CEU4348500017
@@ -398,11 +388,6 @@ BLS CES,ces_exact_aggregate_weekly_payrolls_index,amusement_recreation,CEU707130
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,accommodation,CEU7072100017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,food_services,CEU7072200017
 BLS CES,ces_exact_aggregate_weekly_payrolls_index,other_services,CEU8000000017
-GLOBAL_CES,bls_total_nonfarm_employment,ALL,
-GLOBAL_CES,bls_private_avg_weekly_hours,ALL,
-GLOBAL_CES,bls_private_avg_hourly_earnings,ALL,
-GLOBAL_CES,bls_private_aggregate_weekly_hours_index,ALL,
-GLOBAL_CES,bls_private_aggregate_weekly_payrolls_index,ALL,
 BLS PPI,ppi_industry_net_output,oil_gas_extraction,PCU211---211---
 BLS PPI,ppi_industry_net_output,mining_except_oil_gas,PCU212---212---
 BLS PPI,ppi_industry_net_output,support_mining,PCU213---213---
