@@ -1,0 +1,103 @@
+{
+  "status": "PASS",
+  "policy": "LATEST_OFFICIAL_VALUES_ONLY",
+  "outputs": {
+    "train": "Data/03_integrated_dataset/raw_train.csv",
+    "val": "Data/03_integrated_dataset/raw_val.csv",
+    "test": "Data/03_integrated_dataset/raw_test.csv"
+  },
+  "period": [
+    "2006Q1",
+    "2025Q4"
+  ],
+  "quarters": 80,
+  "industries": 56,
+  "rows": 4480,
+  "columns": 122,
+  "split_periods": {
+    "train": [
+      "2006Q1",
+      "2019Q4"
+    ],
+    "val": [
+      "2020Q1",
+      "2022Q4"
+    ],
+    "test": [
+      "2023Q1",
+      "2025Q4"
+    ]
+  },
+  "split_rows": {
+    "train": 3136,
+    "val": 672,
+    "test": 672
+  },
+  "split_ratio_quarters": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  },
+  "identifier_columns": [
+    "quarter",
+    "node_key",
+    "node_name"
+  ],
+  "target_columns": [
+    "target_profitability",
+    "target_productivity",
+    "target_growth",
+    "target_ici"
+  ],
+  "target_count": 4,
+  "node_feature_count": 24,
+  "global_feature_count": 91,
+  "total_feature_count": 115,
+  "auto_generated_feature_count": 0,
+  "missing_targets": 0,
+  "missing_original_feature_cells": 22196,
+  "gos_quarterly_method": "first-difference proportional Denton, current-VA SAAR indicator; Train/Val/Test annual blocks frozen sequentially, with boundary-ratio anchor",
+  "gos_benchmark_blocks": {
+    "train": [
+      "2005",
+      "2019"
+    ],
+    "val": [
+      "2020",
+      "2022"
+    ],
+    "test": [
+      "2023",
+      "2025"
+    ]
+  },
+  "max_gos_annual_benchmark_error": 5.820766091346741e-11,
+  "raw_axis_definitions": {
+    "profitability": "quarterly imputed GOS / quarterly nominal gross output",
+    "productivity": "quarterly real value added (million 2017 dollars, SAAR) / quarterly mean employment (thousand people); funds_trusts uses BEA 523+525 VA / CES 523+525 employment",
+    "growth": "quarterly real gross output / same quarter previous year - 1"
+  },
+  "target_scores": "fixed Train-only pooled 56-industry Min-Max, 2006Q1–2019Q4; held-out Val/Test use unchanged bounds, without clipping",
+  "target_normalization_fit_period": [
+    "2006Q1",
+    "2019Q4"
+  ],
+  "target_normalization_clipping": false,
+  "funds_trusts_productivity_correction": {
+    "source": "BLS CES CEU5552300001 (NAICS 523+525 combined, NSA)",
+    "numerator": "BEA securities real VA + BEA funds/trusts real VA",
+    "denominator": "CES 523+525 three-month-average employment in thousands",
+    "corrected_quarters": 80,
+    "audit_file": "Results/03_integrated_dataset/funds_trusts_productivity_correction.csv"
+  },
+  "ici": "(target_profitability + target_productivity + target_growth) / 3",
+  "target_mean_timeseries": {
+    "plot": "Results/03_integrated_dataset/target_quarterly_mean_timeseries.png",
+    "quarterly_means_csv": "Results/03_integrated_dataset/target_quarterly_mean_timeseries.csv",
+    "mean_method": "arithmetic mean over all 56 industries, separately for each quarter and scored target",
+    "quarters": 80,
+    "industries_per_quarter": 56
+  },
+  "no_imputation_or_feature_selection_in_stage_03": true,
+  "created_at_utc": "2026-10-11T03:26:08.074988+00:00"
+}
