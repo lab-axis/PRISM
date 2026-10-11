@@ -1,0 +1,14 @@
+{
+  "source_type": "official_BLS_data_snapshot",
+  "snapshots_copied_once_from_repository_commit": "e95e200660503c7d9e5b01320703a03e6dfc796e",
+  "runtime_git_dependency": false,
+  "files": {
+    "Data/01_target_data_collection/raw_latest/qcew_monthly_employment_2003_2025.json": {
+      "sha256": "417bef5445cb2a5c5dd6d13124396291ae79d61532d1984501f04efbe0d4d246",
+      "bytes": 523149,
+      "source_url": "https://api.bls.gov/publicAPI/v2/timeseries/data/",
+      "original_repository_file": "Data/01_target_data_collection/raw/BLS/qcew_monthly_employment_2003_2025.json",
+      "kind": "QCEW API industry employment"
+    }
+  }
+}
