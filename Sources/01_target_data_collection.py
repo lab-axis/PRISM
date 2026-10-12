@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect the latest official source levels for PRISM's 56 industries.
+"""Collect the latest official source levels for PRISM's 59 industries.
 
 No retrospective publication-vintage reconstruction, no target/ICI calculation.
 BEA: latest industry-account release. CES: latest public historical employment
@@ -73,7 +73,10 @@ transit_ground|Transit and ground passenger transportation|434850
 pipeline|Pipeline transportation|434860
 other_transport_support|Other transportation and support activities|434870;434880
 warehousing|Warehousing and storage|434930
-information|Information|500000
+information_publishing|Publishing industries, except internet (includes software)|
+information_motion_picture|Motion picture and sound recording industries|
+information_broadcast_telecom|Broadcasting and telecommunications|
+information_data_services|Data processing, internet publishing, and other information services|
 credit_intermediation|Federal Reserve banks, credit intermediation, and related activities|555210;555220
 securities|Securities, commodity contracts, and investments|
 insurance|Insurance carriers and related activities|555240
@@ -98,9 +101,22 @@ other_services|Other services, except government|800000"""
 INDUSTRIES = [tuple(row.split("|")) for row in NODES.splitlines()]
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
-NAICS = """211|212|213|22|23|321|327|331|332|333|334|335|3361,3362,3363|3364,3365,3366,3369|337|339|311,312|313,314|315,316|322|323|324|325|326|42|44-45|481|482|483|484|485|486|487,488|493|51|521,522|523|524|525|531|532,533|5411|5415|5412,5413,5414,5416,5417,5418,5419|55|561|562|61|621|622,623|624|711,712|713|721|722|81""".split("|")
-assert len(NAICS) == len(INDUSTRIES) == 56
+NAICS = """211|212|213|22|23|321|327|331|332|333|334|335|3361,3362,3363|3364,3365,3366,3369|337|339|311,312|313,314|315,316|322|323|324|325|326|42|44-45|481|482|483|484|485|486|487,488|493|511|512|515,517|518,519|521,522|523|524|525|531|532,533|5411|5415|5412,5413,5414,5416,5417,5418,5419|55|561|562|61|621|622,623|624|711,712|713|721|722|81""".split("|")
+assert len(NAICS) == len(INDUSTRIES) == 59
 NODE_NAICS = dict(zip((n[0] for n in INDUSTRIES), NAICS))
+# Industry nodes are all BEA-defined. Only the employment source differs:
+# current QCEW does not provide consistent 2003–2025 industry histories for
+# information subsectors across the 2022 NAICS revision. Use BLS-reconstructed
+# CES histories for those nodes without changing their BEA industry identities.
+NODE_EMPLOYMENT = {node: ("BLS_QCEW", tuple(codes.split(",")))
+                   for node, codes in NODE_NAICS.items()}
+NODE_EMPLOYMENT.update({
+    "rail_transport": ("BLS_CES", ("tri_434820_NSA.csv",)),
+    "information_publishing": ("BLS_CES", ("CEU5051100001",)),
+    "information_motion_picture": ("BLS_CES", ("CEU5051200001",)),
+    "information_broadcast_telecom": ("BLS_CES", ("CEU5051500001", "CEU5051700001")),
+    "information_data_services": ("BLS_CES", ("CEU5051800001", "CEU5051900001")),
+})
 
 def get(session: requests.Session, url: str) -> bytes:
     response = session.get(url, timeout=120)
@@ -504,6 +520,47 @@ def collect_latest_funds_ces(session: requests.Session) -> tuple[list[dict], dic
                   "source_url": source_url, "origin": origin, "months": len(rows)}
 
 
+def collect_latest_ces_employment() -> tuple[list[dict], dict]:
+    """Collect complete native CES histories declared by the node source registry.
+
+    Revised NAICS 2022 CES histories are not identical to BEA's 2017-NAICS
+    industry definitions; their scope needs validation before constructing ICI.
+    """
+    url = "https://fred.stlouisfed.org/graph/fredgraph.csv"
+    months = pd.period_range(f"{YEAR_START}-01", f"{YEAR_END}-12", freq="M").astype(str)
+    rows = []
+    series_ids = list(dict.fromkeys(series_id
+        for provider, ids in NODE_EMPLOYMENT.values() if provider == "BLS_CES"
+        for series_id in ids if series_id.startswith("CEU")))
+    for series_id in series_ids:
+        # FRED's CSV export may reject the browser user agent on our shared session.
+        response = requests.get(url, params={"id": series_id}, timeout=(6, 30))
+        response.raise_for_status()
+        table = pd.read_csv(io.BytesIO(response.content))
+        date_col = "observation_date" if "observation_date" in table else "DATE"
+        if date_col not in table or series_id not in table:
+            raise RuntimeError(f"Invalid CES information source: {series_id}")
+        dates = pd.to_datetime(table[date_col], errors="raise")
+        if not dates.dt.day.eq(1).all():
+            raise RuntimeError(f"CES information dates are not monthly: {series_id}")
+        values = pd.Series(pd.to_numeric(table[series_id], errors="coerce").to_numpy(),
+                           index=dates.dt.to_period("M").astype(str))
+        if values.index.has_duplicates:
+            raise RuntimeError(f"Duplicate CES information months: {series_id}")
+        values = values.reindex(months)
+        if values.isna().any() or (values <= 0).any() or not np.isfinite(values.to_numpy(float)).all():
+            raise RuntimeError(f"Incomplete CES information history: {series_id}")
+        rows.extend({
+            "provider": "BLS_CES", "series": "employment", "frequency": "monthly",
+            "period": month, "source_industry": series_id, "value": float(value),
+            "units": "thousands_of_people", "source_url": response.url,
+            "source_release_date": "",
+        } for month, value in values.items())
+    return rows, {"source": "BLS_CES_via_FRED", "series_ids": series_ids,
+        "months_per_series": len(months),
+        "classification": "NAICS_2022_revised_history"}
+
+
 def load_verified_qcew_snapshot(codes: list[str]) -> tuple[dict, str]:
     """Use an explicitly preserved source artifact, never a Git HEAD lookup.
 
@@ -524,7 +581,7 @@ def load_verified_qcew_snapshot(codes: list[str]) -> tuple[dict, str]:
         raise RuntimeError("QCEW snapshot provenance or SHA-256 integrity check failed")
     source = json.loads(blob)
     if set(source) != set(codes):
-        raise RuntimeError("QCEW snapshot code coverage disagrees with the 56-node registry")
+        raise RuntimeError("QCEW snapshot code coverage disagrees with the node registry")
     expected_months = set(pd.period_range(
         f"{YEAR_START}-01", f"{YEAR_END}-12", freq="M").astype(str))
     for code in codes:
@@ -570,7 +627,8 @@ def save_qcew_snapshot(rows: list[dict], codes: list[str]) -> None:
 
 def collect_latest_qcew(session: requests.Session) -> tuple[list[dict], dict]:
     """Fetch the BLS current-data API with the exact source NAICS codes."""
-    codes = sorted({code for spec in NODE_NAICS.values() for code in spec.split(",")})
+    codes = sorted({code for provider, ids in NODE_EMPLOYMENT.values()
+                    if provider == "BLS_QCEW" for code in ids})
     rows: list[dict] = []
     calls = 0
     try:
@@ -634,7 +692,7 @@ def collect_latest_qcew(session: requests.Session) -> tuple[list[dict], dict]:
                       "live_api_issue": str(exc)[:200]}
 
 
-def assign_nodes(bea: list[dict], rail: list[dict], qcew: list[dict],
+def assign_nodes(bea: list[dict], ces: list[dict], qcew: list[dict],
                  funds_aggregate: list[dict] | None = None) -> pd.DataFrame:
     """Keep original native observations, and exact component identities."""
     index = {}
@@ -647,21 +705,21 @@ def assign_nodes(bea: list[dict], rail: list[dict], qcew: list[dict],
     for raw in bea:
         for node in index.get(name(raw["source_industry"]).casefold(), []):
             rows.append({**raw, "node_key": node, "component": raw["source_industry"]})
-    for raw in rail:
-        rows.append({**raw, "node_key": "rail_transport", "component": raw["source_industry"]})
     for raw in funds_aggregate or []:
         if (raw["provider"] != "BLS_CES" or raw["series"] != FUNDS_CES_MEASURE
                 or raw["source_industry"] != FUNDS_CES_ID):
             raise RuntimeError("Unexpected CES industry scope in funds aggregate")
         rows.append({**raw, "node_key": "funds_trusts", "component": FUNDS_CES_ID})
-    lookup = {naics: node for node, codes in NODE_NAICS.items()
-              if node != "rail_transport" for naics in codes.split(",")}
-    if len(lookup) != sum(len(codes.split(",")) for node, codes in NODE_NAICS.items()
-                          if node != "rail_transport"):
-        raise RuntimeError("Overlapping QCEW NAICS component mapping: would duplicate employment")
-    for raw in qcew:
-        node = lookup.get(raw["source_industry"])
+    components = [(provider, code, node) for node, (provider, codes) in NODE_EMPLOYMENT.items()
+                  for code in codes]
+    lookup = {(provider, code): node for provider, code, node in components}
+    if len(lookup) != len(components):
+        raise RuntimeError("Overlapping industry employment source mapping")
+    for raw in [*ces, *qcew]:
+        node = lookup.get((raw["provider"], raw["source_industry"]))
         if node:
+            if raw["series"] != "employment":
+                raise RuntimeError("Unexpected industry employment series")
             rows.append({**raw, "node_key": node, "component": raw["source_industry"]})
     result = pd.DataFrame(rows)
     if result.empty:
@@ -688,8 +746,7 @@ def coverage_audit(data: pd.DataFrame) -> pd.DataFrame:
                 for quarter in range(1, 5):
                     for part in parts:
                         expected.append((node, series, "quarterly", f"{year}Q{quarter}", part))
-        employment = ("tri_434820_NSA.csv" if node == "rail_transport" else None)
-        employment_parts = ([employment] if employment else NODE_NAICS[node].split(","))
+        employment_parts = NODE_EMPLOYMENT[node][1]
         for year in range(2005, YEAR_END + 1):
             for month in range(1, 13):
                 for part in employment_parts:
@@ -716,11 +773,13 @@ def collect() -> dict:
         print(f"BEA latest release {bea_meta['release_date']}: {len(bea)} native observations", flush=True)
         rail, ces_meta = collect_latest_rail_ces(session)
         print(f"CES latest rail vintage {ces_meta['latest_vintage_month']}: {len(rail)} months", flush=True)
+        native_ces, native_ces_meta = collect_latest_ces_employment()
+        print(f"CES node employment histories: {len(native_ces)} months", flush=True)
         funds, funds_meta = collect_latest_funds_ces(session)
         print(f"CES 523+525 current combined employment: {len(funds)} months", flush=True)
         qcew, qcew_meta = collect_latest_qcew(session)
         print(f"QCEW current API: {len(qcew)} native observations", flush=True)
-    data = assign_nodes(bea, rail, qcew, funds)
+    data = assign_nodes(bea, [*rail, *native_ces], qcew, funds)
     audit = coverage_audit(data)
     output = DATA / "latest_sources.csv.gz"
     data.to_csv(output, index=False, compression="gzip")
@@ -740,7 +799,8 @@ def collect() -> dict:
         "expected_required_native_source_cells": len(audit),
         "missing_required_native_source_cells": len(missing),
         "latest_file": str(output.relative_to(ROOT)),
-        "bea": bea_meta, "ces": ces_meta, "funds_trusts_ces": funds_meta,
+        "bea": bea_meta, "ces": ces_meta, "native_ces_employment": native_ces_meta,
+        "funds_trusts_ces": funds_meta,
         "qcew": qcew_meta,
     }
     (RESULTS / "collection_summary.json").write_text(

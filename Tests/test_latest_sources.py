@@ -32,6 +32,84 @@ two = module("s02_latest", "02_initial_feature_pool.py")
 
 
 class StageOneLatest(unittest.TestCase):
+    def test_information_is_four_separate_bea_industries(self):
+        self.assertEqual(len(one.INDUSTRIES), 59)
+        self.assertNotIn("information", one.NODE_NAICS)
+        information_nodes = {
+            "information_publishing", "information_motion_picture",
+            "information_broadcast_telecom", "information_data_services",
+        }
+        self.assertEqual(one.NODE_NAICS["information_publishing"], "511")
+        self.assertEqual(one.NODE_NAICS["information_motion_picture"], "512")
+        self.assertEqual(one.NODE_NAICS["information_broadcast_telecom"], "515,517")
+        self.assertEqual(one.NODE_NAICS["information_data_services"], "518,519")
+        source = [dict(provider="BEA", series="gos", frequency="annual", period="2025",
+                       source_industry=label, value=10.0)
+                  for node, label, _ in one.INDUSTRIES if node in information_nodes]
+        self.assertEqual(set(one.assign_nodes(source, [], []).node_key),
+                         information_nodes)
+        self.assertFalse(hasattr(one, "INFORMATION_CES"))
+        self.assertFalse(hasattr(one, "collect_latest_information_ces"))
+        self.assertNotIn("information_ces", inspect.signature(one.assign_nodes).parameters)
+
+    def test_information_ces_monthly_histories_and_native_mapping(self):
+        months = pd.date_range("2003-01-01", "2025-12-01", freq="MS")
+        info_nodes = {node: source for node, source in one.NODE_EMPLOYMENT.items()
+                      if node.startswith("information_")}
+        ids = [sid for _, group in info_nodes.values() for sid in group]
+
+        def response(_url, *, params, timeout):
+            sid = params["id"]
+            data = pd.DataFrame({"DATE": months, sid: [float(ids.index(sid) + 10)] * len(months)})
+
+            class MockResponse:
+                content = data.to_csv(index=False).encode()
+                url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=" + sid
+
+                def raise_for_status(self):
+                    return None
+
+            return MockResponse()
+
+        with patch.object(one.requests, "get", side_effect=response):
+            ces, meta = one.collect_latest_ces_employment()
+        self.assertEqual(len(ces), 6 * 276)
+        self.assertEqual(meta["classification"], "NAICS_2022_revised_history")
+        self.assertEqual(set(meta["series_ids"]), set(ids))
+        rail = dict(provider="BLS_CES", series="employment", frequency="monthly",
+                    period="2025-12", source_industry="tri_434820_NSA.csv", value=149.0,
+                    units="thousands_of_people")
+        result = one.assign_nodes([], [*ces, rail], [])
+        coverage = one.coverage_audit(result)
+        self.assertEqual(set(result.node_key), set(info_nodes) | {"rail_transport"})
+        for node, (_, group) in info_nodes.items():
+            records = result[result.node_key == node]
+            self.assertEqual(len(records), len(group) * 276)
+            self.assertEqual(set(records.component), set(group))
+            self.assertEqual(set(records.units), {"thousands_of_people"})
+            observed = coverage[(coverage.node_key == node)
+                                & (coverage.series == "employment")
+                                & (coverage.period == "2025-12")]
+            self.assertEqual(set(observed.status), {"OBSERVED"})
+            self.assertEqual(len(observed), len(group))
+        self.assertEqual(ces[0]["period"], "2003-01")
+
+    def test_information_ces_rejects_incomplete_history(self):
+        series_id = one.NODE_EMPLOYMENT["information_publishing"][1][0]
+        content = pd.DataFrame({"DATE": ["2003-01-01"], series_id: [100.0]}
+                               ).to_csv(index=False).encode()
+
+        class MockResponse:
+            url = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=" + series_id
+
+            def raise_for_status(self):
+                return None
+
+        with patch.object(one.requests, "get", return_value=MockResponse()) as getter:
+            getter.return_value.content = content
+            with self.assertRaisesRegex(RuntimeError, "Incomplete CES information history"):
+                one.collect_latest_ces_employment()
+
     def test_portable_official_qcew_snapshot_and_checksum(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

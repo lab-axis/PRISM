@@ -33,7 +33,10 @@ transit_ground,Transit and ground passenger transportation,485
 pipeline,Pipeline transportation,486
 other_transport_support,Other transportation and support activities,"487,488"
 warehousing,Warehousing and storage,493
-information,Information,51
+information_publishing,"Publishing industries, except internet (includes software)",511
+information_motion_picture,Motion picture and sound recording industries,512
+information_broadcast_telecom,Broadcasting and telecommunications,"515,517"
+information_data_services,"Data processing, internet publishing, and other information services","518,519"
 credit_intermediation,"Federal Reserve banks, credit intermediation, and related activities","521,522"
 securities,"Securities, commodity contracts, and investments",523
 insurance,Insurance carriers and related activities,524
