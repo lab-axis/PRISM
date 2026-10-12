@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Calculate PRISM's three targets and ICI, then join all 115 source features.
+"""Calculate PRISM targets and a compact strictly lagged feature bank.
 
 Inputs are the latest (revised) official sources from Stages 01 and 02.
-This stage neither retrieves data nor produces extra predictor features,
-PIT histories, imputations, or fitted forecasting models.
+Target-derived features at row t use ONLY information through t-1,
+including validated 2005 inputs where the native components exist.
+Profitability history uses a past-year-annual-GOS proxy rather than the
+retrospectively Denton-benchmarked Target, whose earlier quarters can depend
+on later annual GOS within the same held-out split.
+No same-quarter/future Targets, feature selection, imputation, external source
+or point-in-time vintage is introduced by feature engineering.
 The THREE target scores use a single pooled Train-only Min-Max reference;
 predictor-feature scaling belongs to the later training pipeline.
 
 Normalization rationale for the paper (fixed-origin experiment):
 - For each of profitability, productivity and growth, calculate ONE common
-  min/max from all 56 industries in the complete Train period
+  min/max from all 59 industries in the complete Train period
   (2006Q1-2019Q4), then hold those bounds fixed for Val (2020Q1-2022Q4)
   and Test (2023Q1-2025Q4). Equal raw values therefore receive equal scores
   at every date; later observations cannot rescale historical scores.
@@ -36,7 +41,8 @@ Normalization rationale for the paper (fixed-origin experiment):
   This avoids hidden held-out annual GOS entering TRAIN labels.
 
 Outputs: raw_train.csv, raw_val.csv and raw_test.csv, each one row per
-(quarter, node_key) with four scored targets and 115 original features.
+(quarter, node_key) with four scored targets, the strictly historical
+target-feature bank first and all 115 original Stage 02 features unchanged.
 Raw component levels and verification details are saved under Results.
 """
 
@@ -62,6 +68,7 @@ DATA = ROOT / "Data/03_integrated_dataset"
 RESULTS = ROOT / "Results/03_integrated_dataset"
 MODEL_START, MODEL_END = "2006Q1", "2025Q4"
 HISTORY_START = "2005Q1"  # Needed for 4-quarter real-output growth.
+NODE_COUNT = 59
 SPLIT_PERIODS = {
     "train": ("2006Q1", "2019Q4"),
     "val": ("2020Q1", "2022Q4"),
@@ -75,6 +82,16 @@ SPLIT_FILES = {
 TARGETS = ["target_profitability", "target_productivity", "target_growth", "target_ici"]
 RAW_COMPONENTS = ["profitability_raw", "productivity_raw", "growth_raw"]
 IDS = ["quarter", "node_key", "node_name"]
+HISTORY_COLUMNS = [
+    "history_profitability", "history_productivity", "history_growth",
+]
+# The three direct lags are listed first ONLY for readability and stable
+# indexing in 03-05. They have no mandatory-inclusion status in 06/07
+# feature selection; any of the 157 input features may be excluded.
+TARGET_AXES = ("profitability", "productivity", "growth")
+TARGET_LAGS = (2, 4, 8, 12)
+TARGET_WINDOWS = (4, 8)
+TARGET_CHANGES = (1, 4)
 
 
 def require_files() -> None:
@@ -87,13 +104,17 @@ def require_files() -> None:
         obj = json.loads(summary.read_text(encoding="utf-8"))
         if obj.get("status") != "PASS" or obj.get("policy") != "LATEST_OFFICIAL_VALUES_ONLY":
             raise RuntimeError(f"Input is not the verified latest-value source: {summary}")
+        expected_nodes = obj.get("industry_nodes") if summary == SUMMARY_01 else obj.get("nodes")
+        if expected_nodes != NODE_COUNT:
+            raise RuntimeError(f"Upstream 59-node contract differs: {summary}")
 
 
 def load_nodes() -> pd.DataFrame:
     registry = pd.read_csv(REGISTRY_01, dtype=str).fillna("")
     if (list(registry.columns) != ["node_key", "industry_name", "naics_codes"]
-            or len(registry) != 56 or registry.node_key.duplicated().any()):
-        raise RuntimeError("Stage 01 must define exactly 56 unique PRISM industries")
+            or len(registry) != NODE_COUNT or registry.node_key.duplicated().any()
+            or not registry[["node_key", "industry_name", "naics_codes"]].ne("").all().all()):
+        raise RuntimeError("Stage 01 must define exactly 59 unique PRISM industries")
     return registry
 
 
@@ -124,7 +145,7 @@ def bea_panel(source: pd.DataFrame, series: str, frequency: str,
 
     The 01 industry mapping keeps Hospitals and Nursing as distinct components.
     Their summed chained-dollar totals are a fixed-reference-dollar
-    approximation, consistent with the published PRISM 56-node definition.
+    approximation, consistent with the published PRISM 59-node definition.
     All other nodes have a single BEA component.
     """
     table = source[
@@ -190,7 +211,7 @@ def employment_panel(source: pd.DataFrame, periods: list[str], nodes: list[str])
         raise RuntimeError("Industry quarterly employment must have all three months")
     out = avg["mean"].unstack("node_key").reindex(index=periods, columns=nodes)
     if out.isna().any().any():
-        raise RuntimeError("Incomplete 56-industry quarterly employment panel")
+        raise RuntimeError("Incomplete 59-industry quarterly employment panel")
     return out.astype(float)
 
 
@@ -317,11 +338,11 @@ def denton_with_frozen_split_boundaries(
 
 def score_with_train_reference(values: np.ndarray, quarters: list[str],
                                component: str) -> tuple[np.ndarray, list[dict]]:
-    """Freeze one pooled 56-industry Min-Max reference over *all* Train quarters.
+    """Freeze one pooled 59-industry Min-Max reference over *all* Train quarters.
 
     LEAKAGE CONTRACT (single fixed-origin Train/Val/Test experiment):
     - The model is trained once with the complete 2006Q1–2019Q4 Train set.
-      All 56 industries and all 56 Train quarters are available when its
+      All 59 industries and all 56 Train quarters are available when its
       scaler is fitted; using later TRAIN observations to score earlier TRAIN
       targets is not a Train/Validation/Test split leak in this design.
     - Fit min/max ONLY on Train and use those very same two constants for
@@ -448,13 +469,226 @@ def build_targets(source: pd.DataFrame, registry: pd.DataFrame
     return target, raw_frame, pd.DataFrame(bounds), pd.DataFrame(gos_audit), funds_correction
 
 
+def causal_history_targets(source: pd.DataFrame, targets: pd.DataFrame,
+                           bounds: pd.DataFrame, nodes: list[str]) -> pd.DataFrame:
+    """Provisional unfinished-year scores, never replacements for Target labels.
+
+    For quarter q in year y, estimate quarterly GOS using q's current VA and
+    the annual GOS / quarterly-VA ratio of year y-1. Neither annual GOS of
+    year y nor future-year indicators can influence this estimate.
+    asof_profitability_history supersedes these provisional values whenever
+    year y is already complete at the forecast origin. All 14 profitability
+    features must use that same origin-specific snapshot.
+    Keep the original Train-fitted profitability score scale.
+    Productivity and growth already use native same/prior-quarter components.
+    """
+    quarters = pd.period_range(MODEL_START, MODEL_END, freq="Q").astype(str).tolist()
+    periods = pd.period_range(HISTORY_START, MODEL_END, freq="Q").astype(str).tolist()
+    va = bea_panel(source, "current_va", "quarterly", periods, nodes)
+    gross = bea_panel(source, "current_go", "quarterly", periods, nodes)
+    gos = bea_panel(source, "gos", "annual",
+                    [str(year) for year in range(2005, 2025)], nodes)
+    ratio = np.empty((len(quarters), len(nodes)), dtype=float)
+    for year in range(2006, 2026):
+        prior_year = str(year - 1)
+        prior_quarters = [f"{prior_year}Q{q}" for q in range(1, 5)]
+        current_quarters = [f"{year}Q{q}" for q in range(1, 5)]
+        prior_va = va.loc[prior_quarters].mean(axis=0).to_numpy()
+        if not np.isfinite(prior_va).all() or np.any(prior_va == 0):
+            raise RuntimeError("Invalid previous-year value-added denominator")
+        prev_annual_ratio = gos.loc[prior_year].to_numpy() / prior_va
+        first = (year - 2006) * 4
+        ratio[first:first + 4] = (
+            va.loc[current_quarters].to_numpy() *
+            prev_annual_ratio[None] / gross.loc[current_quarters].to_numpy())
+
+    reference = bounds.loc[bounds.component == "profitability", ["min", "max"]]
+    if (reference.empty or reference["min"].nunique() != 1
+            or reference["max"].nunique() != 1):
+        raise RuntimeError("Missing fixed Train profitability score bounds")
+    low, high = reference.iloc[0].to_numpy(float)
+    if not np.isfinite(ratio).all() or not low < high:
+        raise RuntimeError("Nonfinite causal profitability history")
+    index = pd.MultiIndex.from_product(
+        [quarters, nodes], names=["quarter", "node_key"])
+    reconstructed = targets.set_index(["quarter", "node_key"]).reindex(index).copy()
+    reconstructed["target_profitability"] = (
+        100. * (ratio.reshape(-1) - low) / (high - low))
+    reconstructed["target_ici"] = reconstructed[
+        ["target_profitability", "target_productivity", "target_growth"]].mean(axis=1)
+    return reconstructed.reset_index()[IDS + TARGETS]
+
+
+def pretrain_history_inputs(source: pd.DataFrame, bounds: pd.DataFrame,
+                            nodes: list[str]) -> pd.DataFrame:
+    """Recover usable 2005 history without inventing 2004 quarterly growth.
+
+    The target panel intentionally starts in 2006, but Stage01 already holds
+    2005 quarterly VA/GO/employment and completed 2005 *annual* GOS. These
+    observations are used ONLY for predictions starting in 2006, so a
+    one-year 2005 Denton allocation uses no future reference period.
+    Productivity is directly reconstructible in 2005.
+    Exact 2005 year-over-year growth requires 2004 quarterly real GO, which
+    the 01 collector does not provide; those entries correctly remain NaN.
+    """
+    periods = [f"2005Q{q}" for q in range(1, 5)]
+    annual_gos = bea_panel(source, "gos", "annual", ["2005"], nodes).iloc[0]
+    va = bea_panel(source, "current_va", "quarterly", periods, nodes).to_numpy()
+    go = bea_panel(source, "current_go", "quarterly", periods, nodes).to_numpy()
+    real_va = bea_panel(source, "real_va", "quarterly", periods, nodes).to_numpy()
+    employed = employment_panel(source, periods, nodes).to_numpy()
+    funds, securities = nodes.index("funds_trusts"), nodes.index("securities")
+    real_va[:, funds] += real_va[:, securities]
+    employed[:, funds] = funds_aggregate_employment(source, periods).to_numpy()
+    reconstructed_gos = np.column_stack([
+        proportional_denton(va[:, j], np.asarray([annual_gos.iloc[j]], float))
+        for j in range(NODE_COUNT)])
+    raw_profit = reconstructed_gos / go
+    raw_productivity = real_va / employed
+    score = []
+    for axis, values in (("profitability", raw_profit),
+                         ("productivity", raw_productivity)):
+        reference = bounds.loc[bounds.component.eq(axis), ["min", "max"]]
+        if (reference.empty or reference["min"].nunique() != 1
+                or reference["max"].nunique() != 1):
+            raise RuntimeError(f"Train-only score reference missing for 2005 {axis}")
+        low, high = reference.iloc[0].to_numpy(float)
+        if not np.isfinite(values).all() or not low < high:
+            raise RuntimeError(f"Invalid pre-2006 {axis} history")
+        score.append(100. * (values - low) / (high - low))
+    index = pd.MultiIndex.from_product(
+        [periods, nodes], names=["quarter", "node_key"])
+    return pd.DataFrame({
+        "quarter": index.get_level_values("quarter"),
+        "node_key": index.get_level_values("node_key"),
+        "target_profitability": score[0].reshape(-1),
+        "target_productivity": score[1].reshape(-1),
+        "target_growth": np.full(4 * NODE_COUNT, np.nan),
+    })
+
+
+def asof_profitability_history(
+        source: pd.DataFrame, provisional: pd.DataFrame,
+        prehistory: pd.DataFrame, bounds: pd.DataFrame, nodes: list[str]
+) -> np.ndarray:
+    """At forecast quarter t, reconstruct each earlier quarter with t's history.
+
+    Completed years: apply proportional Denton to the available annual
+    benchmarks through year(t)-1. Keep completed Train/Dev split blocks frozen
+    at their original boundaries. The active block is fit to its completed
+    annual prefix only, using the preceding frozen block's final ratio.
+    This reproduces Stage03's retrospective labels when a split has fully
+    completed, but never lets a later year enter an earlier forecast origin.
+    Unfinished year y == year(t): use its previous-year annual-GOS/VA
+    ratio and only already observed quarterly VA/GO (the provisional bank).
+    The output is [80 forecast origins, 12 previous quarters, 59 industries].
+    Row t never uses annual GOS for year(t) or any economic observation >= t.
+    """
+    if len(nodes) != NODE_COUNT or len(set(nodes)) != NODE_COUNT:
+        raise ValueError("Expected exact 59-node profitability input history")
+    # engineer_target_history() uses alphabetically ordered node columns.
+    # Match that exact order: otherwise a numerically correct annual GOS
+    # estimate would be assigned to a DIFFERENT industry's feature row.
+    nodes = sorted(nodes)
+    quarters = pd.period_range(HISTORY_START, MODEL_END, freq="Q").astype(str).tolist()
+    va = bea_panel(source, "current_va", "quarterly", quarters, nodes).to_numpy()
+    go = bea_panel(source, "current_go", "quarterly", quarters, nodes).to_numpy()
+    completed_years = [str(year) for year in range(2005, 2025)]
+    annual = bea_panel(source, "gos", "annual", completed_years, nodes).to_numpy()
+    if not (go > 0).all():
+        raise RuntimeError("Nonpositive nominal output in profitability history")
+    reference = bounds.loc[bounds.component.eq("profitability"), ["min", "max"]]
+    if reference.empty or reference["min"].nunique() != 1 or reference["max"].nunique() != 1:
+        raise RuntimeError("Invalid Train-only profitability normalization")
+    low, high = reference.iloc[0].to_numpy(float)
+    if not low < high:
+        raise RuntimeError("Degenerate profitability normalization")
+
+    # One completed-year snapshot per prediction year's first quarter.
+    # Never solve with an annual benchmark dated after that snapshot.
+    frozen_blocks: dict[int, np.ndarray] = {}
+    completed_snapshots: dict[int, np.ndarray] = {}
+    for last_year in range(2005, 2025):
+        completed = np.full((len(quarters), NODE_COUNT), np.nan)
+        previous_ratio = None
+        for start_year, block_end in ((2005, 2019), (2020, 2022), (2023, 2025)):
+            if last_year < start_year:
+                break
+            last_in_block = min(last_year, block_end)
+            first = (start_year - 2005) * 4
+            stop = (last_in_block - 2005 + 1) * 4
+            if start_year in frozen_blocks:
+                quarterly = frozen_blocks[start_year]
+            else:
+                quarterly = np.column_stack([
+                    proportional_denton(
+                        va[first:stop, j],
+                        annual[start_year - 2005:last_in_block - 2005 + 1, j],
+                        previous_ratio=(None if previous_ratio is None
+                                        else float(previous_ratio[j])))
+                    for j in range(NODE_COUNT)])
+                if last_in_block == block_end:
+                    frozen_blocks[start_year] = quarterly
+            completed[first:stop] = quarterly
+            previous_ratio = quarterly[-1] / va[stop - 1]
+            if last_in_block < block_end:
+                break
+        completed_snapshots[last_year] = 100. * (completed / go - low) / (high - low)
+    # 2005 is already a completed year by the first 2006 prediction.
+    scores = pd.concat([
+        prehistory[["quarter", "node_key", "target_profitability"]],
+        provisional[["quarter", "node_key", "target_profitability"]],
+    ], ignore_index=True)
+    reference_index = pd.MultiIndex.from_product(
+        [quarters, nodes], names=["quarter", "node_key"])
+    if (len(scores) != len(reference_index) or scores.duplicated(
+            ["quarter", "node_key"]).any()):
+        raise RuntimeError("Provisional profitability history has missing/duplicate rows")
+    provisional_values = (scores.set_index(["quarter", "node_key"])
+                          .reindex(reference_index)["target_profitability"]
+                          .to_numpy(float).reshape(len(quarters), NODE_COUNT))
+    if not np.isfinite(provisional_values).all():
+        raise RuntimeError("Missing historical profitability input")
+    if not np.allclose(
+            completed_snapshots[2005][:4], provisional_values[:4],
+            rtol=1e-12, atol=1e-10):
+        raise RuntimeError("2005 annual GOS is not consistently reconstructed")
+
+    view = np.full((80, 12, NODE_COUNT), np.nan)
+    years = np.asarray([int(q[:4]) for q in quarters])
+    for origin in range(4, len(quarters)):
+        forecast_year = years[origin]
+        completed = completed_snapshots[forecast_year - 1]
+        for depth in range(1, 13):
+            past = origin - depth
+            if past < 0:
+                continue
+            value = (completed[past] if years[past] < forecast_year
+                     else provisional_values[past])
+            view[origin - 4, depth - 1] = value
+    if not np.isfinite(view[:, 0]).all() or np.isinf(view).any():
+        raise RuntimeError("Incomplete next-quarter past profitability")
+    return view
+
+
 def load_features() -> tuple[pd.DataFrame, pd.DataFrame, list[str], list[str]]:
     node = pd.read_csv(NODE_02, dtype={"quarter": str, "node_key": str}, low_memory=False)
     global_features = pd.read_csv(GLOBAL_02, dtype={"quarter": str}, low_memory=False)
     masks = pd.read_csv(MASK_02, dtype={"quarter": str, "node_key": str}, low_memory=False)
+    source_nodes = set(load_nodes().node_key)
+    source_quarters = set(pd.period_range(HISTORY_START, MODEL_END, freq="Q").astype(str))
+    if (len(node) != len(source_quarters) * NODE_COUNT
+            or node.duplicated(["quarter", "node_key"]).any()
+            or set(node.node_key) != source_nodes
+            or set(node.quarter) != source_quarters
+            or len(global_features) != len(source_quarters)
+            or set(global_features.quarter) != source_quarters):
+        raise RuntimeError("Stage 02 must cover exactly 84 quarters and 59 industry nodes")
     node_columns = [col for col in node if col not in {"quarter", "node_key"}]
     global_columns = [col for col in global_features if col != "quarter"]
     summary = json.loads(SUMMARY_02.read_text(encoding="utf-8"))
+    if summary.get("nodes") != NODE_COUNT or summary.get("quarters") != len(source_quarters):
+        raise RuntimeError("Stage 02 node/quarter summary disagrees with Stage 01")
     expected_node, expected_global = int(summary["node_features"]), int(summary["global_features"])
     if (len(node_columns) != expected_node or len(global_columns) != expected_global
             or len(node_columns) + len(global_columns) != summary["total_original_features"]
@@ -481,7 +715,7 @@ def load_features() -> tuple[pd.DataFrame, pd.DataFrame, list[str], list[str]]:
 
 
 def save_target_mean_timeseries(integrated: pd.DataFrame) -> dict:
-    """Plot the equal-weight 56-industry quarterly mean of all four targets.
+    """Plot the equal-weight 59-industry quarterly mean of all four targets.
 
     Recalculate directly from the assembled scored targets, not from raw axes
     or a rolling average. This graph is a diagnostic and changes no model data.
@@ -494,8 +728,8 @@ def save_target_mean_timeseries(integrated: pd.DataFrame) -> dict:
         raise RuntimeError("Duplicate industry-quarter targets in mean time series")
     means = integrated.groupby("quarter", sort=True)[TARGETS].agg(["mean", "count"])
     counts = means.xs("count", axis=1, level=1)
-    if not counts.eq(56).all().all():
-        raise RuntimeError("Target mean plot requires exactly 56 industries per quarter")
+    if not counts.eq(NODE_COUNT).all().all():
+        raise RuntimeError("Target mean plot requires exactly 59 industries per quarter")
     means = means.xs("mean", axis=1, level=1).reindex(
         pd.period_range(MODEL_START, MODEL_END, freq="Q").astype(str)
     )
@@ -525,7 +759,7 @@ def save_target_mean_timeseries(integrated: pd.DataFrame) -> dict:
                 linewidth=2.7, linestyle="-")
         ax.set_title("PRISM | Quarterly Mean Target Scores", fontsize=17, pad=15,
                      fontweight="bold")
-        ax.text(0.0, 1.015, "56-industry mean; fixed 2006Q1–2019Q4 Train reference",
+        ax.text(0.0, 1.015, "59-industry mean; fixed 2006Q1–2019Q4 Train reference",
                 transform=ax.transAxes, fontsize=10, color="#566474")
         ax.set_ylabel("Mean score (Train-reference units)")
         ax.set_xlabel("Quarter")
@@ -548,8 +782,8 @@ def save_target_mean_timeseries(integrated: pd.DataFrame) -> dict:
     return {
         "plot": figure_file.relative_to(ROOT).as_posix(),
         "quarterly_means_csv": data_file.relative_to(ROOT).as_posix(),
-        "mean_method": "arithmetic mean over all 56 industries, separately for each quarter and scored target",
-        "quarters": len(means), "industries_per_quarter": 56,
+        "mean_method": "arithmetic mean over all 59 industries, separately for each quarter and scored target",
+        "quarters": len(means), "industries_per_quarter": NODE_COUNT,
     }
 
 
@@ -574,9 +808,9 @@ def split_integrated_panel(integrated: pd.DataFrame) -> dict[str, pd.DataFrame]:
             raise RuntimeError("Train/Validation/Test quarter ranges overlap")
         claimed.update(quarters)
         part = integrated.loc[integrated["quarter"].isin(quarters)].copy()
-        if (len(part) != len(quarters) * 56
+        if (len(part) != len(quarters) * NODE_COUNT
                 or part["quarter"].nunique() != len(quarters)
-                or not part.groupby("quarter")["node_key"].nunique().eq(56).all()
+                or not part.groupby("quarter")["node_key"].nunique().eq(NODE_COUNT).all()
                 or part["quarter"].tolist() != sorted(part["quarter"].tolist())
                 or part.columns.tolist() != integrated.columns.tolist()):
             raise RuntimeError(f"Invalid {name} split coverage, ordering, or column schema")
@@ -590,6 +824,164 @@ def split_integrated_panel(integrated: pd.DataFrame) -> dict[str, pd.DataFrame]:
     return splits
 
 
+def engineer_target_history(
+        targets: pd.DataFrame, prehistory: pd.DataFrame | None = None,
+        profitability_asof: np.ndarray | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Compact 42-feature bank from leakage-free historical score estimates.
+
+    Feature row t uses historical input scores through t-1, never Y_t or
+    future inputs, including rolling and peer statistics. Source labels are
+    separately preserved in build_targets; history profitability is a proxy.
+    Optional 2005 profitability/productivity observations seed early Train
+    history; 2005 growth stays missing without 2004 quarterly real GO.
+    With profitability_asof, ALL profitability lags and rolling/peer features
+    are computed from the same forecast-origin-specific completed-year values.
+    """
+    keys = ["quarter", "node_key"]
+    quarters = pd.period_range(MODEL_START, MODEL_END, freq="Q").astype(str).tolist()
+    nodes = sorted(targets.node_key.unique())
+    index = pd.MultiIndex.from_product([quarters, nodes], names=keys)
+    if len(nodes) != NODE_COUNT or len(targets) != len(index) or targets.duplicated(keys).any():
+        raise ValueError("Require exact 80-quarter/59-industry Target grid")
+    aligned = targets.set_index(keys).reindex(index)
+    original = aligned[TARGETS].to_numpy(float).reshape(80, NODE_COUNT, 4)
+    if not np.isfinite(original).all():
+        raise ValueError("Nonfinite Target in historical feature inputs")
+    if not np.allclose(original[..., 3], original[..., :3].mean(-1),
+                       rtol=1e-12, atol=1e-12):
+        raise ValueError("ICI identity changed")
+    if profitability_asof is not None:
+        profitability_asof = np.asarray(profitability_asof, dtype=float)
+        if (prehistory is None or profitability_asof.shape != (80, 12, NODE_COUNT)
+                or not np.isfinite(profitability_asof[:, 0]).all()
+                or np.isinf(profitability_asof).any()):
+            raise ValueError("Profitability lookbacks must be complete, past-only 80x12x59")
+    prefix = np.full((4, NODE_COUNT, 3), np.nan)
+    if prehistory is not None:
+        early_quarters = [f"2005Q{q}" for q in range(1, 5)]
+        early_index = pd.MultiIndex.from_product(
+            [early_quarters, nodes], names=keys)
+        if (len(prehistory) != len(early_index)
+                or prehistory.duplicated(keys).any()
+                or not early_index.equals(
+                    prehistory.set_index(keys).sort_index().index)):
+            raise ValueError("2005 history must cover four quarters and all 59 nodes")
+        seed = prehistory.set_index(keys).reindex(early_index)
+        prefix = seed[[f"target_{a}" for a in TARGET_AXES]].to_numpy(float).reshape(
+            4, NODE_COUNT, 3)
+        if (not np.isfinite(prefix[..., :2]).all()
+                or not np.isnan(prefix[..., 2]).all()):
+            raise ValueError("2005 history must include only known profitability/productivity")
+    axes = {axis: np.concatenate((prefix[:, :, i], original[:, :, i]), axis=0)
+            for i, axis in enumerate(TARGET_AXES)}
+    lag_cache = {}
+    features = {}
+    registry = []
+
+    def lag(axis, distance):
+        if distance < 1:
+            raise ValueError("Contemporaneous/future Target leakage")
+        key = (axis, distance)
+        if key not in lag_cache:
+            if axis == "profitability" and profitability_asof is not None:
+                if distance > profitability_asof.shape[1]:
+                    raise ValueError("Insufficient as-of profitability lookback")
+                lag_cache[key] = profitability_asof[:, distance - 1].copy()
+            else:
+                result = np.full((84, NODE_COUNT), np.nan)
+                if distance < 84:
+                    result[distance:] = axes[axis][:-distance]
+                lag_cache[key] = result[4:]
+        return lag_cache[key]
+
+    def add(name, value, family, axis, depth, peers=False):
+        value = np.asarray(value, dtype=float)
+        if name in features or value.shape != (80, NODE_COUNT) or np.isinf(value).any():
+            raise ValueError(f"Invalid Target feature: {name}")
+        features[name] = value.reshape(-1)
+        registry.append(dict(feature=name, family=family, source_target_axes=axis,
+                             minimum_history_quarters=depth,
+                             latest_input_quarter_offset=-1,
+                             cross_industry=peers,
+                             causality="STRICT_T_MINUS_ONE_OR_EARLIER",
+                             scope="NODE_WITH_PRIOR_PEER_DATA" if peers else "NODE_HISTORY"))
+
+    # Previous-quarter input scores are first for readability, never mandatory.
+    # Profitability comes from the past-only proxy; other axes are true lags.
+    for axis in TARGET_AXES:
+        add(f"history_{axis}", lag(axis, 1), "recent_observation", axis, 1)
+
+    for axis in TARGET_AXES:
+        recent = lag(axis, 1)
+        for depth in TARGET_LAGS:
+            add(f"targethist_{axis}_lag{depth:02d}", lag(axis, depth),
+                "historical_level", axis, depth)
+
+        # Change from last observed Target to earlier historical observations.
+        for distance in TARGET_CHANGES:
+            add(f"targethist_{axis}_change{distance:02d}",
+                recent - lag(axis, 1 + distance),
+                "historical_momentum", axis, 1 + distance)
+
+        if axis == "profitability" and profitability_asof is not None:
+            for window in TARGET_WINDOWS:
+                historical = np.stack(
+                    [lag(axis, depth) for depth in range(1, window + 1)])
+                complete = np.isfinite(historical).all(axis=0)
+                observed = np.where(np.isfinite(historical), historical, 0.)
+                means = np.where(complete, observed.mean(axis=0), np.nan)
+                deviations = np.where(complete, observed.std(axis=0, ddof=0), np.nan)
+                add(f"targethist_{axis}_mean_w{window:02d}",
+                    means, "historical_mean", axis, window)
+                add(f"targethist_{axis}_std_w{window:02d}",
+                    deviations, "historical_volatility", axis, window)
+        else:
+            full_recent = np.full((84, NODE_COUNT), np.nan)
+            full_recent[1:] = axes[axis][:-1]
+            full_series = pd.DataFrame(
+                full_recent, index=[f"2005Q{q}" for q in range(1, 5)] + quarters,
+                columns=nodes)
+            for window in TARGET_WINDOWS:
+                r = full_series.rolling(window, min_periods=window)
+                add(f"targethist_{axis}_mean_w{window:02d}",
+                    r.mean().to_numpy()[4:], "historical_mean", axis, window)
+                add(f"targethist_{axis}_std_w{window:02d}",
+                    r.std(ddof=0).to_numpy()[4:], "historical_volatility", axis, window)
+
+        # Four-quarter least-squares slope, using t-4 .. t-1 only.
+        window = 4
+        history = np.stack([lag(axis, k) for k in range(window, 0, -1)])
+        indices = np.arange(window, dtype=float) - (window - 1) / 2.
+        add(f"targethist_{axis}_trend_w04",
+            np.sum(history * indices[:, None, None], axis=0) / np.sum(indices ** 2),
+            "historical_trend", axis, window)
+
+        # Prior-quarter relative rank/gap among all 59 industries.
+        series = pd.DataFrame(recent, index=quarters, columns=nodes)
+        peer_mean = series.mean(axis=1).to_numpy()[:, None]
+        add(f"targethist_{axis}_peer_gap",
+            recent - peer_mean, "prior_industry_relative_level", axis, 1, True)
+        add(f"targethist_{axis}_peer_rank",
+            series.rank(axis=1, pct=True).to_numpy(),
+            "prior_industry_relative_rank", axis, 1, True)
+
+    result = pd.concat([index.to_frame(index=False), pd.DataFrame(features)], axis=1)
+    feature_registry = pd.DataFrame(registry)
+    if len(features) != 42 or result.columns[2:5].tolist() != HISTORY_COLUMNS:
+        raise RuntimeError("Expected 42 target features with direct lags first")
+    first = result.loc[result.quarter == MODEL_START]
+    if prehistory is None:
+        if not first[list(features)].isna().all().all():
+            raise RuntimeError("Missing 2005 source may not create model history")
+    elif (not first[["history_profitability", "history_productivity"]].notna().all().all()
+          or not first["history_growth"].isna().all()):
+        raise RuntimeError("Only validated 2005 historical observations may be restored")
+    if result.duplicated(keys).any() or feature_registry.feature.duplicated().any():
+        raise RuntimeError("Duplicated target-feature rows or names")
+    return result, feature_registry
+
+
 def assemble() -> dict:
     require_files()
     DATA.mkdir(parents=True, exist_ok=True)
@@ -599,11 +991,22 @@ def assemble() -> dict:
 
     print("[1/4] Calculating profitability, productivity, growth and ICI", flush=True)
     targets, raw, score_bounds, denton_check, funds_correction = build_targets(source, registry)
+    history_inputs = causal_history_targets(
+        source, targets, score_bounds, registry.node_key.tolist())
+    prior_inputs = pretrain_history_inputs(
+        source, score_bounds, registry.node_key.tolist())
+    past_profitability = asof_profitability_history(
+        source, history_inputs, prior_inputs, score_bounds, registry.node_key.tolist())
+    history, target_feature_registry = engineer_target_history(
+        history_inputs, prehistory=prior_inputs, profitability_asof=past_profitability)
+    target_features = target_feature_registry.feature.tolist()
     print("[2/4] Joining the 115 original Stage 02 features", flush=True)
     node, glob, node_features, global_features = load_features()
     if targets.duplicated(["quarter", "node_key"]).any():
         raise RuntimeError("Duplicate target rows")
-    joined = targets.merge(node, on=["quarter", "node_key"], how="left",
+    joined = targets.merge(history, on=["quarter", "node_key"], how="left",
+                           validate="one_to_one")
+    joined = joined.merge(node, on=["quarter", "node_key"], how="left",
                            validate="one_to_one", indicator=True)
     if not joined["_merge"].eq("both").all():
         raise RuntimeError("A target row is missing Stage 02 industry features")
@@ -613,23 +1016,31 @@ def assemble() -> dict:
     if not joined["_merge"].eq("both").all():
         raise RuntimeError("A target row is missing Stage 02 global features")
     joined = joined.drop(columns="_merge")
-    columns = IDS + TARGETS + node_features + global_features
+    # All target-only engineered features appear before all 115 original inputs.
+    columns = IDS + TARGETS + target_features + node_features + global_features
     joined = joined[columns].sort_values(["quarter", "node_key"], kind="stable").reset_index(drop=True)
     expected_quarters = pd.period_range(MODEL_START, MODEL_END, freq="Q").astype(str)
-    if (len(joined) != 80 * 56 or joined.node_key.nunique() != 56
-            or joined.quarter.nunique() != 80 or len(joined.columns) != 122
+    if (len(joined) != 80 * NODE_COUNT or joined.node_key.nunique() != NODE_COUNT
+            or joined.quarter.nunique() != 80
+            or len(joined.columns) != len(IDS) + len(TARGETS) + len(target_features) + 115
             or len(node_features) + len(global_features) != 115
-            or not joined.groupby("quarter").node_key.nunique().eq(56).all()
+            or not joined.groupby("quarter").node_key.nunique().eq(NODE_COUNT).all()
             or set(joined.quarter) != set(expected_quarters)):
-        raise RuntimeError("Incomplete 80-quarter x 56-industry integration")
+        raise RuntimeError("Incomplete 80-quarter x 59-industry integration")
     components = joined[TARGETS].to_numpy(dtype=float)
     if not np.isfinite(components).all():
         raise RuntimeError("The three axes or ICI contain missing or infinite values")
     if not np.allclose(components[:, 3], components[:, :3].mean(axis=1), atol=1e-10):
         raise RuntimeError("ICI is not the arithmetic mean of the three target scores")
     features = joined[node_features + global_features]
-    if np.isinf(features.to_numpy(dtype=float)).any():
+    model_inputs = joined[target_features + node_features + global_features]
+    if np.isinf(model_inputs.to_numpy(dtype=float)).any():
         raise RuntimeError("Input features contain infinite values")
+    first = joined.loc[joined.quarter == MODEL_START]
+    if (not first[["history_profitability", "history_productivity"]].notna().all().all()
+            or not first["history_growth"].isna().all()
+            or joined.loc[joined.quarter != MODEL_START, target_features[:3]].isna().any().any()):
+        raise RuntimeError("Past-only Target features violate their minimum history")
 
     print("[3/4] Writing raw_train.csv / raw_val.csv / raw_test.csv and target audits", flush=True)
     splits = split_integrated_panel(joined)
@@ -643,19 +1054,22 @@ def assemble() -> dict:
         RESULTS / "funds_trusts_productivity_correction.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame([
         {"column": name, "role": ("IDENTIFIER" if name in IDS else
-                                  "TARGET" if name in TARGETS else "FEATURE"),
-         "scope": ("NODE" if name in node_features else
+                                  "TARGET" if name in TARGETS else
+                                  "TARGET_DERIVED_FEATURE" if name in target_features else "FEATURE"),
+         "scope": ("NODE" if name in target_features or name in node_features else
                    "GLOBAL" if name in global_features else "ROW")}
         for name in joined.columns
     ]).to_csv(RESULTS / "integrated_column_registry.csv", index=False, encoding="utf-8-sig")
-    print("[4/4] Plotting the four targets' quarterly 56-industry means", flush=True)
+    target_feature_registry.to_csv(
+        RESULTS / "target_feature_registry.csv", index=False, encoding="utf-8-sig")
+    print("[4/4] Plotting the four targets' quarterly 59-industry means", flush=True)
     target_mean_timeseries = save_target_mean_timeseries(joined)
     report = {
         "status": "PASS", "policy": "LATEST_OFFICIAL_VALUES_ONLY",
         "outputs": {key: path.relative_to(ROOT).as_posix()
                     for key, path in SPLIT_FILES.items()},
         "period": [MODEL_START, MODEL_END], "quarters": 80,
-        "industries": 56, "rows": len(joined), "columns": len(joined.columns),
+        "industries": NODE_COUNT, "rows": len(joined), "columns": len(joined.columns),
         "split_periods": {key: list(periods)
                           for key, periods in SPLIT_PERIODS.items()},
         "split_rows": {key: len(part) for key, part in splits.items()},
@@ -665,10 +1079,49 @@ def assemble() -> dict:
         },
         "identifier_columns": IDS, "target_columns": TARGETS,
         "target_count": len(TARGETS),
+        "previous_target_history_columns": HISTORY_COLUMNS,
+        "previous_target_history_lag_quarters": 1,
+        "previous_target_history_source": (
+            "Profitability: completed past years use their OWN annual GOS "
+            "in forecast-origin-bounded Denton with frozen Train/Dev blocks; "
+            "unfinished current year uses the previous year's annual GOS "
+            "and observed quarterly VA/GO. "
+            "All 14 profitability history features use the same forecast-origin view; "
+            "productivity: original prior-quarter scores from 2006 and "
+            "equivalent component-derived 2005 history; "
+            "growth: original prior-quarter score when defined, no invented "
+            "2005 growth. All sources latest revised official values."
+        ),
+        "previous_target_history_first_quarter_nan_cells": int(
+            first[HISTORY_COLUMNS].isna().sum().sum()),
+        "recovered_2005_history_axes": ["profitability", "productivity"],
+        "profitability_history_completed_year_policy": (
+            "Denton fitted only to annual GOS and quarterly VA from completed "
+            "years strictly before the predicted year, freezing each completed "
+            "Train/Dev/Test split block at its boundary"
+        ),
+        "profitability_history_current_year_policy": (
+            "Previous year's annual GOS/mean VA times already-observed "
+            "current-year quarterly VA divided by nominal gross output"
+        ),
+        "target_engineered_feature_count": len(target_features),
+        "target_engineered_feature_groups": {
+            str(k): int(v) for k, v in
+            target_feature_registry.family.value_counts().sort_index().items()
+        },
+        "target_feature_registry": "Results/03_integrated_dataset/target_feature_registry.csv",
+        "target_feature_observation_policy": (
+            "Every row t uses only information through t-1; "
+            "all rolling and peer calculations are strictly lagged; "
+            "insufficient early history remains NaN without backfilling"
+        ),
+        "missing_engineered_target_feature_cells": int(
+            joined[target_features].isna().sum().sum()),
         "node_feature_count": len(node_features),
         "global_feature_count": len(global_features),
         "total_feature_count": len(node_features) + len(global_features),
-        "auto_generated_feature_count": 0,
+        "model_input_feature_count": len(target_features) + len(node_features) + len(global_features),
+        "auto_generated_feature_count": len(target_features),
         "missing_targets": int(joined[TARGETS].isna().sum().sum()),
         "missing_original_feature_cells": int(features.isna().sum().sum()),
         "gos_quarterly_method": (
@@ -686,7 +1139,7 @@ def assemble() -> dict:
             "growth": "quarterly real gross output / same quarter previous year - 1",
         },
         "target_scores": (
-            "fixed Train-only pooled 56-industry Min-Max, "
+            "fixed Train-only pooled 59-industry Min-Max, "
             "2006Q1–2019Q4; held-out Val/Test use unchanged bounds, without clipping"
         ),
         "target_normalization_fit_period": list(SPLIT_PERIODS["train"]),
@@ -710,7 +1163,8 @@ def assemble() -> dict:
     old_combined = DATA / "prism_integrated_quarterly.csv"
     if old_combined.is_file():
         old_combined.unlink()
-    print(json.dumps(report, ensure_ascii=False, indent=2), flush=True)
+    # JSON saved above remains UTF-8; escape non-ASCII for CP949 terminals.
+    print(json.dumps(report, ensure_ascii=True, indent=2), flush=True)
     return report
 
 
