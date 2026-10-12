@@ -1,0 +1,18 @@
+{
+  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "length": 2,
+  "model": "B-MTGNN",
+  "seed": 2029,
+  "epoch_check_mae": 1.0400681495666504,
+  "best_epoch": 6,
+  "inner_early_fit_examples": 20,
+  "inner_selection_fit_examples": 28,
+  "epoch_holdout_quarters": 8,
+  "length_holdout_quarters": 8,
+  "axis_mae": 1.0545342196284422,
+  "ici_mae": 0.7316467094650937,
+  "profitability_mae": 0.7931838323236926,
+  "productivity_mae": 0.6419064554846459,
+  "growth_mae": 1.728512371076988,
+  "persistence_mae": 1.14558021069555
+}

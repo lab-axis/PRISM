@@ -1,0 +1,18 @@
+{
+  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "length": 1,
+  "model": "GraphConv-TCN",
+  "seed": 2029,
+  "epoch_check_mae": 3.1736481189727783,
+  "best_epoch": 67,
+  "inner_early_fit_examples": 20,
+  "inner_selection_fit_examples": 28,
+  "epoch_holdout_quarters": 8,
+  "length_holdout_quarters": 8,
+  "axis_mae": 1.0672277569843298,
+  "ici_mae": 0.65794481607515,
+  "profitability_mae": 1.0586831023161152,
+  "productivity_mae": 0.5459747734234396,
+  "growth_mae": 1.5970253952134341,
+  "persistence_mae": 1.14558021069555
+}

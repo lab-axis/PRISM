@@ -1,0 +1,18 @@
+{
+  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "length": 17,
+  "model": "GAT-TCN",
+  "seed": 2028,
+  "epoch_check_mae": 2.8632216453552246,
+  "best_epoch": 72,
+  "inner_early_fit_examples": 20,
+  "inner_selection_fit_examples": 28,
+  "epoch_holdout_quarters": 8,
+  "length_holdout_quarters": 8,
+  "axis_mae": 1.1333859881988575,
+  "ici_mae": 0.7791958125153241,
+  "profitability_mae": 0.8502237863450962,
+  "productivity_mae": 0.6998190055597866,
+  "growth_mae": 1.8501151726916893,
+  "persistence_mae": 1.14558021069555
+}

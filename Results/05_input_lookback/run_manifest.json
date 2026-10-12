@@ -1,0 +1,23 @@
+{
+  "stage": "S05",
+  "status": "PASS_SUPPLEMENTARY",
+  "role": "SUPPLEMENTARY_DESCRIPTIVE_ONLY",
+  "adopted_lookback_quarters": 12,
+  "trial_count": 500,
+  "model_count": 5,
+  "seed_count": 5,
+  "stage04_sha256": "ba00e80aabc8099d7054e9c4728115eb34258be625551a37f6b5ab7510bb03e3",
+  "stage04_lock_sha256": "e0991e7d142289d091d64e6adb8385dad6d70895383098cf126c1c20e18f5fbb",
+  "source_sha256": "e435debf715648ab5faf017cfcc04ba5617130c6682a97c11ef48b5e997bcd18",
+  "training_fingerprint": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "training_trials_sha256": "ac2a03760739ef22037a8ee1359fc7ae8d6a92434087d98a45aa6ca40143080f",
+  "neural_networks_trained_during_rebuild": 0,
+  "test_opened": false,
+  "figures": [
+    "plots/S05_01_input_length_mae.png",
+    "plots/S05_02_axes_and_ici.png",
+    "plots/S05_03_difference_from_12q.png",
+    "plots/S05_04_years_and_data_support.png"
+  ],
+  "generated_utc": "2026-10-12T16:44:13.069583+00:00"
+}

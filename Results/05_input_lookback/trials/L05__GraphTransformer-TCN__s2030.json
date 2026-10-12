@@ -1,0 +1,18 @@
+{
+  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "length": 5,
+  "model": "GraphTransformer-TCN",
+  "seed": 2030,
+  "epoch_check_mae": 2.009671211242676,
+  "best_epoch": 37,
+  "inner_early_fit_examples": 20,
+  "inner_selection_fit_examples": 28,
+  "epoch_holdout_quarters": 8,
+  "length_holdout_quarters": 8,
+  "axis_mae": 1.0666262475831811,
+  "ici_mae": 0.6369841906521675,
+  "profitability_mae": 0.9731167212140478,
+  "productivity_mae": 0.6842582124965105,
+  "growth_mae": 1.5425038090389847,
+  "persistence_mae": 1.14558021069555
+}

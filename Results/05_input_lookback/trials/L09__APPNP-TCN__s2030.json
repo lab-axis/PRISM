@@ -1,0 +1,18 @@
+{
+  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
+  "length": 9,
+  "model": "APPNP-TCN",
+  "seed": 2030,
+  "epoch_check_mae": 3.869138479232788,
+  "best_epoch": 1,
+  "inner_early_fit_examples": 20,
+  "inner_selection_fit_examples": 28,
+  "epoch_holdout_quarters": 8,
+  "length_holdout_quarters": 8,
+  "axis_mae": 3.07736796962051,
+  "ici_mae": 1.9483586034342988,
+  "profitability_mae": 2.8293122659595658,
+  "productivity_mae": 3.6295427347642537,
+  "growth_mae": 2.77324890813771,
+  "persistence_mae": 1.14558021069555
+}
