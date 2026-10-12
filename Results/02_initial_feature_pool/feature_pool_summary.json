@@ -9,13 +9,13 @@
     "2025Q4"
   ],
   "quarters": 84,
-  "nodes": 56,
+  "nodes": 59,
   "node_features": 24,
   "global_features": 91,
   "total_original_features": 115,
   "coverage_counts": {
-    "OBSERVED": 102528,
-    "NOT_PUBLISHED_FOR_INDUSTRY": 16800,
+    "OBSERVED": 105804,
+    "NOT_PUBLISHED_FOR_INDUSTRY": 19572,
     "NOT_YET_PUBLISHED": 1198,
     "OFFICIALLY_NOT_COLLECTED": 14
   },

@@ -1,16 +1,16 @@
 ﻿feature_id,scope,source,group,node_fraction,median_time_coverage,overall_coverage,status
 qcew_employment,NODE,BLS industry,NODE,1.0,1.0,1.0,PASS
-ces_exact_all_employees,NODE,BLS industry,NODE,0.7678571428571429,1.0,0.7678571428571429,PASS
-ces_exact_avg_weekly_hours_all,NODE,BLS industry,NODE,0.6785714285714286,0.9404761904761905,0.6381802721088435,PASS
-ces_exact_avg_hourly_earnings_all,NODE,BLS industry,NODE,0.6785714285714286,0.9404761904761905,0.6381802721088435,PASS
-ces_exact_prod_nonsup_employees,NODE,BLS industry,NODE,0.6785714285714286,1.0,0.6785714285714286,PASS
-ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS industry,NODE,0.6785714285714286,1.0,0.6785714285714286,PASS
-ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS industry,NODE,0.6785714285714286,1.0,0.6785714285714286,PASS
-ces_exact_women_employees,NODE,BLS industry,NODE,0.75,1.0,0.75,PASS
-ces_exact_avg_weekly_earnings_all,NODE,BLS industry,NODE,0.6785714285714286,0.9404761904761905,0.6381802721088435,PASS
-ces_exact_aggregate_weekly_hours_index,NODE,BLS industry,NODE,0.6785714285714286,0.9404761904761905,0.6381802721088435,PASS
-ces_exact_aggregate_weekly_payrolls_index,NODE,BLS industry,NODE,0.6785714285714286,0.9404761904761905,0.6381802721088435,PASS
-ppi_industry_net_output,NODE,BLS industry,NODE,0.48214285714285715,1.0,0.46556122448979587,PASS
+ces_exact_all_employees,NODE,BLS industry,NODE,0.7288135593220338,1.0,0.7288135593220338,PASS
+ces_exact_avg_weekly_hours_all,NODE,BLS industry,NODE,0.6440677966101694,0.9404761904761905,0.6057304277643261,PASS
+ces_exact_avg_hourly_earnings_all,NODE,BLS industry,NODE,0.6440677966101694,0.9404761904761905,0.6057304277643261,PASS
+ces_exact_prod_nonsup_employees,NODE,BLS industry,NODE,0.6440677966101694,1.0,0.6440677966101694,PASS
+ces_exact_avg_weekly_hours_prod_nonsup,NODE,BLS industry,NODE,0.6440677966101694,1.0,0.6440677966101694,PASS
+ces_exact_avg_hourly_earnings_prod_nonsup,NODE,BLS industry,NODE,0.6440677966101694,1.0,0.6440677966101694,PASS
+ces_exact_women_employees,NODE,BLS industry,NODE,0.711864406779661,1.0,0.711864406779661,PASS
+ces_exact_avg_weekly_earnings_all,NODE,BLS industry,NODE,0.6440677966101694,0.9404761904761905,0.6057304277643261,PASS
+ces_exact_aggregate_weekly_hours_index,NODE,BLS industry,NODE,0.6440677966101694,0.9404761904761905,0.6057304277643261,PASS
+ces_exact_aggregate_weekly_payrolls_index,NODE,BLS industry,NODE,0.6440677966101694,0.9404761904761905,0.6057304277643261,PASS
+ppi_industry_net_output,NODE,BLS industry,NODE,0.4576271186440678,1.0,0.4418886198547215,PASS
 jolts_job_openings_rate,NODE,BLS industry,NODE,1.0,1.0,1.0,PASS
 jolts_job_openings_level,NODE,BLS industry,NODE,1.0,1.0,1.0,PASS
 jolts_hires_rate,NODE,BLS industry,NODE,1.0,1.0,1.0,PASS

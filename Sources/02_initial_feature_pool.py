@@ -8,9 +8,9 @@ original periods are preserved, with explicit masks for unpublished series.
 """
 from __future__ import annotations
 import argparse
-import hashlib
 import io
 import json
+import os
 import re
 from pathlib import Path
 import numpy as np
@@ -20,8 +20,6 @@ import requests
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "Data/02_initial_feature_pool"
 RAW_DIR = DATA_DIR / "raw_latest"
-METADATA_DIR = RAW_DIR / "metadata"
-METADATA_MANIFEST = METADATA_DIR / "source_manifest.json"
 PROC_DIR = DATA_DIR / "processed"
 RESULTS_DIR = ROOT / "Results/02_initial_feature_pool"
 TARGET_LATEST = ROOT / "Data/01_target_data_collection/latest_sources.csv.gz"
@@ -29,7 +27,17 @@ TARGET_SUMMARY = ROOT / "Results/01_target_data_collection/collection_summary.js
 NODE_REGISTRY = ROOT / "Results/01_target_data_collection/node_registry.csv"
 QUARTERS = pd.period_range("2005Q1", "2025Q4", freq="Q").astype(str).tolist()
 BLS_API = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
-BLS_METADATA = "https://download.bls.gov/pub/time.series"
+BLS_HEADERS = {"User-Agent": "PRISM academic research haseung.ryu.ai@gmail.com"}
+BLS_FLAT_FILES = {
+    "ces_industry": "ce/ce.data.0.AllCESSeries",
+    "national_ces": "ce/ce.data.0.AllCESSeries",
+    "ppi_industry": "pc/pc.data.0.Current",
+    "jolts": "jt/jt.data.1.AllItems",
+    "cpi": "cu/cu.data.1.AllItems",
+    "cps": "ln/ln.data.1.AllData",
+    "ppi_commodities": "wp/wp.data.1.AllCommodities",
+    "ppi_final_demand": "wp/wp.data.0.Current",
+}
 NYFED_EFFR = "https://markets.newyorkfed.org/api/rates/unsecured/effr/search.json"
 FRED_ALIASES = {
     "CUUR0000SA0": "CPIAUCNS", "CUUR0000SA0L1E": "CPILFENS",
@@ -49,6 +57,85 @@ CES_TYPES = {
     "16": "aggregate_weekly_hours_index",
     "17": "aggregate_weekly_payrolls_index",
 }
+
+# Published native BLS series IDs for the fixed 59-node universe.
+# These are source definitions, not observations or a downloaded data snapshot.
+# Codes follow the BLS CES 2022-NAICS and PPI native series catalogs.
+CES_NODE_CODES = dict(line.split() for line in """oil_gas_extraction 10211000
+mining_except_oil_gas 10212000
+support_mining 10213000
+utilities 44220000
+construction 20000000
+wood_products 31321000
+nonmetallic_mineral 31327000
+primary_metals 31331000
+fabricated_metal 31332000
+machinery 31333000
+computer_electronic 31334000
+electrical_equipment 31335000
+motor_vehicles 31336001
+furniture 31337000
+misc_manufacturing 31339000
+paper 32322000
+printing 32323000
+petroleum_coal 32324000
+chemicals 32325000
+plastics_rubber 32326000
+wholesale 41420000
+air_transport 43481000
+rail_transport 43482000
+water_transport 43483000
+truck_transport 43484000
+transit_ground 43485000
+pipeline 43486000
+warehousing 43493000
+information_motion_picture 50512000
+insurance 55524000
+real_estate 55531000
+legal 60541100
+computer_systems 60541500
+management_companies 60550000
+admin_support 60561000
+waste_remediation 60562000
+education 65610000
+ambulatory_health 65621000
+social_assistance 65624000
+amusement_recreation 70713000
+accommodation 70721000
+food_services 70722000
+other_services 80000000""".splitlines())
+CES_LIMITED_TYPES = {
+    "rail_transport": {"01"},
+    **{key: {"01", "10"} for key in
+       ("petroleum_coal", "water_transport", "pipeline", "education")},
+}
+PPI_NODE_SERIES = dict(line.split() for line in """oil_gas_extraction PCU211---211---
+mining_except_oil_gas PCU212---212---
+support_mining PCU213---213---
+wood_products PCU321---321---
+nonmetallic_mineral PCU327---327---
+primary_metals PCU331---331---
+fabricated_metal PCU332---332---
+machinery PCU333---333---
+computer_electronic PCU334---334---
+electrical_equipment PCU335---335---
+furniture PCU337---337---
+misc_manufacturing PCU339---339---
+paper PCU322---322---
+printing PCU323---323---
+petroleum_coal PCU324---324---
+chemicals PCU325---325---
+plastics_rubber PCU326---326---
+air_transport PCU481---481---
+rail_transport PCU482---482---
+water_transport PCU483---483---
+truck_transport PCU484---484---
+pipeline PCU486---486---
+warehousing PCU493---493---
+securities PCU523---523---
+insurance PCU524---524---
+legal PCU5411--5411--
+accommodation PCU721---721---""".splitlines())
 
 JOLTS_ELEMENTS = {
     "JO": "job_openings",
@@ -150,28 +237,6 @@ MARKET_TICKERS = {
     "KIE": "insurance_industry",
 }
 
-def expand_compact_naics(spec: str) -> set[str]:
-    """Expand BLS compact NAICS notation such as 3361,2,3 -> {3361,3362,3363}."""
-    spec = str(spec).strip().replace(" ", "")
-    if not spec or spec == "-":
-        return set()
-    if re.fullmatch(r"\d+-\d+", spec):
-        return {spec}
-    parts = [p for p in spec.split(",") if p]
-    if not parts:
-        return set()
-    first = parts[0]
-    out = {first}
-    for token in parts[1:]:
-        if token.isdigit() and first.isdigit() and len(token) < len(first):
-            out.add(first[: len(first) - len(token)] + token)
-        else:
-            out.add(token)
-    return out
-
-def node_naics_set(node: dict[str, str]) -> set[str]:
-    return {x.strip() for x in node["naics_codes"].split(",") if x.strip()}
-
 def jolts_industry(node_key: str) -> str:
     mining = {"oil_gas_extraction", "mining_except_oil_gas", "support_mining"}
     durable = {
@@ -199,7 +264,7 @@ def jolts_industry(node_key: str) -> str:
     if node_key == "wholesale": return "420000"
     if node_key == "retail": return "440000"
     if node_key in transport_util: return "480099"
-    if node_key == "information": return "510000"
+    if node_key.startswith("information_"): return "510000"
     if node_key in finance: return "520000"
     if node_key in realestate: return "530000"
     if node_key in profbiz: return "540099"
@@ -323,8 +388,9 @@ def context() -> tuple[list[dict], list[str]]:
     if summary.get("status") != "PASS" or summary.get("policy") != "LATEST_OFFICIAL_VALUES_ONLY":
         raise RuntimeError("Stage 01 latest-value source collection has not passed")
     df = pd.read_csv(NODE_REGISTRY, dtype=str).fillna("")
-    if len(df) != 56 or df["node_key"].duplicated().any():
-        raise RuntimeError("The fixed 56-industry node registry is invalid")
+    if (len(df) != 59 or summary.get("industry_nodes") != len(df)
+            or df["node_key"].duplicated().any()):
+        raise RuntimeError("The fixed 59-industry node registry is invalid")
     return [
         {"key": row["node_key"], "name": row["industry_name"],
          "naics_codes": row["naics_codes"]}
@@ -332,42 +398,27 @@ def context() -> tuple[list[dict], list[str]]:
     ], QUARTERS
 
 
-def bls_metadata(family: str, file: str) -> pd.DataFrame:
-    """Official BLS reference catalog, independent of old Git repository files.
-
-    Each preserved catalog has a SHA-256 entry in its source manifest.
-    A missing catalog is downloaded from BLS; a 403 without an archived
-    catalog is a hard error, never an excuse to query an older Git commit.
-    """
-    catalog = METADATA_DIR / file
-    if not catalog.is_file():
-        url = f"{BLS_METADATA}/{family}/{file}"
-        response = requests.get(url, timeout=(8, 30))
+def bls_flat_rows(session: requests.Session, family: str,
+                  source_ids: set[str]) -> pd.DataFrame:
+    """Stream native records directly from BLS bulk files, without an API key."""
+    url = "https://download.bls.gov/pub/time.series/" + BLS_FLAT_FILES[family]
+    rows = []
+    with session.get(url, headers=BLS_HEADERS, timeout=180, stream=True) as response:
         response.raise_for_status()
-        METADATA_DIR.mkdir(parents=True, exist_ok=True)
-        catalog.write_bytes(response.content)
-        metadata_manifest = (json.loads(METADATA_MANIFEST.read_text(encoding="utf-8"))
-                             if METADATA_MANIFEST.exists()
-                             else {"source_type": "official_BLS_data_snapshot",
-                                   "runtime_git_dependency": False, "files": {}})
-        metadata_manifest["files"][catalog.relative_to(ROOT).as_posix()] = {
-            "source_url": url, "sha256": hashlib.sha256(response.content).hexdigest(),
-            "bytes": len(response.content), "origin": "live_BLS_catalog_download",
-        }
-        METADATA_MANIFEST.write_text(
-            json.dumps(metadata_manifest, indent=2) + "\n", encoding="utf-8")
-    data = catalog.read_bytes()
-    if not METADATA_MANIFEST.is_file():
-        raise RuntimeError("Official BLS source metadata manifest is missing")
-    manifest = json.loads(METADATA_MANIFEST.read_text(encoding="utf-8"))
-    entry = manifest.get("files", {}).get(catalog.relative_to(ROOT).as_posix())
-    if entry is None or entry.get("sha256") != hashlib.sha256(data).hexdigest():
-        raise RuntimeError(f"Official BLS catalog source checksum mismatch: {catalog}")
-    metadata = pd.read_csv(io.BytesIO(data), sep="\t", dtype=str).fillna("")
-    metadata.columns = [column.strip() for column in metadata]
-    for column in metadata:
-        metadata[column] = metadata[column].astype(str).str.strip()
-    return metadata
+        for raw in response.iter_lines():
+            fields = raw.decode("utf-8", errors="replace").strip().split("\t")
+            if len(fields) < 4 or fields[0].strip() not in source_ids:
+                continue
+            try:
+                sid, year, period, value = fields[:4]
+                year = int(year.strip())
+                value = float(value.strip())
+            except ValueError:
+                continue
+            if 2003 <= year <= 2025 and re.fullmatch(r"M(?:0[1-9]|1[0-2])", period.strip()) and np.isfinite(value):
+                rows.append({"series_id": sid.strip(), "year": year,
+                             "period": period.strip(), "value": value})
+    return pd.DataFrame(rows, columns=["series_id", "year", "period", "value"])
 
 
 def current_bls(session: requests.Session, family: str, source_ids: set[str],
@@ -385,19 +436,49 @@ def current_bls(session: requests.Session, family: str, source_ids: set[str],
     else:
         df = pd.DataFrame(columns=["series_id", "year", "period", "value"])
         origin = "BLS_current_API"
-    if refresh or df.empty:
+    missing = source_ids - set(df["series_id"])
+    fetch_ids = (source_ids.copy() if refresh or df.empty else
+                 missing if family == "ces_industry" else set())
+    flat_error = None
+    if fetch_ids:
+        try:
+            flat = bls_flat_rows(session, family, fetch_ids)
+            if not flat.empty:
+                df = flat if df.empty else pd.concat([df, flat], ignore_index=True)
+                df = df.drop_duplicates(["series_id", "year", "period"], keep="last")
+                origin = "official_BLS_bulk_flat_file"
+                fetch_ids -= set(flat["series_id"])
+                if not fetch_ids:
+                    RAW_DIR.mkdir(parents=True, exist_ok=True)
+                    df.to_csv(path, index=False)
+        except requests.RequestException as exc:
+            flat_error = exc
+    if fetch_ids:
+        api_key = os.environ.get("BLS_API_KEY", "")
+        years_per_request, series_per_request = (20, 50) if api_key else (10, 25)
+        if not api_key and df.empty and family == "ces_industry":
+            requests_needed = 3 * ((len(fetch_ids) + 24) // 25)
+            if requests_needed > 25:
+                raise RuntimeError(
+                    f"The original BLS bulk file download failed ({flat_error}); "
+                    "the anonymous BLS API fallback would exceed its daily request limit. "
+                    "Stage 02 does not require an API key when BLS bulk files are accessible."
+                )
         rows = []
-        # Re-fetch only on explicit refresh or when there is no portable cache.
+        # Fetch newly introduced CES nodes even when older nodes are cached.
         # Incomplete API batches are not silently presented as a full refresh.
         exhausted = False
-        for start in range(2003, 2026, 10):
-            end = min(2025, start + 9)
-            for i in range(0, len(source_ids), 20):
-                batch = sorted(source_ids)[i:i + 20]
+        for start in range(2003, 2026, years_per_request):
+            end = min(2025, start + years_per_request - 1)
+            for i in range(0, len(fetch_ids), series_per_request):
+                batch = sorted(fetch_ids)[i:i + series_per_request]
                 try:
+                    request_body = {"seriesid": batch, "startyear": str(start),
+                                    "endyear": str(end)}
+                    if api_key:
+                        request_body["registrationkey"] = api_key
                     response = session.post(
-                        BLS_API, json={"seriesid": batch, "startyear": str(start),
-                                       "endyear": str(end)}, timeout=60,
+                        BLS_API, json=request_body, timeout=60,
                     )
                     response.raise_for_status()
                     payload = response.json()
@@ -408,6 +489,11 @@ def current_bls(session: requests.Session, family: str, source_ids: set[str],
                     if df.empty:
                         raise RuntimeError(
                             f"No portable {family} BLS source cache and live API unavailable"
+                        ) from exc
+                    if family == "ces_industry" and missing:
+                        raise RuntimeError(
+                            f"Missing official {family} BLS source series: {sorted(missing)}; "
+                            f"live BLS API unavailable: {exc}"
                         ) from exc
                     exhausted = True
                     break
@@ -438,6 +524,10 @@ def current_bls(session: requests.Session, family: str, source_ids: set[str],
         if not df.empty:
             df.to_csv(path, index=False)
     df = df[df["series_id"].isin(source_ids)].copy()
+    if family == "ces_industry" and (source_ids - set(df["series_id"])):
+        raise RuntimeError(
+            f"Published CES sources are missing: {sorted(source_ids - set(df['series_id']))}"
+        )
     # Some stored BLS flat-file extracts contain only a subset of the national
     # CPI indicators. Fill those from their currently published identical
     # unadjusted FRED/BLS source series, rather than leave invented gaps.
@@ -509,7 +599,7 @@ def quarterly_bls(monthly: pd.DataFrame, quarters: list[str]) -> dict[str, pd.Se
 
 
 def latest_qcew_employment(nodes: list[dict], quarters: list[str]) -> dict[str, pd.DataFrame]:
-    """Read *latest* Stage 01 monthly employment, not historical as-of views."""
+    """Read Stage 01 native QCEW/CES employment for every official industry node."""
     source = pd.read_csv(TARGET_LATEST, low_memory=False,
                          dtype={"period": str, "source_industry": str, "node_key": str})
     source = source[source["series"] == "employment"].copy()
@@ -519,8 +609,9 @@ def latest_qcew_employment(nodes: list[dict], quarters: list[str]) -> dict[str, 
     matrix = pd.DataFrame(np.nan, index=quarters, columns=[n["key"] for n in nodes])
     for node in nodes:
         current = source[source["node_key"] == node["key"]]
-        expected = (["tri_434820_NSA.csv"] if node["key"] == "rail_transport"
-                    else node["naics_codes"].split(","))
+        expected = sorted(current["source_industry"].dropna().unique())
+        if not expected:
+            raise RuntimeError(f"Missing Stage 01 employment sources: {node['key']}")
         raw = current.pivot(index="period", columns="source_industry", values="value_thousands")
         native = raw.reindex(columns=expected)
         # An industry composed of multiple NAICS parts needs EVERY part.
@@ -536,24 +627,14 @@ def latest_qcew_employment(nodes: list[dict], quarters: list[str]) -> dict[str, 
 
 def latest_ces(session: requests.Session, nodes: list[dict], quarters: list[str],
                refresh: bool, evidence: list) -> tuple[dict, list[dict]]:
-    catalog = bls_metadata("ce", "ce.series")
-    industry = bls_metadata("ce", "ce.industry")
-    permitted = set(catalog["series_id"])
-    industry_code: dict[str, str] = {}
-    for node in nodes:
-        target = node_naics_set(node)
-        found = industry[industry["naics_code"].map(
-            lambda spec: expand_compact_naics(spec) == target)]
-        if not found.empty:
-            choices = found.copy()
-            choices["level"] = pd.to_numeric(choices["display_level"], errors="coerce")
-            industry_code[node["key"]] = str(choices.sort_values("level").iloc[0]["industry_code"])
+    keys = [node["key"] for node in nodes]
+    if not set(CES_NODE_CODES).issubset(keys):
+        raise RuntimeError("CES source definitions disagree with the 59-node registry")
     mapping = {dtype: {} for dtype in CES_TYPES}
-    for dtype in CES_TYPES:
-        for key, code in industry_code.items():
-            sid = f"CEU{code}{dtype}"
-            if sid in permitted:
-                mapping[dtype][key] = sid
+    for key, code in CES_NODE_CODES.items():
+        for dtype in CES_TYPES:
+            if dtype in CES_LIMITED_TYPES.get(key, CES_TYPES):
+                mapping[dtype][key] = f"CEU{code}{dtype}"
     wanted = set(GLOBAL_CES)
     for sub in mapping.values():
         wanted.update(sub.values())
@@ -562,7 +643,6 @@ def latest_ces(session: requests.Session, nodes: list[dict], quarters: list[str]
     evidence.append(provenance)
     quarterly = quarterly_bls(monthly, quarters)
     features, links = {}, []
-    keys = [node["key"] for node in nodes]
     for dtype, label in CES_TYPES.items():
         name = "ces_exact_" + label
         panel = pd.DataFrame(np.nan, index=quarters, columns=keys)
@@ -577,20 +657,10 @@ def latest_ces(session: requests.Session, nodes: list[dict], quarters: list[str]
 
 def latest_ppi(session: requests.Session, nodes: list[dict], quarters: list[str],
                refresh: bool, evidence: list) -> tuple[dict, list[dict]]:
-    meta = bls_metadata("pc", "pc.series")
-    top = meta[(meta["industry_code"] == meta["product_code"])
-               & meta["series_id"].str.startswith("PCU")].copy()
-    mapping = {}
-    for node in nodes:
-        target = node_naics_set(node)
-        candidates = top[top["industry_code"].map(
-            lambda spec: expand_compact_naics(str(spec).rstrip("-")) == target)]
-        if candidates.empty:
-            continue
-        candidates = candidates.copy()
-        candidates["first_year"] = pd.to_numeric(
-            candidates["begin_year"], errors="coerce").fillna(9999)
-        mapping[node["key"]] = str(candidates.sort_values("first_year").iloc[0]["series_id"])
+    keys = [node["key"] for node in nodes]
+    if not set(PPI_NODE_SERIES).issubset(keys):
+        raise RuntimeError("PPI source definitions disagree with the 59-node registry")
+    mapping = PPI_NODE_SERIES
     monthly, provenance = current_bls(session, "ppi_industry",
                                       set(mapping.values()),
                                       refresh=refresh)
@@ -608,15 +678,14 @@ def latest_ppi(session: requests.Session, nodes: list[dict], quarters: list[str]
 
 def latest_jolts(session: requests.Session, nodes: list[dict], quarters: list[str],
                  refresh: bool, evidence: list) -> tuple[dict, dict, list[dict]]:
-    meta = bls_metadata("jt", "jt.series")
-    meta = meta[(meta["seasonal"] == "U") & (meta["state_code"] == "00")
-                & (meta["area_code"] == "00000") & (meta["sizeclass_code"] == "00")]
     industries = {jolts_industry(n["key"]) for n in nodes}
-    eligible = meta[
-        meta["industry_code"].isin(industries | {"000000"})
-        & meta["dataelement_code"].isin(set(JOLTS_ELEMENTS) | {"UO"})
-        & meta["ratelevel_code"].isin({"L", "R"})
-    ].copy()
+    eligible = pd.DataFrame([
+        {"industry_code": industry, "dataelement_code": element,
+         "ratelevel_code": level,
+         "series_id": f"JTU{industry}000000000{element}{level}"}
+        for industry in sorted(industries | {"000000"})
+        for element in JOLTS_ELEMENTS for level in ("L", "R")
+    ])
     monthly, provenance = current_bls(
         session, "jolts", set(eligible["series_id"]),
         refresh=refresh)
@@ -704,8 +773,7 @@ def latest_market(quarters: list[str], refresh: bool) -> tuple[dict[str, pd.Seri
     if cache.exists() and not refresh:
         prices = pd.read_csv(cache, index_col=0, parse_dates=True)
     else:
-        # A clean checkout needs either its explicit portable source CSV or
-        # a successful public download; never read a deleted Git file.
+        # With no local price CSV, obtain the original observations publicly.
         try:
             import yfinance as yf
             history = yf.download(

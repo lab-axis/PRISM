@@ -219,28 +219,122 @@ class StageOneLatest(unittest.TestCase):
 
 
 class StageTwoLatest(unittest.TestCase):
-    def test_bls_catalog_reads_verified_portable_source(self):
+    def test_stage_two_native_mappings_need_no_downloaded_metadata(self):
+        nodes, quarters = two.context()
+        expected_nodes = {n["key"] for n in nodes}
+        calls = []
+
+        def empty_source(_session, family, ids, *, refresh=False):
+            calls.append((family, set(ids)))
+            return pd.DataFrame(columns=["series_id", "year", "period", "value"]), {}
+
+        with patch.object(two, "current_bls", side_effect=empty_source):
+            ces, ces_mapping = two.latest_ces(None, nodes, quarters, False, [])
+            ppi, ppi_mapping = two.latest_ppi(None, nodes, quarters, False, [])
+            jolts, national, jolts_mapping = two.latest_jolts(None, nodes, quarters, False, [])
+
+        self.assertEqual(len(nodes), 59)
+        self.assertEqual((len(ces), len(ppi), len(jolts)), (10, 1, 12))
+        self.assertEqual(len(national), 0)
+        self.assertTrue(all(table.shape == (84, 59)
+                            for table in [*ces.values(), *ppi.values(), *jolts.values()]))
+        self.assertEqual(len([x for x in ces_mapping
+                              if x["node_key"] == "information_motion_picture"]), 10)
+        self.assertEqual(len(ppi_mapping), 27)
+        self.assertEqual(set(x["node_key"] for x in [*ces_mapping, *ppi_mapping, *jolts_mapping])
+                         - expected_nodes, set())
+        self.assertEqual([len(ids) for _, ids in calls], [394, 27, 204])
+
+    def test_fresh_bls_collection_without_key_does_not_exhaust_quota(self):
+        class BlockedBulk:
+            def get(self, *args, **kwargs):
+                raise two.requests.HTTPError("BLS bulk HTTP 403")
+
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            folder = root / "metadata"
-            folder.mkdir()
-            catalog = folder / "ce.series"
-            manifest = folder / "source_manifest.json"
-            blob = b"series_id\tindustry_code\nCEU0000000001\t00000000\n"
-            catalog.write_bytes(blob)
-            manifest.write_text(json.dumps({
-                "files": {"metadata/ce.series": {
-                    "sha256": hashlib.sha256(blob).hexdigest()
-                }}
-            }))
-            with (patch.object(two, "ROOT", root),
-                  patch.object(two, "METADATA_DIR", folder),
-                  patch.object(two, "METADATA_MANIFEST", manifest)):
-                catalog_table = two.bls_metadata("ce", "ce.series")
-                self.assertEqual(catalog_table.series_id.tolist(), ["CEU0000000001"])
-                catalog.write_bytes(blob + b" ")
-                with self.assertRaisesRegex(RuntimeError, "checksum"):
-                    two.bls_metadata("ce", "ce.series")
+            ids = {f"CEU{i:010d}" for i in range(394)}
+            with (patch.object(two, "RAW_DIR", Path(directory)),
+                  patch.dict(two.os.environ, {"BLS_API_KEY": ""})):
+                with self.assertRaisesRegex(RuntimeError, "anonymous BLS API fallback"):
+                    two.current_bls(BlockedBulk(), "ces_industry", ids)
+
+    def test_clean_bls_bulk_download_works_without_api_key(self):
+        class BulkResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def raise_for_status(self):
+                return None
+
+            def iter_lines(self):
+                return iter([
+                    b"series_id\tyear\tperiod\tvalue",
+                    b"CEU5051200001\t2025\tM01\t100",
+                    b"CEU5051200001\t2025\tM02\t110",
+                    b"CEU5051200001\t2025\tM03\t120",
+                    b"CEU0000000001\t2025\tM01\t999",
+                ])
+
+        class Session:
+            def get(self, url, *, headers, timeout, stream):
+                self.url = url
+                self.headers = headers
+                return BulkResponse()
+
+            def post(self, *args, **kwargs):
+                raise AssertionError("The BLS API must not be used for a bulk download")
+
+        with tempfile.TemporaryDirectory() as directory:
+            session = Session()
+            with (patch.object(two, "RAW_DIR", Path(directory)),
+                  patch.dict(two.os.environ, {"BLS_API_KEY": ""})):
+                result, meta = two.current_bls(
+                    session, "ces_industry", {"CEU5051200001"})
+            self.assertEqual(len(result), 3)
+            self.assertEqual(meta["origin"], "official_BLS_bulk_flat_file")
+            self.assertIn("ce.data.0.AllCESSeries", session.url)
+            self.assertEqual(session.headers, two.BLS_HEADERS)
+            self.assertEqual(len(pd.read_csv(Path(directory) / "ces_industry.csv")), 3)
+
+    def test_registered_bls_api_uses_50_series_and_20_year_windows(self):
+        class Session:
+            def __init__(self):
+                self.requests = []
+
+            def get(self, *args, **kwargs):
+                raise two.requests.HTTPError("BLS flat download unavailable")
+
+            def post(self, _url, *, json, timeout):
+                self.requests.append(json)
+
+                class Response:
+                    def raise_for_status(self):
+                        return None
+
+                    def json(self):
+                        return {"status": "REQUEST_SUCCEEDED", "Results": {"series": [
+                            {"seriesID": sid, "data": [{
+                                "year": request["startyear"], "period": "M01", "value": "1"
+                            }]} for sid in request["seriesid"]
+                        ]}}
+
+                request = json
+                return Response()
+
+        with tempfile.TemporaryDirectory() as directory:
+            session = Session()
+            ids = {f"CEU{i:010d}" for i in range(51)}
+            with (patch.object(two, "RAW_DIR", Path(directory)),
+                  patch.dict(two.os.environ, {"BLS_API_KEY": "test-key"})):
+                data, _ = two.current_bls(session, "ces_industry", ids)
+            self.assertEqual(len(session.requests), 4)
+            self.assertEqual([len(x["seriesid"]) for x in session.requests], [50, 1, 50, 1])
+            self.assertEqual({x["registrationkey"] for x in session.requests}, {"test-key"})
+            self.assertEqual({(x["startyear"], x["endyear"]) for x in session.requests},
+                             {("2003", "2022"), ("2023", "2025")})
+            self.assertEqual(set(data.series_id), ids)
 
     def test_bls_native_source_cache_does_not_call_legacy_git(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -251,6 +345,9 @@ class StageTwoLatest(unittest.TestCase):
             ]).to_csv(cache_path, index=False)
 
             class OfflineSession:
+                def get(self, *args, **kwargs):
+                    raise two.requests.ConnectionError("Simulated offline BLS bulk file")
+
                 def post(self, *args, **kwargs):
                     raise two.requests.ConnectionError("Simulated offline BLS API")
 
@@ -263,6 +360,72 @@ class StageTwoLatest(unittest.TestCase):
                     two.current_bls(
                         OfflineSession(), "ppi_industry", {"PCU999999"},
                         refresh=False)
+
+    def test_new_ces_node_series_is_fetched_into_existing_cache(self):
+        old, new = "CEU5051300001", "CEU5051200002"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ces_industry.csv"
+            pd.DataFrame([{"series_id": old, "year": 2025, "period": "M01",
+                           "value": 1.0}]).to_csv(path, index=False)
+
+            class Session:
+                def __init__(self):
+                    self.requests = []
+
+                def get(self, *args, **kwargs):
+                    raise two.requests.ConnectionError("Simulated BLS bulk 403")
+
+                def post(self, _url, *, json, timeout):
+                    self.requests.append(json)
+
+                    class Response:
+                        def raise_for_status(self):
+                            return None
+
+                        def json(self):
+                            return {"status": "REQUEST_SUCCEEDED", "Results": {
+                                "series": [{"seriesID": new, "data": [
+                                    {"year": str(year), "period": f"M{month:02d}",
+                                     "value": "2.0"}
+                                    for year in range(int(json["startyear"]),
+                                                      int(json["endyear"]) + 1)
+                                    for month in range(1, 13)]}]}}
+
+                    return Response()
+
+            session = Session()
+            with patch.object(two, "RAW_DIR", Path(directory)):
+                result, _ = two.current_bls(session, "ces_industry", {old, new})
+            self.assertEqual(len(session.requests), 3)
+            self.assertTrue(all(call["seriesid"] == [new] for call in session.requests))
+            self.assertEqual(len(result[result.series_id == new]), 276)
+            self.assertEqual(set(pd.read_csv(path).series_id), {old, new})
+
+    def test_new_ces_series_quota_failure_preserves_cache(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "ces_industry.csv"
+            pd.DataFrame([{"series_id": "OLD", "year": 2025,
+                           "period": "M01", "value": 1.0}]).to_csv(path, index=False)
+            original = path.read_bytes()
+
+            class QuotaSession:
+                def get(self, *args, **kwargs):
+                    raise two.requests.ConnectionError("Simulated BLS bulk 403")
+
+                def post(self, *args, **kwargs):
+                    class Response:
+                        def raise_for_status(self):
+                            return None
+
+                        def json(self):
+                            return {"status": "REQUEST_FAILED", "message": ["daily threshold"]}
+
+                    return Response()
+
+            with patch.object(two, "RAW_DIR", Path(directory)):
+                with self.assertRaisesRegex(RuntimeError, "Missing official ces_industry BLS source series"):
+                    two.current_bls(QuotaSession(), "ces_industry", {"OLD", "NEW"})
+            self.assertEqual(path.read_bytes(), original)
 
     def test_no_legacy_feature_multiplication_functions(self):
         self.assertFalse(hasattr(two, "add_derivatives"))
