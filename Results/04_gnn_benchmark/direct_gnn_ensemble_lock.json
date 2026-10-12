@@ -1,0 +1,23 @@
+{
+  "status": "LOCKED",
+  "mode": "direct",
+  "candidate_family": "GNN_ONLY",
+  "models": [
+    "MTGNN"
+  ],
+  "model_count": 1,
+  "selected_mae": 3.8583154173158176,
+  "selected_ici_mae": 2.9037658356684277,
+  "equal_weights": [
+    1.0
+  ],
+  "identical_prediction_duplicates_removed": [],
+  "input_policies": {
+    "MTGNN": {
+      "scaler": "standard",
+      "missing": "mask"
+    }
+  },
+  "selection_method": "Correlation-aware greedy + smallest K within paired industry 1-SE of full-path minimum",
+  "test_opened": false
+}

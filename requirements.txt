@@ -19,4 +19,5 @@ seaborn==0.13.2
 
 lightgbm==4.7.0
 xgboost==3.4.0
+joblib==1.5.3
 torch==2.12.1+cu126
