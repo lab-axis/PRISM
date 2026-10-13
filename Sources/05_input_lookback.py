@@ -1,36 +1,38 @@
 #!/usr/bin/env python3
-"""PRISM Supplementary S05: input-history-length SENSITIVITY, not optimization.
+"""PRISM 05 — MAIN EXPERIMENT: Dev-selected B-MTGNN lookback policy.
 
-The deployed forecasting method remains Stage04 exactly: 12 input quarters,
-five selected GNNs, five matched seeds, equal-weight Structural ensemble,
-Standard/raw-zero/missing-mask preprocessing, Train 2006-19 fitted once,
-and frozen weights with freshly available past X for each Dev forecast.
+RESEARCH QUESTION
+    Using the entire 2006–2019 Train period for preprocessing and all 36
+    common supervised training origins 2011–2019, compare L=1..20 raw
+    quarterly input windows on Dev 2020–2022 and select one length there.
 
-S05 is an optional, DESCRIPTIVE robustness analysis of L=1..20. Lengths
-share the same Train-only supervised origin sets:
-  2011-15 (20 origins): epoch search fit; 2016-17: epoch assessment
-  2011-17 (28 origins): lookback-sensitivity fit
-  2018-19 (8 origins): lookback-sensitivity measurements
-40-L >= L explains the study's 20-quarter upper support limit. The 1:1
-sample-support rule is an explicit design choice, not a statistical law.
-The observed smallest error is recorded honestly as a descriptive fact;
-it does NOT change the original 12-quarter forecasting method.
+DEV POLICY SELECTION (DESCRIPTIVE)
+    For each L and seed, calculate the three-axis Dev MAE individually.
+    Choose the L with the lowest average across the 10 matched seeds;
+    ICI MAE then shorter L break ties. L=1 is the observed Dev selection.
+    Report means, between-seed SD, per-axis/year errors and descriptive
+    differences from original L=12, without p-values or confidence intervals.
 
-Previously completed 500 training trials are cached at
-Results/05_input_lookback/trials/ (500 JSON + 500 NPZ). --rebuild reads
-and validates these 500 trials, regenerates only the supplementary tables
-and figures, and DELETES superseded optimization/final-model artifacts.
-It NEVER fits or reruns a neural network, never archives the superseded
-11-quarter optimization, and never changes any trial predictions.
+INTERPRETATION
+    Dev was already used to select Stage04's Structural formulation.
+    L=1 is a Dev-selected modeling policy, NOT independently validated
+    predictive superiority. L=12 is retained only as the original reference.
+    Downstream stages are not modified by this code.
 
-Use --run only when training trials are genuinely absent/incomplete.
-2023-25 Test is never opened. Historic economic inputs are Stage03's
-latest-revised data; we do not claim real-time publication-vintage replay.
+PROTOCOL — NO TRAIN CV, ROLLING, EXPANDING OR TRAIN-INTERNAL HOLDOUT
+    B-MTGNN Structural only; 10 matched seeds 2026–2035; the same
+    67,190-parameter model and initialization across L; fixed 20-slot
+    temporal core; 75 epochs and 30 MC-dropout draws. The same nine
+    historical score features and economic prior remain for every L,
+    so this compares raw feature-window length conditional on context,
+    NOT the total amount of history available. Test is not accessed.
+
+    py Sources/05_input_lookback.py --analyze   # report/plots only; no fit
+    py Sources/05_input_lookback.py --status
 """
-
 from __future__ import annotations
+
 import argparse
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from functools import lru_cache
 import hashlib
@@ -38,9 +40,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
-import shutil
 import sys
-import tempfile
 import time
 
 import matplotlib
@@ -52,696 +52,634 @@ import torch
 
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/"Sources/05_input_lookback.py"
-STAGE04_SOURCE=ROOT/"Sources/04_gnn_benchmark.py"
-STAGE04_RESULTS=ROOT/"Results/04_gnn_benchmark"
+SOURCE04=ROOT/"Sources/04_bmtgnn_benchmark.py"
+RESULT04=ROOT/"Results/04_bmtgnn_benchmark"
 RESULTS=ROOT/"Results/05_input_lookback"
 ORIGINAL_LOOKBACK=12
-EARLY_END=40           # 2006Q1–2015Q4
-EPOCH_END=48           # 2016Q1–2017Q4
-TRAIN_END=56           # 2018Q1–2019Q4
-DEV_END=68             # 2020Q1–2022Q4; not used for sensitivity
-FIRST_CONTEXT_ORIGIN=12
-AXES=("profitability","productivity","growth")
-OLD_TRAINING_FINGERPRINT="abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b"
-OLD_TRAINING_SOURCE="2a6d884ad88476afd12f10a86e27bfe6ae6bd296367bb89c06be0c2b4a69af83"
+LENGTHS=tuple(range(1,21))
+COMMON_TRAIN_ORIGINS=np.arange(20,56,dtype=int)
+DEV_ORIGINS=np.arange(56,68,dtype=int)
+SEEDS=tuple(range(2026,2036))
+MODEL="B-MTGNN"
+MODE="structural"
+CORE_LOOKBACK=max(LENGTHS)
+SCORE_NAMES=("profitability","productivity","growth")
+DEV_SELECTION_RULE="MIN_10_SEED_MEAN_THREE_AXIS_MAE_THEN_ICI_THEN_SHORTER_L"
 
 
-def sha256(path:Path)->str:
+def sha(path:Path)->str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def atomic_json(path:Path,record:dict)->None:
-    path.parent.mkdir(parents=True,exist_ok=True)
-    tmp=path.with_suffix(path.suffix+".writing")
-    tmp.write_text(json.dumps(record,indent=2,ensure_ascii=False,
-                              allow_nan=False),encoding="utf-8")
-    os.replace(tmp,path)
-
-
-def atomic_npz(path:Path,**arrays)->None:
-    path.parent.mkdir(parents=True,exist_ok=True)
-    tmp=path.with_suffix(".writing.npz")
-    np.savez_compressed(tmp,**arrays)
-    os.replace(tmp,path)
-
-
-def read_json(path:Path)->dict:
+def json_read(path:Path)->dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def json_write(path:Path,value:dict):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temp=path.with_suffix(".json.writing")
+    temp.write_text(json.dumps(value,indent=2,allow_nan=False,
+                               ensure_ascii=False),encoding="utf-8")
+    os.replace(temp,path)
+
+
+def save_npz(path:Path,**arrays):
+    path.parent.mkdir(parents=True,exist_ok=True)
+    temp=path.with_suffix(".writing.npz")
+    np.savez_compressed(temp,**arrays)
+    os.replace(temp,path)
 
 
 @lru_cache(maxsize=1)
 def stage04():
-    spec=importlib.util.spec_from_file_location("_prism05_supplementary04",
-                                                 STAGE04_SOURCE)
-    module=importlib.util.module_from_spec(spec)
-    sys.modules[spec.name]=module
-    spec.loader.exec_module(module)
-    return module
+    spec=importlib.util.spec_from_file_location("_prism05_full_train_04",SOURCE04)
+    mod=importlib.util.module_from_spec(spec)
+    sys.modules[spec.name]=mod
+    spec.loader.exec_module(mod)
+    return mod
 
 
-@dataclass(frozen=True)
-class Ensemble:
-    models:tuple[str,...]
-    seeds:tuple[int,...]
-    weights:tuple[float,...]
-    mode:str
-    lock_sha256:str
-    manifest_sha256:str
-
-
-def original_04()->Ensemble:
+def upstream():
+    """Validate exactly the current frozen B-MTGNN Stage04 Dev contract."""
     m=stage04()
-    lock_file=STAGE04_RESULTS/"selected_ensemble_pool.json"
-    manifest_file=STAGE04_RESULTS/"run_manifest.json"
-    report_file=STAGE04_RESULTS/"selected_mode_and_ensemble.json"
-    if not all(f.is_file() for f in (lock_file,manifest_file,report_file)):
-        raise RuntimeError("Supplementary requires completed Stage04 ensemble")
-    lock,manifest,report=map(read_json,(lock_file,manifest_file,report_file))
-    if (manifest.get("status")!="PASS"
-            or manifest.get("planned_runs")!=762
-            or manifest.get("completed_runs")!=762
-            or manifest.get("signature",{}).get("source_sha256")!=sha256(STAGE04_SOURCE)
-            or report.get("status")!="COMPLETE_ALL_THREE_MODES"
-            or lock.get("status")!="LOCKED"
-            or lock.get("model_family")!="GNN_ONLY"
-            or lock.get("prediction_mode")!=report.get("selected_mode")
-            or lock.get("models")!=report.get("selected_ensemble_models")
-            or lock.get("test_opened") is not False):
-        raise RuntimeError("Stage04 is not the current completed model family")
-    names=tuple(lock["models"])
-    seeds=tuple(lock["seeds"])
-    weights=tuple(float(x) for x in lock["equal_weights"])
-    if (len(names)!=5 or len(set(names))!=5
-            or not set(names).issubset(set(m.GNN_MODELS))
-            or seeds!=tuple(m.DEFAULT_SEEDS)
-            or len(weights)!=5 or not np.allclose(
-                weights,.2,atol=1e-12,rtol=0)
-            or tuple(manifest["signature"][
-                "economic_prior_train_coefficient"])!=tuple(
-                    m.STAGE04_FIXED_ALPHA)):
-        raise RuntimeError("Stage04 fixed ensemble/Train prior changed")
-    for file,field in (
-        ("raw_train.csv","train_sha256"),("raw_val.csv","dev_sha256")):
-        expected=manifest["signature"][field]
-        if (sha256(ROOT/"Data/03_integrated_dataset"/file)!=expected
-                or lock["input_sha256"][
-                    "Data/03_integrated_dataset/"+file]!=expected):
-            raise RuntimeError("Stage04 selected input data SHA mismatch")
-    for model in names:
-        if (m.fixed_preprocessing_policy(model)!=("standard","mask")
-                or lock["input_policies"][model]!=dict(
-                    scaler="standard",missing="mask")):
-            raise RuntimeError("Fixed Stage04 neural preprocessing changed")
-    return Ensemble(names,seeds,weights,lock["prediction_mode"],
-                    sha256(lock_file),sha256(manifest_file))
+    panel=m.load_panel(ROOT)
+    files=(RESULT04/"run_manifest.json",RESULT04/"dev_selection.json")
+    if not all(x.is_file() for x in files):
+        raise RuntimeError("Frozen B-MTGNN Stage04 Dev results required")
+    manifest,lock=map(json_read,files)
+    if (manifest.get("status")!="DEV_FROZEN"
+            or manifest.get("completed_jobs")!=30
+            or manifest.get("total_jobs")!=30
+            or manifest.get("contract")!=m.benchmark_contract()
+            or manifest["contract"].get("model")!=MODEL
+            or manifest["contract"].get("reference_epoch")!=75
+            or tuple(manifest["contract"].get("seeds",()))!=SEEDS
+            or lock.get("model")!=MODEL
+            or lock.get("selected_mode")!=MODE
+            or lock.get("seed_count")!=len(SEEDS)
+            or lock.get("source_sha256")!=manifest.get("training_source_sha256")
+            or m.STAGE04_ACTIVE_EPOCHS!=75
+            or panel.x.shape!=(68,59,157)
+            or panel.train_count!=56):
+        raise RuntimeError("Stage05 requires frozen 04 B-MTGNN Structural Dev")
+    # The historic checkpoints keep their original training-source SHA;
+    # plotting/analysis edits do not retrospectively alter it.
+    m._read_completed_jobs(manifest["training_source_sha256"])
+    return m,panel,lock,manifest
 
 
 def study_design():
-    """One fixed quantitative support rule, not a performance-tuned ceiling."""
-    upper=EARLY_END//2  # early supervised origins: 40-L >= L
-    lengths=tuple(range(1,upper+1))
-    early=np.arange(upper,EARLY_END,dtype=int)
-    epoch=np.arange(EARLY_END,EPOCH_END,dtype=int)
-    refit=np.arange(upper,EPOCH_END,dtype=int)
-    measure=np.arange(EPOCH_END,TRAIN_END,dtype=int)
-    assert (len(lengths)==20 and ORIGINAL_LOOKBACK in lengths
-            and len(early)==20 and len(refit)==28
-            and len(epoch)==8 and len(measure)==8)
-    return dict(lengths=lengths,upper=upper,
-                early=early,epoch=epoch,refit=refit,measure=measure)
-
-
-def three_axis_metrics(pred,truth,previous):
-    pred,truth,previous=(np.asarray(a,dtype=np.float64)
-                         for a in (pred,truth,previous))
-    if (pred.shape!=truth.shape or pred.shape!=previous.shape
-            or pred.ndim!=3 or pred.shape[1:]!=(59,3)
-            or not all(np.isfinite(a).all() for a in (
-                pred,truth,previous))):
-        raise ValueError("Unexpected three-axis historical prediction")
-    errors=pred-truth
+    if (len(LENGTHS)!=20 or not 1<=ORIGINAL_LOOKBACK<=20
+            or len(COMMON_TRAIN_ORIGINS)!=36
+            or DEV_ORIGINS.tolist()!=list(range(56,68))
+            or COMMON_TRAIN_ORIGINS[-1]!=55):
+        raise RuntimeError("Stage05 full Train / Dev design drift")
     return dict(
-        axis_mae=float(np.abs(errors).mean()),
-        ici_mae=float(np.abs(errors.mean(axis=-1)).mean()),
-        profitability_mae=float(np.abs(errors[...,0]).mean()),
-        productivity_mae=float(np.abs(errors[...,1]).mean()),
-        growth_mae=float(np.abs(errors[...,2]).mean()),
-        persistence_mae=float(np.abs(previous-truth).mean()))
+        input_lengths=list(LENGTHS),
+        train_origin_indices=COMMON_TRAIN_ORIGINS.tolist(),
+        dev_origin_indices=DEV_ORIGINS.tolist(),
+        all_2006_2019_is_train=True,
+        train_heldout_years=[],
+        inner_validation=False,
+        epoch_selection="NONE_FIXED_75",
+        dev_used_for_main_policy_selection=True,
+        train_internal_cv=False,
+        training_strategy="SINGLE_FULL_TRAIN_FIT",
+        same_model_parameters_all_lengths=True,
+        same_initialization_per_seed=True,
+        fixed_core_temporal_capacity=CORE_LOOKBACK,
+        common_asof_9d_target_context=True,
+        experiment="conditional_quarterly_feature_window_not_total_history",
+        original_reference_L=ORIGINAL_LOOKBACK,
+        selection_rule=DEV_SELECTION_RULE)
 
 
 class Inputs:
-    """Stage04's unchanged as-of context, economic prior, 59×157 inputs."""
     def __init__(self,panel):
-        self.p=panel
+        self.panel=panel
         self.m=stage04()
-        n,d,info=self.m.economic_components(panel)
-        self.prior=np.zeros_like(panel.y)
-        idx=np.arange(FIRST_CONTEXT_ORIGIN,len(panel.y))
-        self.prior[idx]=self.m.component_structural_prior(
-            n,d,info,idx,np.asarray(self.m.STAGE04_FIXED_ALPHA,float))
-        self.graph_cache={}
+        # Use the same Train-only structural anchor as the frozen Stage04.
+        self.prior,_=self.m.make_fold(panel)
+        # B-MTGNN learns its own graph; it does not take a fitted adjacency.
+        self.graph=torch.eye(self.m.NODE_COUNT)
 
-    def graph(self,fit_end:int):
-        if fit_end not in (EARLY_END,EPOCH_END):
-            raise ValueError("Graph must be from an earlier Train fold")
-        if fit_end not in self.graph_cache:
-            p=self.p
-            train=self.m.Panel(p.x,p.y,p.quarters,p.nodes,p.names,
-                               p.features,fit_end,p.hashes)
-            self.graph_cache[fit_end]=self.m.train_graph(train)
-        return self.graph_cache[fit_end]
-
-    def fold(self,L,fit_end,train_origins,holdout_origins):
-        p=self.p
-        t=np.asarray(train_origins,dtype=int)
-        v=np.asarray(holdout_origins,dtype=int)
-        if (L not in study_design()["lengths"]
-                or fit_end not in (EARLY_END,EPOCH_END)
-                or len(t)==0 or len(v)==0
-                or t.min()<max(L,FIRST_CONTEXT_ORIGIN)
-                or t.max()>=fit_end or v.min()<fit_end
-                or v.max()>=TRAIN_END):
-            raise ValueError("Leaky/unmatched lookback sensitivity fold")
-        c,s=self.m.fit_normalizer(p.x[:fit_end],"standard")
-        present=np.isfinite(p.x)
-        x=((np.where(present,p.x,0.)-c)/s).astype(np.float32)
-        mask=(~present).astype(np.float32)
-        yc=p.y[:fit_end].mean((0,1))
-        ys=p.y[:fit_end].std((0,1))
+    def fold(self,L):
+        if L not in LENGTHS:
+            raise ValueError("Stage05 lookback is in [1,20]")
+        p=self.panel
+        train=COMMON_TRAIN_ORIGINS
+        dev=DEV_ORIGINS
+        center,scale=self.m.fit_normalizer(p.x[:56],"standard")
+        known=np.isfinite(p.x)
+        x=((np.where(known,p.x,0.)-center)/scale).astype(np.float32)
+        mask=(~known).astype(np.float32)
+        yc=p.y[:56].mean((0,1))
+        ys=p.y[:56].std((0,1))
         ys=np.where(ys>1e-8,ys,1.)
-        normalized_y=((p.y-yc)/ys).astype(np.float32)
-        normalized_prior=((self.prior-yc)/ys).astype(np.float32)
-        def pack(ids,prefix):
+        norm_y=((p.y-yc)/ys).astype(np.float32)
+        structural=((self.prior-yc)/ys).astype(np.float32)
+        def pack(indices,prefix):
             return {
-                prefix+"_x":np.stack([x[o-L:o] for o in ids]),
-                prefix+"_mask":np.stack([mask[o-L:o] for o in ids]),
-                prefix+"_y":np.stack([normalized_y[o:o+1] for o in ids]),
-                prefix+"_last":((self.m.past_scores(p,ids)-yc)/ys).astype(np.float32),
-                prefix+"_context":self.m.known_score_context(p,ids,yc,ys),
-                prefix+"_structure":normalized_prior[ids].astype(np.float32)}
-        out=dict(
-            **pack(t,"train"),**pack(v,"val"),
-            x_center=c.astype(np.float32),x_scale=s.astype(np.float32),
-            y_center=yc.astype(np.float32),y_scale=ys.astype(np.float32))
-        if (out["train_x"].shape!=(len(t),L,59,157)
-                or out["val_y"].shape!=(len(v),1,59,3)
-                or any(not np.isfinite(a).all() for a in out.values())):
-            raise RuntimeError("Stage05 input shape/nonfinite value")
-        return out
+                prefix+"_x":np.stack([x[t-L:t] for t in indices]),
+                prefix+"_mask":np.stack([mask[t-L:t] for t in indices]),
+                prefix+"_y":np.stack([norm_y[t:t+1] for t in indices]),
+                prefix+"_last":((
+                    self.m.past_scores(p,indices)-yc)/ys).astype(np.float32),
+                prefix+"_context":self.m.known_score_context(
+                    p,indices,yc,ys),
+                prefix+"_structure":structural[indices]}
+        arrays=dict(
+            **pack(train,"train"),**pack(dev,"val"),
+            x_center=center.astype(np.float32),
+            x_scale=scale.astype(np.float32),
+            y_center=yc.astype(np.float32),
+            y_scale=ys.astype(np.float32),
+            train_origins=train.copy(),val_origins=dev.copy())
+        if (arrays["train_x"].shape!=(36,L,59,157)
+                or arrays["val_x"].shape!=(12,L,59,157)
+                or not all(np.isfinite(v).all() for v in arrays.values())):
+            raise RuntimeError("Stage05 Train/Dev array contract broken")
+        return arrays
 
 
-def train_network(inputs,model_name,seed,length,mode,fold,fit_end,device,
-                  epochs=None):
-    """Original Stage04 architecture/loss/optimizer/Bayesian inference."""
-    m=stage04()
-    m.seed_all(seed)
-    network=m.ThreeAxisStructureGNN(
-        model_name,fold["x_center"],fold["x_scale"],
-        fold["y_center"],fold["y_scale"],
-        num_features=157,nodes=59,prediction_mode=mode)
-    if length!=m.LOOKBACK:
-        network.base=m.ForecastModel(
-            model_name,157,59,m.STAGE04_ACTIVE_WIDTH,length,m.HORIZON)
-    network=network.to(device)
-    optimizer=torch.optim.AdamW(
-        network.parameters(),lr=m.FIXED_LEARNING_RATE,weight_decay=1e-4)
-    keys=("train_x","train_mask","train_y","train_last",
-          "train_structure","train_context",
-          "val_x","val_mask","val_y","val_last",
-          "val_structure","val_context")
-    tensors={key:torch.as_tensor(fold[key],device=device) for key in keys}
-    graph=torch.as_tensor(inputs.graph(fit_end),device=device)
-    scale=torch.as_tensor(fold["y_scale"],device=device)
-    iterations=m.STAGE04_ACTIVE_EPOCHS if epochs is None else int(epochs)
-    best,best_epoch,stale=float("inf"),1,0
-    for epoch in range(1,iterations+1):
-        network.train()
-        optimizer.zero_grad(set_to_none=True)
-        pred=network(tensors["train_x"],tensors["train_mask"],graph,
-                     tensors["train_last"],tensors["train_structure"],
-                     tensors["train_context"])
-        loss=m.three_axis_weighted_huber(
-            pred,tensors["train_y"],tensors["train_last"],scale)
-        if not torch.isfinite(loss):
-            raise RuntimeError("Nonfinite weighted Stage04 loss")
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(network.parameters(),5.,
-                                       error_if_nonfinite=True)
-        optimizer.step()
-        if epochs is None:
-            if model_name=="B-MTGNN":
-                network.train()
-                draws=m.STAGE04_BMTGNN_INNER_MC_SAMPLES
-            else:
-                network.eval()
-                draws=1
-            with torch.inference_mode():
-                p=torch.stack([
-                    network(tensors["val_x"],tensors["val_mask"],graph,
-                            tensors["val_last"],tensors["val_structure"],
-                            tensors["val_context"])
-                    for _ in range(draws)]).mean(0)
-                score=float(((p-tensors["val_y"]).abs()*scale).mean())
-            if score<best-1e-6:
-                best,best_epoch,stale=score,epoch,0
-            else:
-                stale+=1
-            if stale>=m.STAGE04_ACTIVE_PATIENCE:
-                break
-    if epochs is None:
-        return dict(best_epoch=int(best_epoch),epoch_mae=float(best))
-    result=m.mtgnn_bayesian_inference(
-        network,tensors,graph,model_name,seed,
-        fold["y_center"],fold["y_scale"])
-    return dict(prediction=result["prediction"])
+class FixedTemporalInput(torch.nn.Module):
+    """Non-trainable latent left padding; B-MTGNN core always sees 20 slots.
 
-
-def train_one(inputs,ensemble,L,model,seed,design,device):
-    early=inputs.fold(L,EARLY_END,design["early"],design["epoch"])
-    epoch=train_network(
-        inputs,model,seed,L,ensemble.mode,early,EARLY_END,device)
-    second=inputs.fold(L,EPOCH_END,design["refit"],design["measure"])
-    forecast=train_network(
-        inputs,model,seed,L,ensemble.mode,second,EPOCH_END,device,
-        epochs=epoch["best_epoch"])["prediction"]
-    truth=inputs.p.y[design["measure"]]
-    past=stage04().past_scores(inputs.p,design["measure"])
-    return dict(**epoch,**three_axis_metrics(forecast,truth,past)),forecast
-
-
-def trial_paths(root,L,name,seed):
-    stem=f"L{L:02d}__{name}__s{seed}"
-    return root/"trials"/(stem+".json"),root/"trials"/(stem+".npz")
-
-
-def read_trial(root,fingerprint,L,name,seed):
-    meta,array=trial_paths(root,L,name,seed)
-    if meta.is_file()!=array.is_file():
-        raise RuntimeError("Incomplete Stage05 training trial; do not reuse")
-    if not meta.is_file():
-        return None
-    record=read_json(meta)
-    if (record.get("contract_sha256")!=fingerprint
-            or record.get("length")!=L or record.get("model")!=name
-            or record.get("seed")!=seed):
-        raise RuntimeError(f"Stale Stage05 training record: {meta.name}")
-    with np.load(array,allow_pickle=False) as z:
-        if z.files!=["prediction"]:
-            raise RuntimeError("Unexpected trained trial prediction schema")
-        pred=z["prediction"].copy()
-    if pred.shape!=(8,59,3) or not np.isfinite(pred).all():
-        raise RuntimeError(f"Invalid trained trial array {array.name}")
-    return record,pred
-
-
-def write_trial(root,fingerprint,L,name,seed,details,pred):
-    meta,array=trial_paths(root,L,name,seed)
-    if meta.exists() or array.exists():
-        raise RuntimeError("Never overwrite existing training results")
-    atomic_npz(array,prediction=pred)
-    atomic_json(meta,dict(
-        contract_sha256=fingerprint,length=L,model=name,
-        seed=seed,**details))
-
-
-def digest_trial_files(root)->str:
-    h=hashlib.sha256()
-    files=sorted((root/"trials").iterdir())
-    for file in files:
-        if not file.is_file():
-            raise RuntimeError("Unexpected nested trial file")
-        h.update(file.name.encode("utf-8")+b"\0")
-        with file.open("rb") as stream:
-            for block in iter(lambda:stream.read(4*1024*1024),b""):
-                h.update(block)
-    return h.hexdigest()
-
-
-def training_fingerprint(root,ensemble,panel,design):
-    """Trust original run only if its data/model training contract matches.
-
-    The historical hash is retained ON THE 500 MODEL TRAINING FILES ONLY;
-    no former optimization status, selected length or output survives.
+    Padding AFTER the normalizer/context adapter is essential: padding raw
+    features with zeros would create false context features and bias terms.
+    Only genuinely observed L quarters enter the latent representation.
     """
-    manifest=root/"run_manifest.json"
-    if not manifest.is_file():
-        if (root/"trials").exists():
-            raise RuntimeError("Training outputs without provenance manifest")
-        return None
-    state=read_json(manifest)
-    if state.get("status")=="PASS_SUPPLEMENTARY":
-        if (state.get("stage04_sha256")!=sha256(STAGE04_SOURCE)
-                or state.get("stage04_lock_sha256")!=ensemble.lock_sha256
-                or state.get("model_count")!=len(ensemble.models)
-                or state.get("seed_count")!=len(ensemble.seeds)):
-            raise RuntimeError("Supplementary report uses different Stage04")
-        return state["training_fingerprint"]
-    old=state.get("contract",{})
-    if (state.get("status")=="PASS"
-            and state.get("contract_sha256")==OLD_TRAINING_FINGERPRINT
-            and old.get("source_sha256")==OLD_TRAINING_SOURCE
-            and old.get("source04_sha256")==sha256(STAGE04_SOURCE)
-            and old.get("selected04",{}).get("lock_hash")==ensemble.lock_sha256
-            and old.get("selected04",{}).get("manifest_hash")==ensemble.manifest_sha256
-            and old.get("panel_sha256")==panel.hashes
-            and old.get("lookbacks")==list(design["lengths"])
-            and old.get("nodes")==59 and old.get("features")==157
-            and old.get("epoch_cap")==stage04().STAGE04_ACTIVE_EPOCHS
-            and old.get("equal_common_early_fit_origins")==design["early"].tolist()
-            and old.get("equal_common_preselection_fit_origins")==design["refit"].tolist()
-            and old.get("train_only_epoch_origins")==design["epoch"].tolist()
-            and old.get("train_only_lookback_choice_origins")==design["measure"].tolist()):
-        return OLD_TRAINING_FINGERPRINT
-    if (state.get("status")=="TRAINING_SUPPLEMENTARY"
-            and state.get("stage04_sha256")==sha256(STAGE04_SOURCE)
-            and state.get("source_sha256")==sha256(SOURCE)):
-        return state["training_fingerprint"]
-    raise RuntimeError("Unrecognized Stage05 trial provenance; no cache mixing")
+    def __init__(self,backbone):
+        super().__init__()
+        self.backbone=backbone
+
+    def forward(self,encoded,graph):
+        L=encoded.shape[1]
+        if not 1<=L<=CORE_LOOKBACK:
+            raise ValueError("B-MTGNN input length must lie in 1..20")
+        if L<CORE_LOOKBACK:
+            pad=encoded.new_zeros(
+                (encoded.shape[0],CORE_LOOKBACK-L,
+                 encoded.shape[2],encoded.shape[3]))
+            encoded=torch.cat((pad,encoded),dim=1)
+        return self.backbone(encoded,graph)
 
 
-def current_fingerprint(ensemble,panel,design):
-    inputs=dict(
-        source_sha256=sha256(SOURCE),
-        stage04_sha256=sha256(STAGE04_SOURCE),
-        models=list(ensemble.models),seeds=list(ensemble.seeds),
-        weights=list(ensemble.weights),mode=ensemble.mode,
-        stage04_lock_sha256=ensemble.lock_sha256,
-        data_sha256=panel.hashes,
-        historical_fit_origins=design["early"].tolist(),
-        epoch_origins=design["epoch"].tolist(),
-        sensitivity_fit_origins=design["refit"].tolist(),
-        sensitivity_measure_origins=design["measure"].tolist())
-    return hashlib.sha256(json.dumps(inputs,sort_keys=True).encode()).hexdigest()
+def instantiate(m,name,seed,L,z,mode):
+    """Keep EVERY parameter shape and initial tensor identical for all L.
+
+    The original MTGNN temporal stack changes its kernel/norm dimensions at
+    L=20. Fix its core width to 20 for the ENTIRE study, including L=12.
+    B-MTGNN's core pads shorter observed sequences on the left with zeros.
+    No different trainable resize/pooling adapter or L-specific head exists.
+    This L=12 comparator is a newly trained common-support Stage05 control,
+    not the saved Stage04 L=12 checkpoint.
+    """
+    if (name!=MODEL or mode!=MODE or L not in LENGTHS
+            or z["train_x"].shape[1]!=L):
+        raise ValueError("Stage05 requires B-MTGNN Structural and L=1..20")
+    m.seed_all(seed)
+    model=m.ThreeAxisStructureGNN(
+        name,z["x_center"],z["x_scale"],
+        z["y_center"],z["y_scale"],num_features=157,
+        nodes=59,prediction_mode=mode)
+    model.base=m.ForecastModel(
+        name,157,59,m.STAGE04_ACTIVE_WIDTH,CORE_LOOKBACK,m.HORIZON)
+    model.base.core=FixedTemporalInput(model.base.core)
+    return model
 
 
-def score_500_trials(root,fingerprint,ensemble,panel,design):
-    """Recompute the complete 20-length curve from unmodified TRAINING NPZs."""
-    expected=(
-        len(design["lengths"])*len(ensemble.models)*len(ensemble.seeds))
-    files=list((root/"trials").iterdir())
-    if (len(files)!=2*expected
-            or sum(f.suffix==".json" for f in files)!=expected
-            or sum(f.suffix==".npz" for f in files)!=expected):
-        raise RuntimeError("Incomplete 500-run training cache")
-    previous=stage04().past_scores(panel,design["measure"])
-    truth=panel.y[design["measure"]]
+def train_one(inputs,model_name,seed,L,device):
+    m=inputs.m
+    z=inputs.fold(L)
+    net=instantiate(m,model_name,seed,L,z,"structural").to(device)
+    graph=inputs.graph.to(device)
+    ztorch={k:torch.as_tensor(z[k],device=device)
+            for k in ("train_x","train_mask","train_y",
+                      "train_last","train_context","train_structure",
+                      "val_x","val_mask","val_last",
+                      "val_context","val_structure")}
+    optim=torch.optim.AdamW(
+        net.parameters(),lr=m.FIXED_LEARNING_RATE,weight_decay=1e-4)
+    scale=torch.as_tensor(z["y_scale"],device=device)
+    for _ in range(m.STAGE04_ACTIVE_EPOCHS):
+        net.train()
+        optim.zero_grad(set_to_none=True)
+        output=net(ztorch["train_x"],ztorch["train_mask"],graph,
+                   ztorch["train_last"],ztorch["train_structure"],
+                   ztorch["train_context"])
+        cost=m.three_axis_weighted_huber(
+            output,ztorch["train_y"],ztorch["train_last"],scale)
+        if not torch.isfinite(cost):
+            raise RuntimeError("Stage05 nonfinite full-Train training loss")
+        cost.backward()
+        torch.nn.utils.clip_grad_norm_(
+            net.parameters(),5.,error_if_nonfinite=True)
+        optim.step()
+    with m.isolated_snapshot_inference(net):
+        estimate=m.mtgnn_bayesian_inference(
+            net,ztorch,graph,model_name,seed,
+            z["y_center"],z["y_scale"])["prediction"]
+    del net,optim,ztorch
+    if str(device).startswith("cuda"):
+        torch.cuda.empty_cache()
+    if estimate.shape!=(12,59,3) or not np.isfinite(estimate).all():
+        raise RuntimeError("Stage05 Dev prediction invalid")
+    return estimate
+
+
+def run_contract(m,panel,lock,manifest):
+    config=dict(
+        stage="S05_MAIN_BMTGNN_CONTROLLED_LOOKBACK_COMPARISON",
+        source_sha256=sha(SOURCE),
+        stage04_source_sha256=sha(SOURCE04),
+        stage04_manifest_sha256=sha(RESULT04/"run_manifest.json"),
+        stage04_selection_sha256=sha(RESULT04/"dev_selection.json"),
+        stage04_trained_source_sha256=manifest["training_source_sha256"],
+        original_train_dev_sources=panel.hashes,
+        model=MODEL,formulation=MODE,seeds=list(SEEDS),
+        fixed_epochs=m.STAGE04_ACTIVE_EPOCHS,
+        full_train_through="2019Q4",
+        train_origin_count=36,
+        dev_from="2020Q1",dev_end="2022Q4",
+        no_train_internal_validation=True,
+        withheld_train_years=[],
+        all_train_years_used_for_model_fitting=True,
+        lookback_grid=list(LENGTHS),
+        fixed_bmtgnn_core_temporal_capacity=CORE_LOOKBACK,
+        fixed_model_shape_every_length=True,
+        stage04_12q_checkpoint_is_not_stage05_12q_control=True,
+        context_history="FIXED_9D_ASOF_INCLUDES_LAG5_FOR_ALL_L",
+        seed_scoring="PER_SEED_ORIGINAL_THREE_AXIS_MAE_THEN_AVERAGE",
+        learned_graph="B_MTGNN_TRAINED_INTERNAL_ADJACENCY",
+        operational_L=ORIGINAL_LOOKBACK,
+        test_opened=False)
+    digest=hashlib.sha256(
+        json.dumps(config,sort_keys=True).encode()).hexdigest()
+    return config,digest
+
+
+def score_results(root,policy_sig,panel):
+    truth=panel.y[DEV_ORIGINS]
     records=[]
-    yearly=[]
-    for L in design["lengths"]:
-        network_preds=[]
-        for name in ensemble.models:
-            seed_predictions=[]
-            for seed in ensemble.seeds:
-                result=read_trial(root,fingerprint,L,name,seed)
-                if result is None:
-                    raise RuntimeError(f"Missing trained trial: {L}/{name}/{seed}")
-                row,forecast=result
-                scored=three_axis_metrics(forecast,truth,previous)
-                if any(not np.isclose(row[key],scored[key],rtol=0,atol=1e-10)
-                       for key in scored):
-                    raise RuntimeError(f"Stored training score mismatch {L}/{name}/{seed}")
-                seed_predictions.append(forecast)
-            network_preds.append(np.mean(np.stack(seed_predictions),axis=0))
-        prediction=np.average(
-            np.stack(network_preds),axis=0,weights=ensemble.weights)
-        metrics=three_axis_metrics(prediction,truth,previous)
-        records.append(dict(
-            input_quarters=L,**metrics,
-            common_early_fit_origins=len(design["early"]),
-            common_sensitivity_fit_origins=len(design["refit"]),
-            historical_measure_origins=len(design["measure"]),
-            original_stage04_12q_reference=(L==ORIGINAL_LOOKBACK)))
-        per_q=np.abs(prediction-truth).mean(axis=(1,2))
-        for year,quarter_idx in ((2018,slice(0,4)),(2019,slice(4,8))):
-            yearly.append(dict(input_quarters=L,year=year,
-                               axis_mae=float(per_q[quarter_idx].mean())))
-    table=pd.DataFrame(records).sort_values("input_quarters")
-    blocks=pd.DataFrame(yearly)
-    reference=float(table.loc[
-        table.input_quarters.eq(ORIGINAL_LOOKBACK),"axis_mae"].iloc[0])
-    table["mae_minus_original_12q"]=table.axis_mae-reference
-    for year in (2018,2019):
-        scores=blocks.loc[blocks.year.eq(year)].sort_values("input_quarters")
-        ref=float(scores.loc[
-            scores.input_quarters.eq(ORIGINAL_LOOKBACK),"axis_mae"].iloc[0])
-        table[f"{year}_mae"]=scores.axis_mae.to_numpy()
-        table[f"{year}_minus_original_12q"]=scores.axis_mae.to_numpy()-ref
-    return table
+    for L in LENGTHS:
+        for seed in SEEDS:
+            stem=f"L{L:02d}__{MODEL}__s{seed}"
+            mpath=root/"trials"/(stem+".json")
+            ppath=root/"trials"/(stem+".npz")
+            if not mpath.is_file() or not ppath.is_file():
+                raise RuntimeError(f"Missing Stage05 Dev trial {stem}")
+            meta=json_read(mpath)
+            if (meta.get("signature")!=policy_sig or
+                    meta.get("train_internal_validation") is not False or
+                    meta.get("L")!=L or meta.get("model")!=MODEL or
+                    meta.get("seed")!=seed or
+                    meta.get("fixed_epochs")!=75 or
+                    meta.get("prediction_sha256")!=sha(ppath)):
+                raise RuntimeError(f"Inconsistent Stage05 trial {stem}")
+            with np.load(ppath,allow_pickle=False) as data:
+                prediction=data["prediction"].copy()
+            if (prediction.shape!=(12,59,3) or
+                    not np.isfinite(prediction).all()):
+                raise RuntimeError(f"Malformed Dev forecast {stem}")
+            residual=prediction-truth
+            row=dict(input_quarters=L,seed=seed,model=MODEL,
+                     mode=MODE,axis_mae=float(np.abs(residual).mean()),
+                     ici_mae=float(np.abs(residual.mean(-1)).mean()),
+                     train_origin_count=36,dev_origin_count=12)
+            for j,name in enumerate(SCORE_NAMES):
+                row[name+"_mae"]=float(np.abs(residual[...,j]).mean())
+            for y,year in enumerate((2020,2021,2022)):
+                four=residual[4*y:4*(y+1)]
+                row[f"{year}_mae"]=float(np.abs(four).mean())
+                row[f"{year}_ici_mae"]=float(
+                    np.abs(four.mean(-1)).mean())
+            records.append(row)
+    return pd.DataFrame(records).sort_values(
+        ["input_quarters","seed"]).reset_index(drop=True)
 
 
-def plot_four(table,panel,design,output_dir):
-    """Every plotted point is from the 500 cached Train-only predictions."""
-    output_dir.mkdir(parents=True,exist_ok=True)
-    x=table.input_quarters.to_numpy()
-    figures=[]
+def summarize_seed_scores(seed_scores):
+    """Aggregate seed-level errors. NEVER score the seed-mean forecast."""
+    expected={(length,seed) for length in LENGTHS for seed in SEEDS}
+    actual=set(zip(seed_scores.input_quarters,seed_scores.seed))
+    if len(seed_scores)!=200 or actual!=expected:
+        raise RuntimeError("Exactly 20 lookbacks × 10 seeds required")
+    baseline=seed_scores.loc[
+        seed_scores.input_quarters==ORIGINAL_LOOKBACK].set_index("seed")
+    rows=[]
+    for L in LENGTHS:
+        selected=seed_scores.loc[
+            seed_scores.input_quarters==L].set_index("seed")
+        if set(selected.index)!=set(baseline.index):
+            raise RuntimeError("Unpaired seed set")
+        row=dict(
+            input_quarters=L,model=MODEL,mode=MODE,
+            seed_count=len(SEEDS),train_origin_count=36,
+            dev_origin_count=12,train_internal_validation=False,
+            epoch=75,operational_12q=(L==ORIGINAL_LOOKBACK))
+        for metric in ("axis_mae","ici_mae",
+                       *(name+"_mae" for name in SCORE_NAMES),
+                       *(f"{year}_{suffix}" for year in (2020,2021,2022)
+                         for suffix in ("mae","ici_mae"))):
+            val=selected[metric]
+            row[metric]=float(val.mean())
+            row[metric+"_seed_sd"]=float(val.std(ddof=1))
+            difference=val-baseline[metric]
+            row[metric+"_paired_delta_vs_12q"]=float(difference.mean())
+            row[metric+"_paired_delta_sd"]=float(
+                difference.std(ddof=1))
+        rows.append(row)
+    return pd.DataFrame(rows).sort_values("input_quarters").reset_index(drop=True)
+
+
+def finalize(root,contract,digest,panel):
+    seed_scores=score_results(root,digest,panel)
+    table=summarize_seed_scores(seed_scores)
+    seed_scores.to_csv(root/"seed_scores.csv",
+                       index=False,encoding="utf-8-sig")
+    table.to_csv(root/"lookback_summary.csv",
+                 index=False,encoding="utf-8-sig")
+    selected_record=table.sort_values(
+        ["axis_mae","ici_mae","input_quarters"]).iloc[0]
+    selected=int(selected_record.input_quarters)
+    images=root/"plots"
+    images.mkdir(exist_ok=True)
+
     def save(fig,name):
         fig.tight_layout()
-        target=output_dir/name
-        fig.savefig(target,dpi=170,bbox_inches="tight")
+        fig.savefig(images/name,dpi=175,bbox_inches="tight")
         plt.close(fig)
-        figures.append(name)
-    def reference(ax):
-        ax.axvline(ORIGINAL_LOOKBACK,ls="--",color="tab:orange",
-                   label="Pre-existing Stage04 12-quarter setting")
-    fig,ax=plt.subplots(figsize=(11.4,5.0))
-    ax.plot(x,table.axis_mae,"o-",lw=1.3,markersize=4,
-            label="2018-2019 historical sensitivity MAE")
-    reference(ax)
-    ax.set(title="Supplementary: input-history sensitivity (no length selection)",
-           xlabel="Input history (quarters)",ylabel="3-axis MAE, lower is better")
-    ax.set_xticks(x)
-    ax.grid(alpha=.3);ax.legend()
+
+    # Restore the original FOUR S05 figures and relative filenames.
+    fig,ax=plt.subplots(figsize=(11.4,5.4))
+    x=table.input_quarters
+    ax.plot(x,table.axis_mae,"o-",lw=2,
+            label="Ten-seed mean 3-axis MAE")
+    ax.fill_between(
+        x,table.axis_mae-table.axis_mae_seed_sd,
+        table.axis_mae+table.axis_mae_seed_sd,
+        alpha=.17,label="Between-seed ±1 SD (not CI)")
+    ax.axvline(ORIGINAL_LOOKBACK,color="tab:orange",ls="--",
+               label="Original reference L=12")
+    ax.axvline(selected,color="tab:green",ls="-.",
+               label=f"Dev selected L={selected}")
+    ax.set(xlabel="Observed quarterly feature-input window L",
+           ylabel="Dev 3-axis MAE",
+           title="B-MTGNN lookback sensitivity | same model capacity")
+    ax.set_xticks(LENGTHS)
+    ax.grid(alpha=.2);ax.legend()
     save(fig,"S05_01_input_length_mae.png")
 
     fig,ax=plt.subplots(figsize=(11.4,5.4))
-    for metric,title in (
-        ("profitability_mae","Profitability"),
-        ("productivity_mae","Productivity"),
-        ("growth_mae","Growth"),("ici_mae","ICI")):
-        ax.plot(x,table[metric],"o-",ms=3,label=title)
-    reference(ax)
-    ax.set(title="Sensitivity of three original axes and ICI",
-           xlabel="Input history (quarters)",ylabel="Mean absolute error")
-    ax.set_xticks(x);ax.grid(alpha=.3);ax.legend()
+    for metric,label in (("profitability_mae","Profitability"),
+                         ("productivity_mae","Productivity"),
+                         ("growth_mae","Growth"),("ici_mae","ICI")):
+        ax.plot(x,table[metric],"o-",markersize=3,label=label)
+    ax.axvline(ORIGINAL_LOOKBACK,color="tab:orange",ls="--",
+               label="Original L=12")
+    ax.axvline(selected,color="tab:green",ls="-.",
+               label=f"Dev selected L={selected}")
+    ax.set(xlabel="Observed input quarters",ylabel="Dev MAE",
+           title="Original three target axes and ICI across lookback")
+    ax.set_xticks(LENGTHS)
+    ax.grid(alpha=.2);ax.legend()
     save(fig,"S05_02_axes_and_ici.png")
 
     fig,ax=plt.subplots(figsize=(11.4,4.8))
-    ax.axhline(0,color="black",lw=1,alpha=.6)
-    ax.bar(x,table.mae_minus_original_12q)
-    reference(ax)
-    ax.set(title="Descriptive differences relative to fixed Stage04 12 quarters",
-           xlabel="Input history (quarters)",
-           ylabel="Historical MAE minus 12Q MAE (negative = lower)")
-    ax.set_xticks(x);ax.grid(axis="y",alpha=.25);ax.legend()
+    delta=table["axis_mae_paired_delta_vs_12q"]
+    spread=table["axis_mae_paired_delta_sd"]
+    ax.axhline(0.,color="black",ls=":")
+    ax.errorbar(x,delta,yerr=spread,fmt="o-",capsize=3,
+                label="Seed-paired MAE difference ±1 SD")
+    ax.axvline(ORIGINAL_LOOKBACK,color="tab:orange",ls="--",
+               label="Original reference L=12")
+    ax.axvline(selected,color="tab:green",ls="-.",
+               label=f"Dev selected L={selected}")
+    ax.set(xlabel="Observed input quarters",
+           ylabel="MAE(L) − MAE(L12)",
+           title="Seed-paired sensitivity versus fixed L=12")
+    ax.set_xticks(LENGTHS)
+    ax.grid(alpha=.2);ax.legend()
     save(fig,"S05_03_difference_from_12q.png")
 
     fig,axes=plt.subplots(1,2,figsize=(14.2,5.0))
-    for year in (2018,2019):
-        axes[0].plot(x,table[f"{year}_minus_original_12q"],
-                     "o-",ms=3,label=str(year))
-    axes[0].axhline(0,color="black",ls=":",alpha=.7)
-    reference(axes[0])
-    axes[0].set(title="Only two historical annual comparison blocks",
-                xlabel="Input history (quarters)",
-                ylabel="Yearly MAE difference from original 12Q")
-    axes[0].grid(alpha=.25);axes[0].legend(fontsize=8)
-    axes[1].plot(x,EARLY_END-x,label="Feasible early-fit origins")
-    axes[1].plot(x,x,"--",label="One fit origin per input quarter")
-    axes[1].axhline(len(design["early"]),color="tab:green",
-                    label="Same 20 origins actually used")
-    reference(axes[1])
-    axes[1].set(title="A declared sample-support boundary, not an optimum",
-                xlabel="Input history (quarters)",ylabel="Quarterly origin count")
-    axes[1].grid(alpha=.25);axes[1].legend(fontsize=8)
+    for year in (2020,2021,2022):
+        axes[0].plot(x,table[f"{year}_mae"],"o-",markersize=3,
+                     label=str(year))
+    axes[0].axvline(ORIGINAL_LOOKBACK,ls="--",color="tab:orange")
+    axes[0].axvline(selected,ls="-.",color="tab:green",
+                   label=f"Dev selected L={selected}")
+    axes[0].set(title="Year-specific three-axis Dev MAE",
+                xlabel="Observed input quarters",ylabel="MAE")
+    axes[0].grid(alpha=.2);axes[0].legend()
+    axes[1].plot(x,[len(COMMON_TRAIN_ORIGINS)]*len(x),
+                 "o-",label="Train target origins")
+    axes[1].plot(x,[len(DEV_ORIGINS)]*len(x),
+                 "s--",label="Dev target origins")
+    axes[1].set_ylim(0,42)
+    axes[1].set(title="Identical target-origin support at every L",
+                xlabel="Observed input quarters",ylabel="Origins")
+    axes[1].grid(alpha=.2);axes[1].legend()
     save(fig,"S05_04_years_and_data_support.png")
-    return figures
 
-
-def rebuild(root,ensemble,panel,design):
-    """Delete ALL former 05 non-training artifacts. Never retrain/rename L11."""
-    if not root.is_dir() or not (root/"trials").is_dir():
-        raise RuntimeError("No trained 500-run sensitivity cache to report")
-    fingerprint=training_fingerprint(root,ensemble,panel,design)
-    if fingerprint is None:
-        raise RuntimeError("Missing provenance for cached model training")
-    before=digest_trial_files(root)
-    table=score_500_trials(root,fingerprint,ensemble,panel,design)
-    if len(table)!=20:
-        raise RuntimeError("Expected exactly 20 descriptive lookback rows")
-    minimum=table.sort_values(["axis_mae","input_quarters"]).iloc[0]
-    reference=table.loc[
-        table.input_quarters.eq(ORIGINAL_LOOKBACK)].iloc[0]
-    with tempfile.TemporaryDirectory(
-            prefix="prism05_supplementary_build_",dir=ROOT/"Results") as tmp:
-        stage=Path(tmp)
-        table.to_csv(stage/"supplementary_sensitivity.csv",
-                     index=False,encoding="utf-8-sig")
-        figures=plot_four(table,panel,design,stage/"plots")
-        report=dict(
-            stage="S05",status="PASS_SUPPLEMENTARY",
-            purpose="DESCRIPTIVE_INPUT_LENGTH_SENSITIVITY_ONLY",
-            operational_lookback=ORIGINAL_LOOKBACK,
-            operational_setting_source="Unchanged pre-existing Stage04",
-            no_new_operational_model=True,
-            GNNs=list(ensemble.models),matched_seeds=list(ensemble.seeds),
-            weights=list(ensemble.weights),forecast_mode=ensemble.mode,
-            tested_input_lengths=list(design["lengths"]),
-            evaluation_quarters=panel.quarters[EPOCH_END:TRAIN_END],
-            common_early_fit_origins=len(design["early"]),
-            common_sensitivity_fit_origins=len(design["refit"]),
-            observation_years=[2018,2019],
-            original_12q_historical_mae=float(reference.axis_mae),
-            descriptive_smallest_mae_length=int(minimum.input_quarters),
-            descriptive_smallest_mae=float(minimum.axis_mae),
-            descriptive_minimum_minus_12q=float(
-                minimum.axis_mae-reference.axis_mae),
-            analysis_not_a_model_policy=True,
-            statistical_equivalence_not_claimed=True,
-            global_optimum_not_claimed=True,
-            prior_calibrated_on_all_2006_2019_train=True,
-            stage04_architectures_chosen_using_dev=True,
-            frozen_forecasting_policy_unchanged=True,
-            model_training_executed_during_rebuild=False,
-            ici_definition="Arithmetic mean of original three axes",
-            test_opened=False,
-            plots=["plots/"+p for p in figures])
-        atomic_json(stage/"supplementary_report.json",report)
-        digest_after=digest_trial_files(root)
-        if digest_after!=before:
-            raise RuntimeError("Model training cache was modified during reporting")
-        state=dict(
-            stage="S05",status="PASS_SUPPLEMENTARY",
-            role="SUPPLEMENTARY_DESCRIPTIVE_ONLY",
-            adopted_lookback_quarters=ORIGINAL_LOOKBACK,
-            trial_count=500,model_count=len(ensemble.models),
-            seed_count=len(ensemble.seeds),
-            stage04_sha256=sha256(STAGE04_SOURCE),
-            stage04_lock_sha256=ensemble.lock_sha256,
-            source_sha256=sha256(SOURCE),
-            training_fingerprint=fingerprint,
-            training_trials_sha256=before,
-            neural_networks_trained_during_rebuild=0,
-            test_opened=False,
-            figures=report["plots"],
-            generated_utc=datetime.now(timezone.utc).isoformat())
-        atomic_json(stage/"run_manifest.json",state)
-        # The user explicitly requested NO archive, no selected-L11 legacy
-        # results and no remaining optimization result paths. Keep only
-        # the 500 trained trial records and their prediction NPZs.
-        removed=[]
-        for item in root.iterdir():
-            if item.name=="trials":
-                continue
-            removed.append(item.name)
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
-        for item in stage.iterdir():
-            shutil.move(str(item),str(root/item.name))
-        if digest_trial_files(root)!=before:
-            raise RuntimeError("500 trained model outputs changed during cleanup")
-        allowed={"trials","plots","supplementary_sensitivity.csv",
-                 "supplementary_report.json","run_manifest.json"}
-        if {p.name for p in root.iterdir()}!=allowed:
-            raise RuntimeError("Superseded Stage05 files survived cleanup")
-        print("SUPPLEMENTARY_05_PASS",
-              "TRIALS",500,"FIXED_L",ORIGINAL_LOOKBACK,
-              "DESCRIPTIVE_LOWEST_L",int(minimum.input_quarters),
-              "PLOTS",len(figures),"RETRAINED",0,flush=True)
-        print("REMOVED_OBSOLETE_STAGE05_ARTIFACTS",removed,flush=True)
+    selection=dict(
+        model=MODEL,mode=MODE,
+        selected_lookback_quarters=selected,
+        reference_lookback_quarters=ORIGINAL_LOOKBACK,
+        selection_data="DEV_2020Q1_2022Q4",
+        fit_data="TRAIN_2006Q1_2019Q4",
+        comparison_train_target_origins="2011Q1_2019Q4",
+        selection_rule=DEV_SELECTION_RULE,
+        selected_dev_mean_three_axis_mae=float(selected_record.axis_mae),
+        selected_dev_mean_ici_mae=float(selected_record.ici_mae),
+        seed_count=len(SEEDS),
+        result_is_independent_validation=False,
+        prior_dev_exposure=True,
+        downstream_policy_applied=False)
+    json_write(root/"lookback_dev_selection.json",selection)
+    report=dict(
+        stage="S05",status="COMPLETE_MAIN_DEV_ANALYSIS",
+        experiment_class="MAIN_CONTROLLED_LOOKBACK_COMPARISON",
+        policy_selection="TEN_SEED_MEAN_DEV_THREE_AXIS_MAE",
+        epoch_selection="NONE_FIXED_75",
+        input_lengths=list(LENGTHS),
+        model=MODEL,mode=MODE,
+        seed_count=len(SEEDS),
+        operational_lookback_quarters=selected,
+        original_reference_lookback_quarters=ORIGINAL_LOOKBACK,
+        all_training_quarters="2006Q1-2019Q4",
+        trained_supervised_origins="2011Q1-2019Q4",
+        comparison="Dev 2020Q1-2022Q4",
+        dev_previously_used_for_stage04_model_selection=True,
+        independent_test_claim=False,
+        conditional_on_fixed_asof_9d_context=True,
+        constant_temporal_core_capacity=CORE_LOOKBACK,
+        per_seed_errors_averaged_not_seed_ensemble_predictions=True,
+        development_minimum_mean_mae_length=selected,
+        selected_length_is_dev_conditional=True,
+        trained_length_seed_jobs=len(LENGTHS)*len(SEEDS),
+        train_internal_cv=False,
+        train_strategy="FULL_TRAIN_SINGLE_FIT_PER_SEED_AND_LENGTH",
+        dev_selected_lookback_quarters=selected,
+        reference_lookback_quarters=ORIGINAL_LOOKBACK,
+        dev_policy_selection=selection,
+        test_opened=False)
+    json_write(root/"main_experiment_report.json",report)
+    json_write(root/"run_manifest.json",dict(
+        status="COMPLETE_MAIN_DEV_ANALYSIS",
+        signature=digest,contract=contract,
+        completed_runs=200,test_opened=False,
+        training_source_sha256=contract["source_sha256"],
+        analysis_source_sha256=sha(SOURCE),
+        finished_utc=datetime.now(timezone.utc).isoformat()))
+    print("05_MAIN_DEV_ANALYSIS_COMPLETE",
+          "TRIALS",200,"ORIGINAL_REFERENCE",ORIGINAL_LOOKBACK,
+          "SELECTED_DEV_LENGTH",selected,flush=True)
     return report
 
 
-def run_missing_trials(root,ensemble,panel,design,device,budget_minutes):
-    """Optional fresh/resume path only; no final model / length optimization."""
-    root.mkdir(parents=True,exist_ok=True)
-    info=root/"run_manifest.json"
-    previous=read_json(info) if info.is_file() else None
-    if previous and previous.get("status")=="PASS_SUPPLEMENTARY":
-        return rebuild(root,ensemble,panel,design)
-    if previous:
-        fingerprint=training_fingerprint(root,ensemble,panel,design)
-    else:
-        fingerprint=current_fingerprint(ensemble,panel,design)
-    if fingerprint is None:
-        fingerprint=current_fingerprint(ensemble,panel,design)
-    begun=time.perf_counter()
-    state=dict(stage="S05",status="TRAINING_SUPPLEMENTARY",
-               source_sha256=sha256(SOURCE),
-               stage04_sha256=sha256(STAGE04_SOURCE),
-               training_fingerprint=fingerprint,
-               model_count=len(ensemble.models),seed_count=len(ensemble.seeds),
-               adopted_lookback_quarters=ORIGINAL_LOOKBACK,
-               test_opened=False)
-    atomic_json(info,state)
-    inputs=Inputs(panel)
-    completed=0
-    for L in design["lengths"]:
-        for name in ensemble.models:
-            for seed in ensemble.seeds:
-                if read_trial(root,fingerprint,L,name,seed) is not None:
-                    completed+=1
-                    continue
-                if time.perf_counter()-begun>budget_minutes*60:
-                    state.update(status="TRAINING_SUPPLEMENTARY",
-                                 finished_trials=completed,
-                                 next_job=f"L{L}:{name}:{seed}")
-                    atomic_json(info,state)
-                    print("SUPPLEMENTARY_05_RESUMABLE",completed,"/500")
-                    return state
-                scores,pred=train_one(
-                    inputs,ensemble,L,name,seed,design,device)
-                write_trial(root,fingerprint,L,name,seed,scores,pred)
-                completed+=1
-                print("SUPPLEMENTARY_05_TRIAL",completed,"/500",
-                      "L",L,name,seed,flush=True)
-    return rebuild(root,ensemble,panel,design)
+def analyze_frozen_experiment():
+    """Regenerate Dev summaries, policy selection and four plots: no new fit.
+
+    The training-source fingerprint is kept verbatim from its original
+    manifest even if reporting code subsequently changes. A separate
+    analysis-source SHA documents the current descriptive analysis code.
+    Do not rewrite original job signatures or train another model.
+    """
+    m,panel,lock,upstream_manifest=upstream()
+    path=RESULTS/"run_manifest.json"
+    if not path.is_file():
+        raise RuntimeError("Main Stage05 requires 200 completed training jobs")
+    original=json_read(path)
+    contract=original["contract"]
+    digest=hashlib.sha256(
+        json.dumps(contract,sort_keys=True).encode()).hexdigest()
+    if (original["signature"]!=digest
+            or original.get("completed_runs")!=len(LENGTHS)*len(SEEDS)
+            or original.get("status") not in (
+                "COMPLETE_DESCRIPTIVE","COMPLETE_MAIN_DEV_ANALYSIS")
+            or contract.get("model")!=MODEL
+            or contract.get("formulation")!=MODE
+            or tuple(contract.get("seeds",()))!=SEEDS
+            or contract.get("lookback_grid")!=list(LENGTHS)
+            or contract.get("fixed_epochs")!=75
+            or contract.get("train_origin_count")!=36
+            or contract.get("fixed_bmtgnn_core_temporal_capacity")!=20
+            or contract.get("fixed_model_shape_every_length") is not True
+            or contract.get("original_train_dev_sources")!=panel.hashes
+            or contract.get("stage04_source_sha256")!=sha(SOURCE04)
+            or contract.get("stage04_manifest_sha256")!=
+                sha(RESULT04/"run_manifest.json")
+            or contract.get("stage04_selection_sha256")!=
+                sha(RESULT04/"dev_selection.json")
+            or contract.get("test_opened") is not False
+            or original.get("test_opened") is not False):
+        raise RuntimeError("Frozen Stage05 training/data contract mismatch")
+    report=finalize(RESULTS,contract,digest,panel)
+    # The training contract/source SHA from the original 200 fits is kept
+    # distinct from the analysis source SHA added in finalize().
+    assert json_read(path)["contract"]["source_sha256"]==contract["source_sha256"]
+    return report
+
+
+def run(args):
+    if args.status:
+        state=(json_read(RESULTS/"run_manifest.json")
+               if (RESULTS/"run_manifest.json").is_file() else None)
+        print("05_STATUS",
+              (state or {}).get("status","NOT_STARTED"),
+              "current_jobs",len(list((RESULTS/"trials").glob("*.json"))),
+              "CANONICAL_RESULTS",RESULTS,
+              "TRAIN_INTERNAL_VALIDATION",False)
+        return
+    if args.dry_run:
+        print("05_MAIN_EXPERIMENT_BMTGNN_ONLY_FIXED_CAPACITY",
+              "TRAIN 2006–2019 FULL",
+              "TRAIN TARGET ORIGINS 2011–2019 (36 COMMON)",
+              "EVAL DEV 2020–2022 (12)",
+              "FIXED_EPOCHS 75","L=1..20",
+              "BMTGNN_STRUCTURAL",
+              "SEEDS 2026–2035 (10)",
+              "TOTAL TRIALS 200",
+              "CORE_CAPACITY 20 FOR EVERY L",
+              "ASOF_9D_CONTEXT FIXED",
+              "ORIGINAL L12 NOT RETRAINED FROM STAGE04",
+              "DEV_SELECT_MIN_10_SEED_MEAN_3AXIS_MAE",
+              "ORIGINAL_L12_REFERENCE_ONLY",
+              "FOUR_DESCRIPTIVE_PLOTS",
+              "NO 2018–2019 HOLDOUT","NO TEST",flush=True)
+        return
+    if args.analyze:
+        analyze_frozen_experiment()
+        return
+    if not args.run:
+        raise ValueError("Use --dry-run, --status or --run")
+    if args.max_minutes<=0:
+        raise ValueError("Positive minutes required")
+    m,panel,lock,manifest=upstream()
+    contract,digest=run_contract(m,panel,lock,manifest)
+    dest=RESULTS/"run_manifest.json"
+    previous=json_read(dest) if dest.is_file() else None
+    if previous and previous.get("completed_runs")==200:
+        raise RuntimeError(
+            "The 200 original Stage05 jobs are already complete; "
+            "use --analyze to refresh Dev selection and four plots, "
+            "never retrain or relabel their source provenance")
+    if previous and previous.get("signature")!=digest:
+        raise RuntimeError("New Stage05 run is inconsistent with saved data")
+    if args.device=="cuda" and not torch.cuda.is_available():
+        raise RuntimeError("CUDA unavailable")
+    RESULTS.mkdir(parents=True,exist_ok=True)
+    json_write(dest,dict(
+        status="RUNNING",signature=digest,contract=contract,
+        train_internal_validation=False,test_opened=False))
+    torch.set_num_threads(4)
+    inp=Inputs(panel)
+    device=torch.device(args.device)
+    started=time.perf_counter()
+    for L in LENGTHS:
+        for seed in SEEDS:
+            stem=f"L{L:02d}__{MODEL}__s{seed}"
+            meta=RESULTS/"trials"/(stem+".json")
+            data=RESULTS/"trials"/(stem+".npz")
+            if meta.is_file() and data.is_file():
+                info=json_read(meta)
+                if (info["signature"]!=digest or
+                        info["prediction_sha256"]!=sha(data)):
+                    raise RuntimeError("Stage05 cached result contract changed")
+                continue
+            if meta.exists() or data.exists():
+                raise RuntimeError("Incomplete Stage05 job")
+            if time.perf_counter()-started>=args.max_minutes*60:
+                json_write(dest,dict(
+                    status="PARTIAL",signature=digest,contract=contract,
+                    next_job=stem,
+                    train_internal_validation=False,test_opened=False))
+                print("05_PAUSED_RESUMABLE",stem,flush=True)
+                return
+            prediction=train_one(inp,MODEL,seed,L,device)
+            save_npz(data,prediction=prediction)
+            json_write(meta,dict(
+                signature=digest,L=L,model=MODEL,seed=seed,
+                fixed_epochs=m.STAGE04_ACTIVE_EPOCHS,
+                prediction_sha256=sha(data),
+                trained_2006_2019_only=True,
+                train_internal_validation=False,test_opened=False))
+            print("05_TRAIN_DEV",stem,flush=True)
+    return finalize(RESULTS,contract,digest,panel)
 
 
 def main():
-    parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rebuild",action="store_true",
-                        help="Rebuild supplementary from saved 500 trials; ZERO model fits")
-    parser.add_argument("--status",action="store_true")
-    parser.add_argument("--dry-run",action="store_true")
-    parser.add_argument("--run",action="store_true",
-                        help="Fit any missing trials; NOT needed for completed 500-trial cache")
-    parser.add_argument("--device",choices=("cpu","cuda"),
-                        default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--max-minutes",type=float,default=25.)
-    args=parser.parse_args()
-    ensemble=original_04()
-    panel=stage04().load_panel(ROOT)
-    if (panel.x.shape!=(68,59,157) or panel.y.shape!=(68,59,3)
-            or panel.train_count!=56):
-        raise RuntimeError("Original 59×157 Stage03 Train/Dev panel changed")
-    design=study_design()
-    if args.dry_run:
-        print("S05_SUPPLEMENTARY_ONLY L=1..20 / original 04 L12 frozen")
-        print("TRAIN EPOCHS 2016-2017; SENSITIVITY 2018-2019; NO MODEL CHOICE")
-        print("MODELS",ensemble.models,"SEEDS",ensemble.seeds,"TRIALS",500)
-        return
-    if args.status:
-        manifest=RESULTS/"run_manifest.json"
-        previous=read_json(manifest) if manifest.is_file() else {}
-        print("S05_STATUS",previous.get("status","READY"),
-              "TRIAL_FILES",len(list((RESULTS/"trials").glob("*.npz"))),
-              "OPERATIONAL_LOOKBACK",ORIGINAL_LOOKBACK)
-        return
-    if args.run:
-        if args.max_minutes<=0:
-            parser.error("--max-minutes must be positive")
-        device=torch.device(args.device)
-        if device.type=="cuda" and not torch.cuda.is_available():
-            raise RuntimeError("CUDA unavailable")
-        torch.set_num_threads(4)
-        run_missing_trials(RESULTS,ensemble,panel,design,device,args.max_minutes)
-        return
-    if args.rebuild:
-        rebuild(RESULTS,ensemble,panel,design)
-        return
-    parser.error("Use --rebuild for existing results, --status, --dry-run or --run")
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--dry-run",action="store_true")
+    p.add_argument("--status",action="store_true")
+    p.add_argument("--analyze",action="store_true")
+    p.add_argument("--run",action="store_true")
+    p.add_argument("--device",choices=("cpu","cuda"),
+                   default="cuda" if torch.cuda.is_available() else "cpu")
+    p.add_argument("--max-minutes",type=float,default=25.)
+    run(p.parse_args())
 
 
 if __name__=="__main__":

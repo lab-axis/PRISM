@@ -1,18 +1,11 @@
 {
-  "contract_sha256": "abb0e4fad9317d6291c577362cc5483a2273a83f9eb20f35a9a354768441d50b",
-  "length": 1,
+  "signature": "ea04a72159b6d38a4602c909902b345ab7a1096af1e07f68bfa0cf0a8e84fb9d",
+  "L": 1,
   "model": "B-MTGNN",
   "seed": 2027,
-  "epoch_check_mae": 1.0967013835906982,
-  "best_epoch": 22,
-  "inner_early_fit_examples": 20,
-  "inner_selection_fit_examples": 28,
-  "epoch_holdout_quarters": 8,
-  "length_holdout_quarters": 8,
-  "axis_mae": 0.9804007289085358,
-  "ici_mae": 0.6399988015051932,
-  "profitability_mae": 0.8625983663477479,
-  "productivity_mae": 0.499754489824026,
-  "growth_mae": 1.5788493305538334,
-  "persistence_mae": 1.14558021069555
+  "fixed_epochs": 75,
+  "prediction_sha256": "e60074d10c22478b2c38b2c8b53aa318b65ea42273ef5f1d9b4f1d9504b885d3",
+  "trained_2006_2019_only": true,
+  "train_internal_validation": false,
+  "test_opened": false
 }

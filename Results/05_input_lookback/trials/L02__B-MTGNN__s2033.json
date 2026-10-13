@@ -1,0 +1,11 @@
+{
+  "signature": "ea04a72159b6d38a4602c909902b345ab7a1096af1e07f68bfa0cf0a8e84fb9d",
+  "L": 2,
+  "model": "B-MTGNN",
+  "seed": 2033,
+  "fixed_epochs": 75,
+  "prediction_sha256": "d7a4db2e6f3f6d08441bf76597b591669e63c871c1a5e6e9e719e352afcf8043",
+  "trained_2006_2019_only": true,
+  "train_internal_validation": false,
+  "test_opened": false
+}

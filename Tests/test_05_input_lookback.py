@@ -1,11 +1,12 @@
-"""PRISM S05: descriptive sensitivity only, NO model-selection output."""
-
+"""PRISM Stage05: matched-capacity B-MTGNN lookback sensitivity, Dev only."""
 from __future__ import annotations
+
+from dataclasses import replace
 import importlib.util
 from pathlib import Path
-import shutil
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -15,208 +16,298 @@ import torch
 
 ROOT=Path(__file__).resolve().parents[1]
 SPEC=importlib.util.spec_from_file_location(
-    "_prism05_supplementary_tests",ROOT/"Sources/05_input_lookback.py")
+    "_prism05_bmtgnn_tests",ROOT/"Sources/05_input_lookback.py")
 m=importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name]=m
 SPEC.loader.exec_module(m)
 
 
-class SupplementaryContractTests(unittest.TestCase):
-    def test_all_lengths_derived_from_declared_sample_support(self):
-        d=m.study_design()
-        self.assertEqual(d["upper"],20)
-        self.assertEqual(d["lengths"],tuple(range(1,21)))
-        self.assertEqual(d["early"].tolist(),list(range(20,40)))
-        self.assertEqual(d["epoch"].tolist(),list(range(40,48)))
-        self.assertEqual(d["refit"].tolist(),list(range(20,48)))
-        self.assertEqual(d["measure"].tolist(),list(range(48,56)))
+class DesignTests(unittest.TestCase):
+    def test_single_model_ten_seeds_and_predeclared_common_support(self):
+        self.assertEqual(m.RESULTS,ROOT/"Results/05_input_lookback")
+        self.assertEqual(m.MODEL,"B-MTGNN")
+        self.assertEqual(m.MODE,"structural")
+        self.assertEqual(m.SOURCE04,ROOT/"Sources/04_bmtgnn_benchmark.py")
+        self.assertEqual(m.SEEDS,tuple(range(2026,2036)))
+        self.assertEqual(m.LENGTHS,tuple(range(1,21)))
         self.assertEqual(m.ORIGINAL_LOOKBACK,12)
-        self.assertGreaterEqual(len(d["early"]),max(d["lengths"]))
+        self.assertEqual(m.CORE_LOOKBACK,20)
+        self.assertEqual(m.COMMON_TRAIN_ORIGINS.tolist(),list(range(20,56)))
+        self.assertEqual(m.DEV_ORIGINS.tolist(),list(range(56,68)))
+        design=m.study_design()
+        self.assertEqual(design["epoch_selection"],"NONE_FIXED_75")
+        self.assertFalse(design["inner_validation"])
+        self.assertEqual(design["train_heldout_years"],[])
+        self.assertTrue(design["same_model_parameters_all_lengths"])
+        self.assertTrue(design["common_asof_9d_target_context"])
+        self.assertTrue(design["dev_used_for_main_policy_selection"])
+        self.assertFalse(design["train_internal_cv"])
+        self.assertEqual(design["training_strategy"],"SINGLE_FULL_TRAIN_FIT")
+        self.assertFalse(hasattr(m,"TRAIN_SELECTION_FOLDS"))
+        self.assertFalse(hasattr(m,"TRAIN_SELECTION_ORIGINS"))
+        self.assertEqual(
+            design["experiment"],
+            "conditional_quarterly_feature_window_not_total_history")
 
-    def test_no_longer_any_length_selection_or_final_model_optimization(self):
-        for obsolete in (
-                "select_length","describe_sensitivity",
-                "final_one","save_final","get_final",
-                "archive_legacy_selected_outputs",
-                "train_only_lookback_selection"):
-            self.assertFalse(hasattr(m,obsolete),obsolete)
+    def test_current_stage04_dev_freeze_and_ten_seed_lock(self):
+        m4,panel,selection,manifest=m.upstream()
+        self.assertEqual(m4.GNN_MODELS,("B-MTGNN",))
+        self.assertEqual(selection["selected_mode"],m.MODE)
+        self.assertEqual(selection["seed_count"],10)
+        self.assertEqual(manifest["status"],"DEV_FROZEN")
+        self.assertEqual(manifest["completed_jobs"],30)
+        self.assertEqual(manifest["total_jobs"],30)
+        self.assertEqual(panel.x.shape,(68,59,157))
+        self.assertNotIn(
+            "Data/03_integrated_dataset/raw_test.csv",panel.hashes)
+        contract,digest=m.run_contract(m4,panel,selection,manifest)
+        self.assertEqual(contract["stage04_trained_source_sha256"],
+                         manifest["training_source_sha256"])
+        self.assertEqual(contract["fixed_model_shape_every_length"],True)
+        self.assertEqual(contract["seeds"],list(m.SEEDS))
+        self.assertEqual(contract["fixed_epochs"],75)
+        self.assertEqual(len(digest),64)
 
-    def test_upstream_stage04_predefined_frozen_contract(self):
-        locked=m.original_04()
-        self.assertEqual(locked.mode,"structural")
-        self.assertEqual(locked.seeds,tuple(m.stage04().DEFAULT_SEEDS))
-        self.assertEqual(locked.models,(
-            "B-MTGNN","APPNP-TCN","GraphConv-TCN",
-            "GAT-TCN","GraphTransformer-TCN"))
-        self.assertEqual(locked.weights,(.2,)*5)
-        self.assertEqual(m.stage04().LOOKBACK,12)
-        self.assertTrue((m.STAGE04_RESULTS/"ensemble_predictions.npz").is_file())
 
-
-class FixedInputsAndTrainingTests(unittest.TestCase):
+class InputsAndInitializationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         torch.set_num_threads(3)
-        cls.panel=m.stage04().load_panel(ROOT)
-        cls.engine=m.Inputs(cls.panel)
-        cls.design=m.study_design()
+        cls.m4,cls.panel,_,_=m.upstream()
+        cls.inputs=m.Inputs(cls.panel)
 
-    def test_59_industries_157_features_and_test_closed(self):
-        p=self.panel
-        self.assertEqual(p.x.shape,(68,59,157))
-        self.assertEqual(p.y.shape,(68,59,3))
-        self.assertEqual(len(p.features)-115,42)
-        self.assertNotIn("Data/03_integrated_dataset/raw_test.csv",p.hashes)
-
-    def test_same_training_origins_all_lengths(self):
-        for L in (1,8,12,20):
-            a=self.engine.fold(
-                L,40,self.design["early"],self.design["epoch"])
-            b=self.engine.fold(
-                L,48,self.design["refit"],self.design["measure"])
-            self.assertEqual(a["train_x"].shape,(20,L,59,157))
-            self.assertEqual(a["val_x"].shape,(8,L,59,157))
-            self.assertEqual(b["train_x"].shape,(28,L,59,157))
-            self.assertEqual(b["val_y"].shape,(8,1,59,3))
-
-    def test_original_stage04_normalizer_and_asof_anchor(self):
-        p=self.panel
-        fold=self.engine.fold(
-            12,48,self.design["refit"],self.design["measure"])
-        old=m.stage04().prepare_three_axis_fold(
-            p,self.engine.prior,48,48,56,"standard","mask")
-        for k in ("x_center","x_scale","y_center","y_scale",
-                  "val_x","val_mask","val_y","val_last","val_context",
-                  "val_structure"):
-            with self.subTest(name=k):
-                np.testing.assert_array_equal(fold[k],old[k])
-
-    def test_current_target_and_unavailable_predictors_do_not_enter_input(self):
-        p=self.panel
-        before=self.engine.fold(
-            12,48,self.design["refit"],self.design["measure"])
-        # The prediction origin 2018Q1 is withheld from inputs. Only the
-        # historic as-of row-t target proxies are permitted.
-        after_x=p.x.copy()
-        after_y=p.y.copy()
-        after_x[48:,:,42:]+=9999
-        after_y[48:]+=9999
-        mutated=m.stage04().Panel(
-            after_x,after_y,p.quarters,p.nodes,p.names,p.features,
-            p.train_count,p.hashes)
-        self.engine.p=mutated
-        try:
-            changed=self.engine.fold(
-                12,48,self.design["refit"],self.design["measure"])
-        finally:
-            self.engine.p=p
-        for key in (
-                "train_x","train_y","val_mask",
-                "val_last","val_context","val_structure"):
-            np.testing.assert_array_equal(before[key],changed[key])
-        # The FIRST 2018Q1 forecast cannot see its own unknown X[48].
+    def test_all_lengths_have_identical_train_targets_and_dev_origins(self):
+        a=self.inputs.fold(12)
+        for length in m.LENGTHS:
+            b=self.inputs.fold(length)
+            with self.subTest(L=length):
+                self.assertEqual(b["train_x"].shape,(36,length,59,157))
+                self.assertEqual(b["val_x"].shape,(12,length,59,157))
+                self.assertEqual(b["train_y"].shape,(36,1,59,3))
+                self.assertEqual(b["val_y"].shape,(12,1,59,3))
+                self.assertEqual(b["train_origins"].tolist(),list(range(20,56)))
+                self.assertEqual(b["val_origins"].tolist(),list(range(56,68)))
+                for key in ("train_y","train_last","train_context",
+                            "train_structure","val_y","val_last",
+                            "val_context","val_structure","x_center",
+                            "x_scale","y_center","y_scale"):
+                    np.testing.assert_array_equal(a[key],b[key])
+                self.assertTrue(np.isfinite(b["train_x"]).all())
+                self.assertTrue(np.isfinite(b["val_x"]).all())
+        self.assertEqual(a["train_origins"][-8:].tolist(),list(range(48,56)))
         np.testing.assert_array_equal(
-            before["val_x"][0],changed["val_x"][0])
-        # But 2018Q2/Q3 CAN see previous observed 2018Q1 economic X.
-        self.assertFalse(np.array_equal(
-            before["val_x"][1:],changed["val_x"][1:]))
-        self.assertFalse(np.array_equal(before["val_y"],changed["val_y"]))
+            a["train_x"][:,-1],self.inputs.fold(1)["train_x"][:,0])
 
-    def test_network_training_still_runs_without_result_publication(self):
-        g=m.original_04()
-        name=g.models[0]
-        L=12
-        early=self.engine.fold(L,40,self.design["early"],self.design["epoch"])
-        with patch.object(m.stage04(),"STAGE04_ACTIVE_EPOCHS",2):
-            epoch=m.train_network(
-                self.engine,name,2026,L,g.mode,
-                early,40,torch.device("cpu"))
-        self.assertIn(epoch["best_epoch"],(1,2))
-        second=self.engine.fold(
-            L,48,self.design["refit"],self.design["measure"])
-        pred=m.train_network(
-            self.engine,name,2026,L,g.mode,
-            second,48,torch.device("cpu"),
-            epochs=epoch["best_epoch"])["prediction"]
-        self.assertEqual(pred.shape,(8,59,3))
-        self.assertTrue(np.isfinite(pred).all())
+    def test_stage04_original_dev_inputs_and_economic_prior_match(self):
+        panel=self.panel
+        economic,_=self.m4.make_fold(panel)
+        np.testing.assert_array_equal(self.inputs.prior,economic)
+        original=self.m4.prepare_three_axis_fold(
+            panel,economic,56,56,68,"standard","mask")
+        stage05=self.inputs.fold(12)
+        for key in ("x_center","x_scale","y_center","y_scale",
+                    "val_x","val_mask","val_y","val_last",
+                    "val_context","val_structure"):
+            with self.subTest(field=key):
+                np.testing.assert_array_equal(stage05[key],original[key])
+        self.assertNotEqual(original["train_x"].shape[0],
+                            stage05["train_x"].shape[0])
+
+    def test_no_train_cv_or_shortened_train_fits_can_be_invoked(self):
+        self.assertFalse(hasattr(self.inputs,"train_prefix_prior"))
+        with self.assertRaises(TypeError):
+            self.inputs.fold(12,fit_end=40,eval_end=48)
+        z=self.inputs.fold(12)
+        self.assertEqual(z["train_origins"][0],20)
+        self.assertEqual(z["train_origins"][-1],55)
+        self.assertEqual(z["val_origins"][0],56)
+        self.assertEqual(z["val_origins"][-1],67)
+
+    def test_poisoned_dev_labels_and_features_do_not_change_train_fit(self):
+        before=self.inputs.fold(12)
+        p=self.panel
+        corrupted_x=p.x.copy()
+        corrupted_y=p.y.copy()
+        corrupted_x[56:,:,42:]+=1e7
+        corrupted_y[56:]+=1e6
+        poisoned=replace(p,x=corrupted_x,y=corrupted_y)
+        self.inputs.panel=poisoned
+        try:
+            after=self.inputs.fold(12)
+        finally:
+            self.inputs.panel=p
+        for key in ("train_x","train_mask","train_y","train_last",
+                    "train_context","train_structure","x_center",
+                    "x_scale","y_center","y_scale","val_last",
+                    "val_context","val_structure"):
+            np.testing.assert_array_equal(before[key],after[key])
+        np.testing.assert_array_equal(before["val_x"][0],after["val_x"][0])
+        self.assertFalse(np.array_equal(before["val_y"],after["val_y"]))
+
+    def test_every_length_has_exactly_same_initial_parameter_tensors(self):
+        baseline=None
+        baseline_rng=None
+        for L in m.LENGTHS:
+            with self.subTest(L=L):
+                data=self.inputs.fold(L)
+                net=m.instantiate(self.m4,m.MODEL,2026,L,data,m.MODE)
+                state=net.state_dict()
+                rng=torch.get_rng_state().clone()
+                if baseline is None:
+                    baseline={k:v.clone() for k,v in state.items()}
+                    baseline_rng=rng
+                self.assertEqual(set(state),set(baseline))
+                for key,value in state.items():
+                    torch.testing.assert_close(
+                        value,baseline[key],atol=0,rtol=0)
+                self.assertTrue(torch.equal(rng,baseline_rng))
+                self.assertEqual(
+                    sum(x.numel() for x in net.parameters()),67190)
+                self.assertEqual(
+                    net.base.core.backbone.skip0.kernel_size[1],20)
+        self.assertEqual(m.ORIGINAL_LOOKBACK,12)
+
+    def test_padding_is_zero_latent_states_not_fake_observed_rows(self):
+        class Capture(torch.nn.Module):
+            def forward(self,encoded,graph):
+                self.last=encoded.clone()
+                return encoded
+        monitor=Capture()
+        wrapper=m.FixedTemporalInput(monitor)
+        for L in (1,12,19,20):
+            with self.subTest(L=L):
+                valid=torch.randn(2,L,59,16)
+                output=wrapper(valid,torch.eye(59))
+                self.assertEqual(output.shape,(2,20,59,16))
+                torch.testing.assert_close(
+                    output[:,20-L:],valid,atol=0,rtol=0)
+                self.assertEqual(
+                    torch.count_nonzero(output[:,:20-L]).item(),0)
+
+    def test_the_model_really_consumes_one_to_twenty_quarters(self):
+        for length in (1,12,19,20):
+            with self.subTest(L=length):
+                data=self.inputs.fold(length)
+                net=m.instantiate(
+                    self.m4,m.MODEL,2026,length,data,m.MODE)
+                net.eval()
+                z={k:torch.as_tensor(data["val_"+k][:1])
+                   for k in ("x","mask","last","structure","context")}
+                with torch.no_grad():
+                    y=net(z["x"],z["mask"],torch.eye(59),
+                          z["last"],z["structure"],z["context"])
+                self.assertEqual(y.shape,(1,1,59,3))
+                self.assertTrue(torch.isfinite(y).all())
+
+    def test_one_epoch_training_smoke_has_valid_mc_prediction(self):
+        with patch.object(self.m4,"STAGE04_ACTIVE_EPOCHS",1):
+            predicted=m.train_one(
+                self.inputs,m.MODEL,2026,20,torch.device("cpu"))
+        self.assertEqual(predicted.shape,(12,59,3))
+        self.assertTrue(np.isfinite(predicted).all())
 
 
-class CachedSensitivityTests(unittest.TestCase):
+class SeedAggregationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.panel=m.stage04().load_panel(ROOT)
-        cls.lock=m.original_04()
-        cls.d=m.study_design()
 
-    def test_complete_original_500_model_training_trials_untouched(self):
-        root=m.RESULTS
-        self.assertEqual(len(list((root/"trials").glob("*.json"))),500)
-        self.assertEqual(len(list((root/"trials").glob("*.npz"))),500)
-        self.assertEqual(m.read_json(root/"run_manifest.json")[
-            "training_trials_sha256"],m.digest_trial_files(root))
+    def test_errors_are_scored_before_seed_aggregation_and_paired(self):
+        rows=[]
+        for L in m.LENGTHS:
+            for seed in m.SEEDS:
+                bias=(seed-2026-4.5)*.1+L*.001
+                v=abs(bias)
+                row=dict(input_quarters=L,seed=seed,model=m.MODEL,
+                         mode=m.MODE,axis_mae=v,ici_mae=v,
+                         **{f"{axis}_mae":v for axis in m.SCORE_NAMES},
+                         **{f"{year}_{metric}":v
+                            for year in (2020,2021,2022)
+                            for metric in ("mae","ici_mae")})
+                rows.append(row)
+        scored=pd.DataFrame(rows)
+        result=m.summarize_seed_scores(scored)
+        self.assertEqual(len(result),20)
+        self.assertTrue((result.seed_count==10).all())
+        self.assertGreater(result.iloc[11].axis_mae,.20)
+        # Seed-ensemble prediction errors would be ~.012, incorrectly small.
+        self.assertNotAlmostEqual(result.iloc[11].axis_mae,.012,places=2)
+        self.assertAlmostEqual(
+            result.loc[result.input_quarters==12,
+                       "axis_mae_paired_delta_vs_12q"].iloc[0],0.)
+        self.assertAlmostEqual(
+            result.loc[result.input_quarters==12,
+                       "axis_mae_paired_delta_sd"].iloc[0],0.)
 
-    def test_all_500_cached_models_match_reaggregated_sensitivity(self):
-        root=m.RESULTS
-        signature=m.training_fingerprint(root,self.lock,self.panel,self.d)
-        curve=m.score_500_trials(
-            root,signature,self.lock,self.panel,self.d)
-        recorded=pd.read_csv(root/"supplementary_sensitivity.csv")
-        pd.testing.assert_frame_equal(
-            curve.reset_index(drop=True),
-            recorded.reset_index(drop=True),check_exact=False,atol=1e-12)
-        self.assertEqual(len(curve),20)
-        row12=curve.loc[curve.input_quarters.eq(12)].iloc[0]
-        self.assertAlmostEqual(float(row12.axis_mae),0.9983377548536462)
+    def test_200_job_dev_selection_and_four_descriptive_plots(self):
+        m4=m.stage04()
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            digest="unit_test_05_signature"
+            truth=self.panel.y[56:68]
+            for L in m.LENGTHS:
+                for seed in m.SEEDS:
+                    stem=f"L{L:02d}__{m.MODEL}__s{seed}"
+                    path=root/"trials"/(stem+".npz")
+                    prediction=truth+(.02*L+.1*(seed-2030))
+                    m.save_npz(path,prediction=prediction)
+                    m.json_write(root/"trials"/(stem+".json"),dict(
+                        signature=digest,L=L,model=m.MODEL,seed=seed,
+                        fixed_epochs=75,prediction_sha256=m.sha(path),
+                        train_internal_validation=False))
+            seed_scores=m.score_results(root,digest,self.panel)
+            self.assertEqual(len(seed_scores),200)
+            row=seed_scores[
+                (seed_scores.input_quarters==12)&
+                (seed_scores.seed==2026)].iloc[0]
+            self.assertAlmostEqual(row.axis_mae,.16,places=8)
+            report=m.finalize(
+                root,{"source_sha256":"synthetic_test_only"},
+                digest,self.panel)
+            self.assertEqual(report["status"],"COMPLETE_MAIN_DEV_ANALYSIS")
+            self.assertEqual(report["trained_length_seed_jobs"],200)
+            self.assertEqual(report["operational_lookback_quarters"],
+                             report["dev_selected_lookback_quarters"])
+            self.assertEqual(report["original_reference_lookback_quarters"],12)
+            self.assertFalse(report["train_internal_cv"])
+            self.assertEqual(report["dev_policy_selection"]["fit_data"],
+                             "TRAIN_2006Q1_2019Q4")
+            self.assertEqual(
+                len(pd.read_csv(root/"seed_scores.csv")),200)
+            self.assertEqual(
+                len(pd.read_csv(root/"lookback_summary.csv")),20)
+            selected=m.json_read(root/"lookback_dev_selection.json")
+            self.assertEqual(selected["reference_lookback_quarters"],12)
+            self.assertEqual(selected["selection_rule"],m.DEV_SELECTION_RULE)
+            self.assertEqual(selected["selected_lookback_quarters"],
+                             int(pd.read_csv(root/"lookback_summary.csv").
+                                 sort_values(["axis_mae","ici_mae",
+                                              "input_quarters"]).iloc[0].
+                                 input_quarters))
+            self.assertNotIn("statistical_design",report)
+            self.assertNotIn("omnibus",report)
+            self.assertNotIn("statistical_design",
+                             m.json_read(root/"run_manifest.json"))
+            self.assertFalse(hasattr(m,"inferential_statistics"))
+            self.assertFalse(hasattr(m,"holm_familywise_pvalues"))
+            expected={
+                "S05_01_input_length_mae.png",
+                "S05_02_axes_and_ici.png",
+                "S05_03_difference_from_12q.png",
+                "S05_04_years_and_data_support.png"}
+            actual={p.name for p in (root/"plots").glob("*.png")}
+            self.assertEqual(actual,expected)
+            for figure in (root/"plots").glob("*.png"):
+                self.assertGreater(figure.stat().st_size,10000)
+            self.assertFalse(report["test_opened"])
 
-    def test_descriptive_minimum_is_not_a_deployed_policy(self):
-        report=m.read_json(m.RESULTS/"supplementary_report.json")
-        self.assertEqual(report["status"],"PASS_SUPPLEMENTARY")
-        self.assertEqual(report["operational_lookback"],12)
-        self.assertEqual(report["descriptive_smallest_mae_length"],11)
-        self.assertTrue(report["analysis_not_a_model_policy"])
-        self.assertFalse(report["model_training_executed_during_rebuild"])
-        self.assertFalse(report["test_opened"])
-        self.assertFalse(report["statistical_equivalence_not_claimed"] is False)
-
-    def test_old_model_selection_outputs_actually_deleted(self):
-        root=m.RESULTS
-        expected={
-            "trials","plots","supplementary_sensitivity.csv",
-            "supplementary_report.json","run_manifest.json"}
-        self.assertEqual({p.name for p in root.iterdir()},expected)
-        self.assertFalse(list(root.rglob("*.pt")))
-        self.assertEqual(len(list((root/"plots").glob("*.png"))),4)
-        for old in (
-                "final","selected_input_lookback.json",
-                "train_only_lookback_selection.json",
-                "train_only_lookback_sensitivity.csv",
-                "frozen_dev_predictions.npz"):
-            self.assertFalse((root/old).exists())
-        self.assertFalse(any(
-            "archive" in f.name.lower() for f in root.rglob("*")))
-
-    def test_rebuild_on_isolated_copy_never_calls_training(self):
-        src=m.RESULTS
-        with tempfile.TemporaryDirectory(prefix="prism05_test_rebuild_") as tmp:
-            target=Path(tmp)/"results"
-            target.mkdir()
-            shutil.copytree(src/"trials",target/"trials")
-            shutil.copy2(src/"run_manifest.json",target/"run_manifest.json")
-            digest=m.digest_trial_files(target)
-            # Simulate old detritus; all non-training leftovers must vanish.
-            (target/"final").mkdir()
-            (target/"final"/"L11__old_model.pt").write_bytes(b"obsolete")
-            (target/"selected_input_lookback.json").write_text(
-                '{"selected_lookback":11}',encoding="utf-8")
-            with patch.object(m,"train_network",
-                              side_effect=AssertionError("NO TRAINING ALLOWED")):
-                result=m.rebuild(target,self.lock,self.panel,self.d)
-            self.assertEqual(result["operational_lookback"],12)
-            self.assertFalse((target/"final").exists())
-            self.assertFalse((target/"selected_input_lookback.json").exists())
-            self.assertEqual(m.digest_trial_files(target),digest)
-            self.assertEqual(len(list((target/"plots").glob("*.png"))),4)
+    def test_real_dev_selection_is_lookback_one_without_tests(self):
+        selected=m.json_read(m.RESULTS/"lookback_dev_selection.json")
+        self.assertEqual(selected["selected_lookback_quarters"],1)
+        self.assertEqual(selected["reference_lookback_quarters"],12)
+        self.assertEqual(selected["selection_rule"],m.DEV_SELECTION_RULE)
+        self.assertFalse(selected["result_is_independent_validation"])
+        self.assertFalse(selected["downstream_policy_applied"])
 
 
 if __name__=="__main__":
