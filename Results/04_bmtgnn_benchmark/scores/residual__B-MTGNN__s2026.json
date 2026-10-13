@@ -1,0 +1,19 @@
+{
+  "mode": "residual",
+  "model": "B-MTGNN",
+  "seed": 2026,
+  "reference_epoch": 75,
+  "source_sha256": "bbb348d0e6b6504c4bdc0f4b396799e141631f77850435eace0e6a056f9ba6ca",
+  "seconds": 5.934394800002337,
+  "axis_mae": 3.8909274932704903,
+  "ici_mae": 3.288225937112409,
+  "mae_profitability": 2.3236457483779724,
+  "mae_productivity": 0.9859019251323347,
+  "mae_growth": 8.363234806301165,
+  "year_0_mae": 3.2739151161358637,
+  "year_0_ici_mae": 2.7073463102378184,
+  "year_1_mae": 4.457762634471194,
+  "year_1_ici_mae": 3.8152950546749644,
+  "year_2_mae": 3.941104729204413,
+  "year_2_ici_mae": 3.342036446424445
+}
