@@ -1,0 +1,16 @@
+{
+  "contract_sha256": "2bff57ede48f039f14e84a57b627eb764452c4d4c4f7c063562a104ef31cf974",
+  "input_sha256": "5d6640ae7b1207063e83a36c40bddbea8654cb77007bb93c576fc7c904a1669b",
+  "subset": "greedy_0.990",
+  "variant": "masked",
+  "model": "GraphTransformer-TCN",
+  "seed": 2030,
+  "epoch": 44,
+  "training": "2006Q1-2019Q4 ONLY",
+  "dev_weights_frozen": true,
+  "parameters": 10566,
+  "fit_seconds": 0.7755045000085374,
+  "inference_draws": 30,
+  "inference_regime": "OTHER_GNN_LEGACY_MC_UNCHANGED",
+  "test_opened": false
+}
