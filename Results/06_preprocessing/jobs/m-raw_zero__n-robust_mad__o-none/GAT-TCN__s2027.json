@@ -1,0 +1,17 @@
+{
+  "signature": "e9967821f468ae3c7f26839ebb6112e485dbb282164f7a7355e54e07b9723d2f",
+  "policy": "m-raw_zero__n-robust_mad__o-none",
+  "model": "GAT-TCN",
+  "seed": 2027,
+  "epoch": 51,
+  "input_sha256": "724414ae240a7b66286eb410313bc3091a633b26fa7cb297fb4636008a8ce668",
+  "fitted_train_end": "2019Q4",
+  "used_dev_to_choose_epoch": false,
+  "prediction_horizon": 1,
+  "lookback": 12,
+  "node_count": 59,
+  "feature_count": 157,
+  "fit_seconds": 0.7299903000021004,
+  "inference_regime": "OTHER_GNN_LEGACY_MC_UNCHANGED",
+  "inference_draws": 30
+}

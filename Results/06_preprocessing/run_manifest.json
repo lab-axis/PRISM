@@ -1,0 +1,137 @@
+{
+  "started_utc": "2026-10-12T17:37:31.695128+00:00",
+  "status": "PASS",
+  "signature": "e9967821f468ae3c7f26839ebb6112e485dbb282164f7a7355e54e07b9723d2f",
+  "contract": {
+    "code_sha256": "89b81765a22332946f0060f9110dbdde9674daba26521f63a3c7e8e45acc04ed",
+    "stage04_source_sha256": "ba00e80aabc8099d7054e9c4728115eb34258be625551a37f6b5ab7510bb03e3",
+    "stage04_lock_sha256": "e0991e7d142289d091d64e6adb8385dad6d70895383098cf126c1c20e18f5fbb",
+    "stage04_manifest_sha256": "dd93359069f12a2f2122e01f2d304499a008b58c81bf52b762b69d38266bca59",
+    "original_data_sha256": {
+      "Data/03_integrated_dataset/raw_train.csv": "37ce33440d77b22176458a47c02e1e50166d09dfd2062cfd365e416a603b51ed",
+      "Data/03_integrated_dataset/raw_val.csv": "c3b7cd3a10523d804f3e8cec013c25f25ba42d083116035003d228c778a55b35"
+    },
+    "fixed_models": [
+      "B-MTGNN",
+      "APPNP-TCN",
+      "GraphConv-TCN",
+      "GAT-TCN",
+      "GraphTransformer-TCN"
+    ],
+    "matched_seeds": [
+      2026,
+      2027,
+      2028,
+      2029,
+      2030
+    ],
+    "fixed_epochs": {
+      "B-MTGNN__s2026": 13,
+      "B-MTGNN__s2027": 18,
+      "B-MTGNN__s2028": 10,
+      "B-MTGNN__s2029": 23,
+      "B-MTGNN__s2030": 12,
+      "APPNP-TCN__s2026": 25,
+      "APPNP-TCN__s2027": 62,
+      "APPNP-TCN__s2028": 42,
+      "APPNP-TCN__s2029": 54,
+      "APPNP-TCN__s2030": 29,
+      "GraphConv-TCN__s2026": 58,
+      "GraphConv-TCN__s2027": 66,
+      "GraphConv-TCN__s2028": 19,
+      "GraphConv-TCN__s2029": 72,
+      "GraphConv-TCN__s2030": 34,
+      "GAT-TCN__s2026": 50,
+      "GAT-TCN__s2027": 51,
+      "GAT-TCN__s2028": 44,
+      "GAT-TCN__s2029": 40,
+      "GAT-TCN__s2030": 75,
+      "GraphTransformer-TCN__s2026": 62,
+      "GraphTransformer-TCN__s2027": 49,
+      "GraphTransformer-TCN__s2028": 63,
+      "GraphTransformer-TCN__s2029": 53,
+      "GraphTransformer-TCN__s2030": 44
+    },
+    "input_quarters": 12,
+    "target_horizon_quarters": 1,
+    "output_mode": "structural",
+    "num_nodes": 59,
+    "num_features": 157,
+    "structural_coefficients": [
+      0.25,
+      0.1,
+      0.25
+    ],
+    "model_selection_epoch_source": "original Stage04 Train-internal epochs",
+    "full_train_end": "2019Q4",
+    "dev_from": "2020Q1",
+    "dev_end": "2022Q4",
+    "test_opened": false,
+    "no_distribution_fit_from_dev": true,
+    "dev_reused_for_model_selection": true,
+    "stage1_missing": [
+      "raw_zero",
+      "scaled_zero",
+      "train_median",
+      "train_mean",
+      "causal_ffill",
+      "causal_seasonal"
+    ],
+    "stage2_normalization": [
+      "none",
+      "standard",
+      "robust_iqr",
+      "robust_mad",
+      "maxabs",
+      "quantile_normal"
+    ],
+    "stage3_outlier": [
+      "none",
+      "winsor005",
+      "winsor01",
+      "mad_clip5",
+      "asinh",
+      "signed_log1p"
+    ],
+    "evaluation": "actual matched five-GNN five-seed mean ensemble",
+    "policy_sequence": [
+      "missing",
+      "normalization",
+      "outlier"
+    ],
+    "minimum_annual_improvement_count": 2,
+    "post_selection_reverse_ablation": true
+  },
+  "models": [
+    "B-MTGNN",
+    "APPNP-TCN",
+    "GraphConv-TCN",
+    "GAT-TCN",
+    "GraphTransformer-TCN"
+  ],
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "baseline_policy": "m-raw_zero__n-standard__o-none",
+  "selected_policy": "m-raw_zero__n-standard__o-none",
+  "next_resume": "py Sources/06_preprocessing.py --run --max-minutes 25",
+  "full_train_model_retrained_on_dev": false,
+  "test_opened": false,
+  "current_stage": "COMPLETE",
+  "current_factor": "outlier",
+  "adopted_so_far": "m-raw_zero__n-standard__o-none",
+  "completed_policy_scores": 16,
+  "figures": [
+    "plots/06_01_stagewise_mae.png",
+    "plots/06_02_cumulative_mae.png",
+    "plots/06_03_year_by_year.png",
+    "plots/06_04_three_axes_ici.png",
+    "plots/06_05_final_ablation.png"
+  ],
+  "elapsed_seconds": 264.52969630000007,
+  "completed_utc": "2026-10-12T17:41:56.224423+00:00"
+}

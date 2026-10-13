@@ -1,0 +1,7 @@
+﻿policy,stage,component,missing,normalization,outlier,status,axis_mae,ici_mae,delta_mae,delta_ici,better_years,qualifies_as_change,previously_active,stage_result
+m-raw_zero__n-standard__o-none,3,outlier,raw_zero,standard,none,PASS,2.340279421959421,1.7894925355233664,0.0,0.0,0,False,True,True
+m-raw_zero__n-standard__o-winsor005,3,outlier,raw_zero,standard,winsor005,PASS,2.3490409405527135,1.7795701543468774,0.00876151859329255,-0.009922381176489026,1,False,False,False
+m-raw_zero__n-standard__o-winsor01,3,outlier,raw_zero,standard,winsor01,PASS,2.349739409790923,1.779594526616531,0.009459987831502037,-0.009898008906835454,1,False,False,False
+m-raw_zero__n-standard__o-mad_clip5,3,outlier,raw_zero,standard,mad_clip5,PASS,2.3430735740786326,1.7783475751986433,0.0027941521192116348,-0.011144960324723119,1,False,False,False
+m-raw_zero__n-standard__o-asinh,3,outlier,raw_zero,standard,asinh,PASS,2.347507722472117,1.7752130954717533,0.007228300512696073,-0.01427944005161308,0,False,False,False
+m-raw_zero__n-standard__o-signed_log1p,3,outlier,raw_zero,standard,signed_log1p,PASS,2.351017954109797,1.7792240030640205,0.010738532150376123,-0.010268532459345892,0,False,False,False

@@ -1,0 +1,101 @@
+{
+  "stage": 6,
+  "status": "LOCKED",
+  "policy_id": "m-raw_zero__n-standard__o-none",
+  "preprocessing": {
+    "missing": "raw_zero",
+    "normalization": "standard",
+    "outlier": "none"
+  },
+  "unchanged_04_reference_policy": {
+    "missing": "raw_zero",
+    "normalization": "standard",
+    "outlier": "none"
+  },
+  "original_04_dev_metrics": {
+    "axis_mae": 2.340279421959421,
+    "ici_mae": 1.7894925355233664,
+    "persistence_mae": 3.3270890477129726,
+    "profitability_mae": 2.121991931727681,
+    "productivity_mae": 0.7707333837173618,
+    "growth_mae": 4.128112950433218,
+    "2020_mae": 3.3275021636780715,
+    "2020_ici_mae": 2.749157415133575,
+    "2021_mae": 2.137830699575614,
+    "2021_ici_mae": 1.6102310440178285,
+    "2022_mae": 1.555505402624577,
+    "2022_ici_mae": 1.0090891474186963
+  },
+  "frozen_selected_dev_metrics": {
+    "axis_mae": 2.340279421959421,
+    "ici_mae": 1.7894925355233664,
+    "persistence_mae": 3.3270890477129726,
+    "profitability_mae": 2.1219919317276816,
+    "productivity_mae": 0.7707333837173618,
+    "growth_mae": 4.128112950433219,
+    "2020_mae": 3.3275021636780706,
+    "2020_ici_mae": 2.749157415133575,
+    "2021_mae": 2.137830699575615,
+    "2021_ici_mae": 1.610231044017828,
+    "2022_mae": 1.555505402624577,
+    "2022_ici_mae": 1.0090891474186958
+  },
+  "total_policy_lookups": 16,
+  "three_factors_six_candidates_per_stage": true,
+  "each_step_development_selected": true,
+  "no_heldout_independent_test_claim": true,
+  "test_opened": false,
+  "selected_on": "Dev 2020Q1-2022Q4; previously used for Stage04 model selection",
+  "full_train_end": "2019Q4",
+  "no_fitted_distributions_from_dev": true,
+  "no_train_internal_evaluation": true,
+  "frozen_weights_for_every_dev_quarter": true,
+  "gnn_models": [
+    "B-MTGNN",
+    "APPNP-TCN",
+    "GraphConv-TCN",
+    "GAT-TCN",
+    "GraphTransformer-TCN"
+  ],
+  "matched_seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "input_length_quarters": 12,
+  "forecast_horizon_quarters": 1,
+  "structural_coefficients": [
+    0.25,
+    0.1,
+    0.25
+  ],
+  "reused_04_epoch_counts": true,
+  "fixed_training_source_sha256": "ba00e80aabc8099d7054e9c4728115eb34258be625551a37f6b5ab7510bb03e3",
+  "stage04_model_pool_sha256": "e0991e7d142289d091d64e6adb8385dad6d70895383098cf126c1c20e18f5fbb",
+  "stage06_signature": "e9967821f468ae3c7f26839ebb6112e485dbb282164f7a7355e54e07b9723d2f",
+  "stage_summaries": [
+    {
+      "stage": 1,
+      "policy": "m-raw_zero__n-standard__o-none"
+    },
+    {
+      "stage": 2,
+      "policy": "m-raw_zero__n-standard__o-none"
+    },
+    {
+      "stage": 3,
+      "policy": "m-raw_zero__n-standard__o-none"
+    }
+  ],
+  "ablation": [],
+  "figures": [
+    "plots/06_01_stagewise_mae.png",
+    "plots/06_02_cumulative_mae.png",
+    "plots/06_03_year_by_year.png",
+    "plots/06_04_three_axes_ici.png",
+    "plots/06_05_final_ablation.png"
+  ],
+  "created_utc": "2026-10-12T17:41:56.222424+00:00"
+}

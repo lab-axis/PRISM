@@ -1,0 +1,7 @@
+﻿policy,stage,component,missing,normalization,outlier,status,axis_mae,ici_mae,delta_mae,delta_ici,better_years,qualifies_as_change,previously_active,stage_result
+m-raw_zero__n-standard__o-none,2,normalization,raw_zero,standard,none,PASS,2.340279421959421,1.7894925355233664,0.0,0.0,0,False,True,True
+m-raw_zero__n-none__o-none,2,normalization,raw_zero,none,none,PASS,2.384571723322617,1.8179562034610721,0.044292301363196174,0.028463667937705717,0,False,False,False
+m-raw_zero__n-robust_iqr__o-none,2,normalization,raw_zero,robust_iqr,none,PASS,2.358390998778155,1.8090599039849424,0.018111576818733877,0.01956736846157603,0,False,False,False
+m-raw_zero__n-robust_mad__o-none,2,normalization,raw_zero,robust_mad,none,PASS,2.358747302418634,1.808934502964697,0.018467880459212882,0.019441967441330643,0,False,False,False
+m-raw_zero__n-maxabs__o-none,2,normalization,raw_zero,maxabs,none,PASS,2.3969362900560087,1.8146274969176035,0.056656868096587765,0.0251349613942371,0,False,False,False
+m-raw_zero__n-quantile_normal__o-none,2,normalization,raw_zero,quantile_normal,none,PASS,2.345968860038038,1.7690497387088913,0.005689438078617215,-0.02044279681447514,1,False,False,False

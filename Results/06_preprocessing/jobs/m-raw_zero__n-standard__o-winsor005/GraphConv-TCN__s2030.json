@@ -1,0 +1,17 @@
+{
+  "signature": "e9967821f468ae3c7f26839ebb6112e485dbb282164f7a7355e54e07b9723d2f",
+  "policy": "m-raw_zero__n-standard__o-winsor005",
+  "model": "GraphConv-TCN",
+  "seed": 2030,
+  "epoch": 34,
+  "input_sha256": "c7a525f1d796de0bd3bcd2fb3f9dd43b90b6a938221dd38a1056aec7ea8550de",
+  "fitted_train_end": "2019Q4",
+  "used_dev_to_choose_epoch": false,
+  "prediction_horizon": 1,
+  "lookback": 12,
+  "node_count": 59,
+  "feature_count": 157,
+  "fit_seconds": 0.40626549999433337,
+  "inference_regime": "OTHER_GNN_LEGACY_MC_UNCHANGED",
+  "inference_draws": 30
+}
