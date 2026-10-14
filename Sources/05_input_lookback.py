@@ -615,8 +615,6 @@ def run(args):
         return
     if not args.run:
         raise ValueError("Use --dry-run, --status or --run")
-    if args.max_minutes<=0:
-        raise ValueError("Positive minutes required")
     m,panel,lock,manifest=upstream()
     contract,digest=run_contract(m,panel,lock,manifest)
     dest=RESULTS/"run_manifest.json"
@@ -637,7 +635,6 @@ def run(args):
     torch.set_num_threads(4)
     inp=Inputs(panel)
     device=torch.device(args.device)
-    started=time.perf_counter()
     for L in LENGTHS:
         for seed in SEEDS:
             stem=f"L{L:02d}__{MODEL}__s{seed}"
@@ -651,13 +648,6 @@ def run(args):
                 continue
             if meta.exists() or data.exists():
                 raise RuntimeError("Incomplete Stage05 job")
-            if time.perf_counter()-started>=args.max_minutes*60:
-                json_write(dest,dict(
-                    status="PARTIAL",signature=digest,contract=contract,
-                    next_job=stem,
-                    train_internal_validation=False,test_opened=False))
-                print("05_PAUSED_RESUMABLE",stem,flush=True)
-                return
             prediction=train_one(inp,MODEL,seed,L,device)
             save_npz(data,prediction=prediction)
             json_write(meta,dict(
@@ -678,7 +668,6 @@ def main():
     p.add_argument("--run",action="store_true")
     p.add_argument("--device",choices=("cpu","cuda"),
                    default="cuda" if torch.cuda.is_available() else "cpu")
-    p.add_argument("--max-minutes",type=float,default=25.)
     run(p.parse_args())
 
 

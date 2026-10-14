@@ -4,7 +4,6 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import sys
-import time
 
 import numpy as np
 import pandas as pd
@@ -203,10 +202,9 @@ def test_mean_of_ten_individual_seed_errors_not_ensemble_error(
 
     monkeypatch.setattr(ctx["m07"], "fit_subset_model", mock_fit)
     indices = tuple(range(156))
-    row, interrupted = m.score_policy(
+    row = m.score_policy(
         ctx, tmp_path, indices, "top156", "TOPK",
-        "test-contract", "cpu", time.perf_counter(), 10)
-    assert interrupted is None
+        "test-contract", "cpu")
     assert len(calls) == 10
     expected, individual = ctx["m06"].seed_policy_metrics(
         np.stack(expected_predictions), ctx["panel"])
@@ -220,32 +218,25 @@ def test_mean_of_ten_individual_seed_errors_not_ensemble_error(
         raise AssertionError("Valid cached seed must not be retrained")
 
     monkeypatch.setattr(ctx["m07"], "fit_subset_model", fail_if_retrained)
-    again, interrupted = m.score_policy(
+    again = m.score_policy(
         ctx, tmp_path, indices, "top156", "TOPK",
-        "test-contract", "cpu", time.perf_counter(), 10)
-    assert interrupted is None
+        "test-contract", "cpu")
     assert again["axis_mae"] == pytest.approx(row["axis_mae"])
     with open(tmp_path / "models" / "top156" / "B-MTGNN__s2026.npz",
               "ab") as file:
         file.write(b"tampered")
     with pytest.raises(RuntimeError, match="model cache"):
         m.score_policy(ctx, tmp_path, indices, "top156", "TOPK",
-                       "test-contract", "cpu", time.perf_counter(), 10)
+                       "test-contract", "cpu")
 
 
-def test_resumable_budget_and_frozen_baseline_no_retraining(ctx, tmp_path):
-    baseline, interrupted = m.score_policy(
+def test_frozen_baseline_no_retraining(ctx, tmp_path):
+    baseline = m.score_policy(
         ctx, tmp_path, tuple(range(157)), "top157",
-        "TOPK", "test-contract", "cpu", time.perf_counter(), 10)
-    assert interrupted is None
+        "TOPK", "test-contract", "cpu")
     assert baseline["reused_stage06_baseline"]
     assert baseline["axis_mae"] == pytest.approx(ctx["baseline"]["axis_mae"])
     assert not (tmp_path / "models" / "top157").exists()
-    incomplete, next_job = m.score_policy(
-        ctx, tmp_path, tuple(range(156)), "top156",
-        "TOPK", "test-contract", "cpu", time.perf_counter() - 120, 1)
-    assert incomplete is None
-    assert next_job["next_seed"] == 2026
 
 
 def test_true_k_input_initialization_parity_and_real_single_seed(ctx):
@@ -287,9 +278,8 @@ def test_completed_train_ranking_reproduces_ten_real_seeds(ctx):
     if not path.exists():
         pytest.skip("Train-only ranking has not been executed")
     study_sig = m.signature(m.contract(ctx))
-    frame, stability, paused = m.build_ranking(
-        ctx, m.RESULTS, study_sig, "cpu", time.perf_counter(), .01)
-    assert paused is None
+    frame, stability = m.build_ranking(
+        ctx, m.RESULTS, study_sig, "cpu")
     assert len(frame) == 157
     assert m.validate_ranking(frame, ctx["panel"].features)
     assert len(list((m.RESULTS / "ranking" / "seeds").glob("*.npz"))) == 10

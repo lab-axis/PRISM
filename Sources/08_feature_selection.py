@@ -29,8 +29,8 @@ The future Test split is not opened here. No legacy Stage08 compatibility.
 
     py -m pytest -q Tests/test_08_feature_selection.py
     py Sources/08_feature_selection.py --dry-run
-    py -u Sources/08_feature_selection.py --ranking-only --max-minutes 25
-    py -u Sources/08_feature_selection.py --run --max-minutes 25
+    py -u Sources/08_feature_selection.py --ranking-only
+    py -u Sources/08_feature_selection.py --run
     py Sources/08_feature_selection.py --status
 """
 from __future__ import annotations
@@ -319,8 +319,7 @@ def validate_ranking(frame: pd.DataFrame, features: list[str]) -> tuple[int, ...
     return order
 
 
-def build_ranking(ctx, root: Path, study_sig: str, device,
-                  started: float, max_minutes: float):
+def build_ranking(ctx, root: Path, study_sig: str, device):
     ranking_dir = root / "ranking"
     finished = ranking_dir / "feature_importance.csv"
     record = ranking_dir / "provenance.json"
@@ -356,7 +355,7 @@ def build_ranking(ctx, root: Path, study_sig: str, device,
         stability = rank_stability(cached)
         if stability != meta["stability"]:
             raise RuntimeError("Saved ranking stability does not reproduce seed results")
-        return frame, stability, None
+        return frame, stability
     z, truth = ranking_tensors(ctx, device)
     scale = ctx["full_fold"]["y_scale"]
     center = ctx["full_fold"]["y_center"]
@@ -376,8 +375,6 @@ def build_ranking(ctx, root: Path, study_sig: str, device,
         elif path.exists() or meta_path.exists():
             raise RuntimeError("Incomplete Stage08 Train ranking cache")
         else:
-            if time.perf_counter() - started >= max_minutes * 60:
-                return None, None, dict(phase="RANKING", next_seed=seed)
             model = load_frozen_seed(ctx, seed, device)
             effects, reference = seed_importance(model, z, truth, center, scale)
             del model
@@ -417,7 +414,7 @@ def build_ranking(ctx, root: Path, study_sig: str, device,
         no_dev_labels_used_in_ranking=True, train_in_sample=True,
         dropout_off_only_for_ranking=True, stability=stability,
         test_opened=False))
-    return frame, stability, None
+    return frame, stability
 
 
 def topk_indices(order: tuple[int, ...], k: int) -> tuple[int, ...]:
@@ -459,8 +456,7 @@ def select_k(records: list[dict]) -> int:
 
 
 def score_policy(ctx, root: Path, indices: tuple[int, ...],
-                 label: str, kind: str, study_sig: str, device,
-                 started: float, budget_minutes: float):
+                 label: str, kind: str, study_sig: str, device):
     """Matched ten-seed FULL training, with seed-locked 07 compact API."""
     if kind not in ("TOPK", "RANDOM") or not label:
         raise ValueError("Unknown Stage08 policy type")
@@ -498,9 +494,6 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
             elif any(p.exists() for p in (meta_path, prediction_path, weights_path)):
                 raise RuntimeError("Incomplete Stage08 seed job; refusing mixed cache")
             else:
-                if time.perf_counter() - started >= budget_minutes * 60:
-                    return None, dict(phase=kind, policy=label,
-                                      K=len(indices), next_seed=seed)
                 fitted = ctx["m07"].fit_subset_model(
                     ctx, current, changed, seed, device)
                 prediction = fitted["prediction"]
@@ -559,7 +552,7 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
             raise RuntimeError("Stage08 policy cache does not reproduce seed metrics")
     else:
         write_json(location, result)
-    return result, None
+    return result
 
 
 def compare_stage07(rows: list[dict], root: Path):
@@ -749,8 +742,6 @@ def run(args):
         return None
     if not args.run and not args.ranking_only:
         raise ValueError("Use --run or --ranking-only")
-    if args.max_minutes <= 0:
-        raise ValueError("max-minutes must be positive")
     ctx = upstream()
     spec = contract(ctx)
     sig = signature(spec)
@@ -770,20 +761,10 @@ def run(args):
         contract=spec, started_utc=(old or {}).get(
             "started_utc", datetime.now(timezone.utc).isoformat()),
         test_opened=False,
-        resume="py -u Sources/08_feature_selection.py --run --max-minutes 25")
-
-    def pause(next_job):
-        manifest.update(
-            status="PARTIAL_TIME_BUDGET", next_job=next_job,
-            elapsed_seconds=time.perf_counter() - start)
-        write_json(path, manifest)
-        return manifest
+        resume="py -u Sources/08_feature_selection.py --run")
 
     write_json(path, manifest)
-    ranking, stability, interrupted = build_ranking(
-        ctx, RESULTS, sig, device, start, args.max_minutes)
-    if interrupted:
-        return pause(interrupted)
+    ranking, stability = build_ranking(ctx, RESULTS, sig, device)
     if args.ranking_only:
         manifest.update(
             status="TRAIN_RANKING_COMPLETE", ranked_features=len(ranking),
@@ -793,23 +774,18 @@ def run(args):
     order = validate_ranking(ranking, ctx["panel"].features)
     scores = []
     for k in ALL_K:
-        current, interrupted = score_policy(
+        current = score_policy(
             ctx, RESULTS, topk_indices(order, k), f"top{k:03d}",
-            "TOPK", sig, device, start, args.max_minutes)
-        if interrupted:
-            return pause(interrupted)
+            "TOPK", sig, device)
         scores.append(current)
         print("08_TOPK", k, "MAE", round(current["axis_mae"], 6),
               "PASS", current["qualified"], flush=True)
     chosen = select_k(scores)
     controls = []
     for random_seed in RANDOM_SUBSET_SEEDS:
-        current, interrupted = score_policy(
+        current = score_policy(
             ctx, RESULTS, random_indices(random_seed),
-            f"random_{random_seed}", "RANDOM", sig, device,
-            start, args.max_minutes)
-        if interrupted:
-            return pause(interrupted)
+            f"random_{random_seed}", "RANDOM", sig, device)
         controls.append(dict(subset_seed=random_seed,
                              axis_mae=current["axis_mae"],
                              ici_mae=current["ici_mae"],
@@ -853,7 +829,6 @@ def main():
     parser.add_argument("--status", action="store_true")
     parser.add_argument("--ranking-only", action="store_true")
     parser.add_argument("--run", action="store_true")
-    parser.add_argument("--max-minutes", type=float, default=25.)
     parser.add_argument("--device", choices=("cpu", "cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     run(parser.parse_args())

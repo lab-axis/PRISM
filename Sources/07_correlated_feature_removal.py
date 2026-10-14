@@ -40,7 +40,7 @@ is reported explicitly to prevent a misleading "fully removed" claim.
 Command:
     py Sources/07_correlated_feature_removal.py --dry-run
     py Sources/07_correlated_feature_removal.py --analyze-only
-    py -u Sources/07_correlated_feature_removal.py --run --max-minutes 25
+    py -u Sources/07_correlated_feature_removal.py --run
     py Sources/07_correlated_feature_removal.py --status
 
 These are descriptive repeated-Dev selection results, NOT independent Test
@@ -600,8 +600,7 @@ def fit_subset_model(ctx,subset:Subset,data:dict,seed:int,device):
         inference_regime="B_MTGNN_MC_DROPOUT")
 
 
-def run_subset(ctx,root,subset:Subset,mode:str,signature:str,
-               device,start,budget_minutes):
+def run_subset(ctx,root,subset:Subset,mode:str,signature:str,device):
     """Fit or resume exactly ten matched seed jobs; score seeds separately."""
     if mode=="compact" and not subset.dropped:
         raise ValueError("Nothing to compact")
@@ -611,7 +610,7 @@ def run_subset(ctx,root,subset:Subset,mode:str,signature:str,
             parameters=ctx["baseline_parameters"],
             model_count=1,seed_count=len(SEEDS),
             feature_count=FEATURE_COUNT,removed_count=0,
-            reused_upstream=True),None
+            reused_upstream=True)
     changed=adapt_inputs(ctx["full_fold"],subset,mode)
     provenance=dataset_sha(changed)
     folder=_candidate_folder(root,subset,mode)
@@ -652,10 +651,6 @@ def run_subset(ctx,root,subset:Subset,mode:str,signature:str,
         elif meta.exists() or npz.exists() or ck.exists():
             raise RuntimeError(f"Incomplete Stage07 checkpoint {folder}/{stem}")
         else:
-            if time.perf_counter()-start>=budget_minutes*60:
-                return None,dict(
-                    next_subset=subset.label,variant=mode,
-                    next_model="B-MTGNN",next_seed=seed)
             fitted=fit_subset_model(ctx,subset,changed,seed,device)
             result=fitted["prediction"]
             folder.mkdir(parents=True,exist_ok=True)
@@ -693,7 +688,7 @@ def run_subset(ctx,root,subset:Subset,mode:str,signature:str,
         model_count=1,
         seed_count=len(SEEDS),
         reused_upstream=False,seed_metrics=individual)
-    return scores,None
+    return scores
 
 
 def run_contract(ctx)->dict:
@@ -1062,8 +1057,6 @@ def run(args):
         return previous
     if not args.analyze_only and not args.run:
         raise ValueError("Supply --analyze-only or --run")
-    if args.max_minutes<=0:
-        raise ValueError("Require positive time budget")
     if previous and previous.get("status")=="PASS" and not args.analyze_only:
         print("07_ALREADY_PASS",previous["selected_policy"],flush=True)
         return json_read(RESULTS/"selected_features.json")
@@ -1075,7 +1068,7 @@ def run(args):
         started_utc=(previous or {}).get(
             "started_utc",datetime.now(timezone.utc).isoformat()),
         no_clustering=True,test_opened=False,
-        resume="py -u Sources/07_correlated_feature_removal.py --run --max-minutes 25")
+        resume="py -u Sources/07_correlated_feature_removal.py --run")
     atomic_json(path,manifest)
     torch.set_num_threads(4)
     audit=cached_audit(ctx,RESULTS,signature)
@@ -1110,17 +1103,8 @@ def run(args):
             alias=metric["source_label"]
             result=metric["scores"]
         else:
-            result,paused=run_subset(
-                ctx,RESULTS,subset,"masked",signature,
-                device,started,args.max_minutes)
-            if paused:
-                manifest.update(
-                    status="PARTIAL_TIME_BUDGET",current_phase="MASKED",
-                    next_job=paused,
-                    elapsed_seconds=time.perf_counter()-started)
-                atomic_json(path,manifest)
-                print("07_PARTIAL_MASKED",paused,flush=True)
-                return manifest
+            result=run_subset(
+                ctx,RESULTS,subset,"masked",signature,device)
             record_by_kept[key]=dict(
                 source_label=subset.label,scores=result)
         candidate=selection_safeguards(result,current_baseline)
@@ -1160,23 +1144,12 @@ def run(args):
         alias=compact_by_kept.get(candidate.kept)
         if alias is not None:
             compact=alias["scores"]
-            paused=None
         elif candidate.dropped:
-            compact,paused=run_subset(
-                ctx,RESULTS,candidate,"compact",signature,
-                device,started,args.max_minutes)
+            compact=run_subset(
+                ctx,RESULTS,candidate,"compact",signature,device)
         else:
             compact=dict(current_baseline,
                          parameters=ctx["baseline_parameters"])
-            paused=None
-        if paused:
-            manifest.update(
-                status="PARTIAL_TIME_BUDGET",current_phase="COMPACT",
-                current_compact_candidate=candidate.label,next_job=paused,
-                elapsed_seconds=time.perf_counter()-started)
-            atomic_json(path,manifest)
-            print("07_PARTIAL_COMPACT",paused,flush=True)
-            return manifest
         if alias is None:
             compact_by_kept[candidate.kept]=dict(
                 label=candidate.label,scores=compact)
@@ -1272,7 +1245,6 @@ def main():
     parser.add_argument("--analyze-only",action="store_true")
     parser.add_argument("--run",action="store_true")
     parser.add_argument("--status",action="store_true")
-    parser.add_argument("--max-minutes",type=float,default=25.)
     parser.add_argument("--device",choices=("cpu","cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     args=parser.parse_args()

@@ -42,7 +42,7 @@ distribution transforms. Test data is NEVER opened.
   py Sources/06_preprocessing.py --dry-run
   py Sources/06_preprocessing.py --design-plot
   py Sources/06_preprocessing.py --status
-  py -u Sources/06_preprocessing.py --run --max-minutes 25
+  py -u Sources/06_preprocessing.py --run
 """
 from __future__ import annotations
 
@@ -594,8 +594,7 @@ def seed_policy_metrics(predictions,panel):
     return average,individual
 
 
-def evaluate_policy_trials(root,policy,panel,prior,device,signature,
-                           start_time,max_minutes,input_cache):
+def evaluate_policy_trials(root,policy,panel,prior,device,signature,input_cache):
     """Evaluate matched individual seeds, reusing byte-identical inputs."""
     policy.validate()
     data,audit=prepare_policy(panel,policy,prior)
@@ -612,7 +611,7 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,
                     input_sha256=input_sha,
                     identical_input_reused_from=equivalent,
                     baseline_from_stage05=False,
-                    preprocessor_audit=audit),forecasts,None
+                    preprocessor_audit=audit),forecasts
 
     if policy==ORIGINAL:
         original_stage05_parity(panel,prior)
@@ -633,7 +632,7 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,
                         status="NUMERICAL_FAILURE",
                         input_sha256=input_sha,
                         failed_seed=existing["seed"],
-                        error=existing["error"]),None,None
+                        error=existing["error"]),None
         for seed in SEEDS:
             stem=f"{MODEL}__s{seed}"
             meta=jobs/(stem+".json")
@@ -666,8 +665,6 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,
             elif any(file.exists() for file in (meta,predfile,weightfile)):
                 raise RuntimeError("Stage06 interrupted/incomplete job: "+stem)
             else:
-                if time.perf_counter()-start_time>=max_minutes*60:
-                    return None,None,dict(next_policy=policy.id,next_seed=seed)
                 try:
                     forecast,state,seconds=fit_policy_model(data,seed,device)
                 except (RuntimeError,ValueError,FloatingPointError) as error:
@@ -685,7 +682,7 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,
                     return dict(policy=policy.id,**asdict(policy),
                                 status="NUMERICAL_FAILURE",
                                 input_sha256=input_sha,
-                                failed_seed=seed,error=reason),None,None
+                                failed_seed=seed,error=reason),None
                 checkpoint=dict(
                     signature=signature,policy=policy.id,seed=seed,
                     model=MODEL,input_sha256=input_sha,epoch=75,
@@ -712,11 +709,10 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,
                 input_sha256=input_sha,
                 identical_input_reused_from=None,
                 baseline_from_stage05=base,
-                preprocessor_audit=audit),forecasts,None
+                preprocessor_audit=audit),forecasts
 
 
-def policy_summary(root,policy,panel,prior,device,signature,
-                   start_time,max_minutes,input_cache):
+def policy_summary(root,policy,panel,prior,device,signature,input_cache):
     """Hash-validate frozen seed arrays and resume a policy idempotently."""
     location=root/"policies"/(policy.id+".json")
     binary=root/"policies"/(policy.id+".npz")
@@ -732,7 +728,7 @@ def policy_summary(root,policy,panel,prior,device,signature,
         if row.get("status")=="NUMERICAL_FAILURE":
             if binary.exists():
                 raise RuntimeError("Failed policy has prediction file")
-            return row,None
+            return row
         if not binary.exists() or row.get("prediction_sha256")!=sha(binary):
             raise RuntimeError("Policy prediction cache mismatch")
         with np.load(binary,allow_pickle=False) as saved:
@@ -741,14 +737,11 @@ def policy_summary(root,policy,panel,prior,device,signature,
         if any(abs(row[key]-val)>1e-9 for key,val in computed.items()):
             raise RuntimeError("Cached per-seed policy mean differs from metrics")
         input_cache.setdefault(input_sha,policy.id)
-        return row,None
+        return row
     if binary.exists():
         raise RuntimeError("Stage06 incomplete policy report")
-    row,forecasts,paused=evaluate_policy_trials(
-        root,policy,panel,prior,device,signature,
-        start_time,max_minutes,input_cache)
-    if paused is not None:
-        return None,paused
+    row,forecasts=evaluate_policy_trials(
+        root,policy,panel,prior,device,signature,input_cache)
     row.update(signature=signature,count_seeds=len(SEEDS))
     if row["status"]=="PASS":
         write_npz(binary,seed_predictions=forecasts,
@@ -756,7 +749,7 @@ def policy_summary(root,policy,panel,prior,device,signature,
         row["prediction_sha256"]=sha(binary)
         input_cache.setdefault(input_sha,policy.id)
     write_json(location,row)
-    return row,None
+    return row
 
 
 def eligible_policy_table(policies, rows):
@@ -1229,8 +1222,6 @@ def run(args):
         return label
     if not args.run:
         raise ValueError("Use --dry-run, --status, --design-plot or --run")
-    if args.max_minutes<=0:
-        raise ValueError("Stage06 requires a positive per-call time budget")
     device=torch.device(args.device)
     if device.type=="cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA device requested but unavailable")
@@ -1273,19 +1264,8 @@ def run(args):
     results={}
     hashes={}
     for idx,policy in enumerate(grid,1):
-        row,paused=policy_summary(
-            RESULTS,policy,panel,prior,device,signature,
-            start,args.max_minutes,hashes)
-        if paused is not None:
-            manifest.update(
-                status="PARTIAL_TIME_BUDGET",resume_job=paused,
-                candidates_complete=len(results),
-                distinct_model_inputs=len(hashes),
-                duration_seconds=time.perf_counter()-start)
-            write_json(manifest_file,manifest)
-            print("06_FULL_GRID_RESUMABLE",len(results),"/",GRID_SIZE,
-                  paused,flush=True)
-            return manifest
+        row=policy_summary(
+            RESULTS,policy,panel,prior,device,signature,hashes)
         if row is None or row.get("status") not in ("PASS","NUMERICAL_FAILURE"):
             raise RuntimeError("Stage06 policy result lacks final status")
         results[policy.id]=row
@@ -1387,7 +1367,6 @@ def main():
     parser.add_argument("--status",action="store_true")
     parser.add_argument("--design-plot",action="store_true")
     parser.add_argument("--run",action="store_true")
-    parser.add_argument("--max-minutes",type=float,default=25.)
     parser.add_argument("--device",choices=("cpu","cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     args=parser.parse_args()
