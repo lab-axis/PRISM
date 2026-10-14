@@ -1,0 +1,21 @@
+{
+  "signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "policy": "top004",
+  "kind": "TOPK",
+  "original_indices": [
+    6,
+    21,
+    38,
+    124
+  ],
+  "seed": 2026,
+  "input_sha256": "e05b9d112ee2b92ef19f5a3065889c4a280934d79fd270c7475e6084a9853fe3",
+  "epoch": 75,
+  "parameters": 62294,
+  "checkpoint_sha256": "b58a290e1daf887db85d92143ea68f3d6f0de61c11cc8135b0835f696ff7c036",
+  "prediction_sha256": "ed9083398170c591bad88b31656818524ab89ef2b74f7d1207221281713d5d63",
+  "fit_seconds": 3.1219019000127446,
+  "inference_draws": 30,
+  "inference_regime": "B_MTGNN_MC_DROPOUT",
+  "test_opened": false
+}
