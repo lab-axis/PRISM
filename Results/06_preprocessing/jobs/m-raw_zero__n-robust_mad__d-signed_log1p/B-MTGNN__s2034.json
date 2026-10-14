@@ -1,12 +1,12 @@
 {
-  "signature": "a45cfa005b1bfc58c153def3c6105f6ec1d977b847f330247e74a902d6eebb26",
+  "signature": "f3ff922c4a0aa1dda48e75f46209d4590a451de44a7005d82f0ef82280df114b",
   "policy": "m-raw_zero__n-robust_mad__d-signed_log1p",
   "seed": 2034,
   "model": "B-MTGNN",
   "epoch": 75,
   "input_sha256": "1582bdbe286600c68dc90e92c188c262cdff534c6cda85f49bdd6612f1c76bc4",
   "prediction_sha256": "fd431035379657bac7fa68428a1a9123c8f8e4c9c80f8bdfc64da84283ce3143",
-  "checkpoint_sha256": "c3b47b724b7a621b0dcaacc75c128dfa0aa917470b3eed760ae8b94718dea627",
+  "checkpoint_sha256": "35e05fd71c409149cf360ef410ceb13cfc2cb9d1ae99ea42b1f229a26b4024e2",
   "fit_seconds": 3.3782977999944706,
   "test_opened": false
 }
