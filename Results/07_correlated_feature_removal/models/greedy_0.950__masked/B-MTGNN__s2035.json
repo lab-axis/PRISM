@@ -1,8 +1,8 @@
 {
-  "contract_sha256": "3d59c72d8bae5bd979a086be8e7b3171e1713cbd6c883429947b8450c0d87618",
+  "contract_sha256": "d930c65456007d4fbc450f2d3ad3a0a7a38b2b93e00ddcc7a1b8a782ba16dcef",
   "input_sha256": "0c932d728c3ddcca0a7ff0bfea7bbdf1dec895dd4ac9ff899ec78907a694a65d",
   "prediction_sha256": "6db09b8b3647a83be1063d092573756f78ee189010d530bd6da89c4e33bed5df",
-  "checkpoint_sha256": "27ad76ce50aa04cb406069893678ccf746622fc6625b4d31cef427373df7d205",
+  "checkpoint_sha256": "1c94482d7828aa32afc29a45a03cabc77b64b64e43fcbd5e35f865a588099040",
   "subset": "greedy_0.950",
   "variant": "masked",
   "model": "B-MTGNN",
