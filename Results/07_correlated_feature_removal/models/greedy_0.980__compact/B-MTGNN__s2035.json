@@ -1,0 +1,17 @@
+{
+  "contract_sha256": "3d59c72d8bae5bd979a086be8e7b3171e1713cbd6c883429947b8450c0d87618",
+  "input_sha256": "bc6816d5c9b4e487a4be956c9cf974e5d277842d374c6fb812474ebbac928149",
+  "prediction_sha256": "f8abbcc74b16b09b8f26ad4891578a8e273dc6f7bbbef0150047301d01a2ff7c",
+  "checkpoint_sha256": "9b7fd5f825436151933c99dab50269323f23de74b416945a92bdddfd831b1126",
+  "subset": "greedy_0.980",
+  "variant": "compact",
+  "model": "B-MTGNN",
+  "seed": 2035,
+  "epoch": 75,
+  "training": "36 common origins, 2011Q1-2019Q4",
+  "parameters": 66454,
+  "fit_seconds": 2.9250728000188246,
+  "inference_draws": 30,
+  "inference_regime": "B_MTGNN_MC_DROPOUT",
+  "test_opened": false
+}

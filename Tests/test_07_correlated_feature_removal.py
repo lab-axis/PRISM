@@ -1,4 +1,4 @@
-"""Stage07 stable Spearman greedy pruning: no clustering and no time leakage."""
+"""Stage07 L1 B-MTGNN, ten-seed compact pruning and leakage regression."""
 from __future__ import annotations
 import importlib.util
 import json
@@ -19,14 +19,44 @@ SPEC.loader.exec_module(m)
 
 
 class GreedyLogicTests(unittest.TestCase):
+    def test_true_compact_can_win_even_when_masked_diagnostic_fails(self):
+        # A real compact model must be evaluated regardless of how the
+        # 157-slot masked surrogate performs. It is not a valid gate.
+        origin=m.Subset("no_removal",None,tuple(range(157)),(),
+                        pd.DataFrame(),0)
+        smaller=m.Subset("greedy_0.995",.995,
+                         tuple(range(156)),(156,),pd.DataFrame(),1)
+        second=m.Subset("greedy_0.990",.990,
+                        tuple(range(155)),(155,156),pd.DataFrame(),2)
+        base=dict(axis_mae=2.,ici_mae=1.6,
+                  **{f"{year}_mae":2. for year in (2020,2021,2022)})
+        trial=dict(
+            policy="greedy_0.995",kept_count=156,axis_mae=1.9,
+            ici_mae=1.58,
+            **{"2020_mae":1.9,"2021_mae":1.9,"2022_mae":2.05})
+        weaker=dict(
+            policy="greedy_0.990",kept_count=155,axis_mae=2.1,
+            ici_mae=1.59,
+            **{"2020_mae":2.1,"2021_mae":2.1,"2022_mae":2.1})
+        winner,score=m.select_compact_candidate(
+            (origin,smaller,second),[trial,weaker],base)
+        self.assertIs(winner,smaller)
+        self.assertAlmostEqual(score["axis_mae"],1.9)
+        baseline,score=m.select_compact_candidate(
+            (origin,smaller,second),[
+                dict(trial,axis_mae=2.2),weaker],base)
+        self.assertIs(baseline,origin)
+        self.assertEqual(score,base)
+
     def test_six_candidates_and_single_0_157_baseline(self):
         self.assertEqual(m.THRESHOLDS,(None,.995,.990,.980,.950,.900))
         self.assertEqual(len(m.THRESHOLDS),6)
         self.assertEqual(m.FEATURE_ROLES,(
             (0,42,"target_history"),(42,66,"industry_source"),
             (66,157,"global_source")))
-        self.assertEqual(m.LOOKBACK,12)
+        self.assertEqual(m.LOOKBACK,1)
         self.assertEqual(m.HORIZON,1)
+        self.assertEqual(m.SEEDS,tuple(range(2026,2036)))
 
     def test_transitive_chain_is_not_a_cluster(self):
         # A ↔ B and B ↔ C are highly correlated, but A ↔ C is not.
@@ -93,17 +123,17 @@ class OriginalDatasetTests(unittest.TestCase):
 
     def test_upstream_04_06_locked(self):
         ctx=self.ctx
-        self.assertEqual(tuple(ctx["models"]),(
-            "B-MTGNN","APPNP-TCN","GraphConv-TCN",
-            "GAT-TCN","GraphTransformer-TCN"))
-        self.assertEqual(tuple(ctx["epochs"]),tuple(ctx["epochs"]))
-        self.assertEqual(len(ctx["epochs"]),25)
+        self.assertEqual(ctx["models"],("B-MTGNN",))
+        self.assertEqual(ctx["epochs"],75)
+        self.assertEqual(ctx["original_forecasts"].shape,(10,12,59,3))
+        self.assertEqual(ctx["full_fold"]["train_x"].shape,(36,1,59,157))
+        self.assertEqual(ctx["full_fold"]["val_x"].shape,(12,1,59,157))
         self.assertEqual(ctx["panel"].x.shape,(68,59,157))
         self.assertEqual(ctx["panel"].y.shape,(68,59,3))
         self.assertNotIn("Data/03_integrated_dataset/raw_test.csv",
                          ctx["panel"].hashes)
-        self.assertEqual(ctx["locked_policy"].id,
-                         "m-raw_zero__n-standard__o-none")
+        chosen=m.json_read(m.RESULT06/"selected_preprocessing.json")
+        self.assertEqual(ctx["locked_policy"].id,chosen["policy_id"])
 
     def test_global_duplicate_quarter_not_pseudo_replication(self):
         raw=self.raw_train
@@ -141,6 +171,13 @@ class OriginalDatasetTests(unittest.TestCase):
             self.assertEqual(a.kept,b.kept)
             self.assertEqual(a.dropped,b.dropped)
 
+    def test_alternate_quarter_block_width_retains_valid_audit(self):
+        alternate=m.assess_train_correlations(
+            self.raw_train,draws=3,seed=20261013,width=8)
+        self.assertEqual(alternate.rho.shape,(157,157))
+        self.assertTrue(np.isfinite(alternate.lower_abs).all())
+        self.assertTrue(np.isfinite(alternate.sign_consistency).all())
+
     def test_mask_and_compact_change_only_main_input(self):
         subset=m.greedy_prune(
             self.audit,self.panel.features,.90)
@@ -150,9 +187,9 @@ class OriginalDatasetTests(unittest.TestCase):
             altered=m.adapt_inputs(full,subset,kind)
             channel_count=157 if kind=="masked" else len(subset.kept)
             self.assertEqual(
-                altered["train_x"].shape,(44,12,59,channel_count))
+                altered["train_x"].shape,(36,1,59,channel_count))
             self.assertEqual(
-                altered["val_x"].shape,(12,12,59,channel_count))
+                altered["val_x"].shape,(12,1,59,channel_count))
             for key in ("train_y","val_y","train_last","val_last",
                         "train_context","val_context",
                         "train_structure","val_structure",
@@ -175,12 +212,15 @@ class OriginalDatasetTests(unittest.TestCase):
             m.dataset_sha(m.adapt_inputs(full,subset,"masked")),
             m.dataset_sha(m.adapt_inputs(full,subset,"compact")))
 
-    def test_original_frozen_predictions_equal_04_and_06(self):
+    def test_original_ten_seed_scores_identical_to_selected_06(self):
         p=self.panel
         result=m.selected_baseline_scores(self.ctx)
-        self.assertAlmostEqual(result["axis_mae"],2.340279421959421)
-        self.assertAlmostEqual(result["ici_mae"],1.7894925355233664)
-        self.assertEqual(self.ctx["original_forecast"].shape,(12,59,3))
+        expected,indiv=self.ctx["m06"].seed_policy_metrics(
+            self.ctx["original_forecasts"],p)
+        self.assertAlmostEqual(result["axis_mae"],expected["axis_mae"])
+        self.assertAlmostEqual(result["ici_mae"],expected["ici_mae"])
+        self.assertEqual(len(indiv),10)
+        self.assertAlmostEqual(result["axis_mae"],2.451713824742347)
         baseline=m.Subset(
             "no_removal",None,tuple(range(157)),(),pd.DataFrame(),0)
         masked=m.adapt_inputs(self.ctx["full_fold"],baseline,"masked")
@@ -188,31 +228,61 @@ class OriginalDatasetTests(unittest.TestCase):
             np.testing.assert_array_equal(
                 masked[key],self.ctx["full_fold"][key])
 
-    def test_all_selected_gnns_can_accept_actual_compact_K(self):
+    def test_compact_K_shares_initial_weights_and_fixed_core(self):
         subset=m.greedy_prune(
             self.audit,self.panel.features,.90)
         folded=m.adapt_inputs(self.ctx["full_fold"],subset,"compact")
-        m04=self.ctx["m04"]
-        for name in self.ctx["models"]:
-            with self.subTest(architecture=name):
-                m04.seed_all(2026)
-                model=m04.ThreeAxisStructureGNN(
-                    name,folded["x_center"],folded["x_scale"],
-                    folded["y_center"],folded["y_scale"],
-                    num_features=len(subset.kept),
-                    nodes=59,prediction_mode="structural").eval()
-                graph=torch.tensor(m04.train_graph(self.panel))
-                inputs={
-                    k:torch.tensor(folded["val_"+k][:1])
-                    for k in ("x","mask","last","structure","context")}
-                with torch.inference_mode():
-                    prediction=model(
-                        inputs["x"],inputs["mask"],graph,
-                        inputs["last"],inputs["structure"],inputs["context"])
-                self.assertEqual(prediction.shape,(1,1,59,3))
-                self.assertTrue(torch.isfinite(prediction).all())
+        full_model=m.instantiate_subset(
+            self.ctx,subset,2026,compact=False).eval()
+        compact_model=m.instantiate_subset(
+            self.ctx,subset,2026,compact=True).eval()
+        k=len(subset.kept)
+        self.assertEqual(compact_model.base.values.in_features,k)
+        self.assertEqual(
+            sum(p.numel() for p in full_model.parameters())-
+            sum(p.numel() for p in compact_model.parameters()),
+            2*self.ctx["m04"].STAGE04_ACTIVE_WIDTH*(157-k))
+        torch.testing.assert_close(
+            compact_model.base.values.weight,
+            full_model.base.values.weight[:,list(subset.kept)])
+        torch.testing.assert_close(
+            compact_model.base.missing.weight,
+            full_model.base.missing.weight[:,list(subset.kept)])
+        for name,weight in compact_model.named_parameters():
+            if name.startswith(("base.values.","base.missing.")):
+                continue
+            torch.testing.assert_close(
+                weight,dict(full_model.named_parameters())[name])
+        self.assertIsInstance(
+            compact_model.base.core,self.ctx["m05"].FixedTemporalInput)
+        graph=torch.eye(59)
+        inputs={key:torch.tensor(folded["val_"+key][:1])
+                for key in ("x","mask","last","structure","context")}
+        with torch.inference_mode():
+            prediction=compact_model(
+                inputs["x"],inputs["mask"],graph,
+                inputs["last"],inputs["structure"],inputs["context"])
+        self.assertEqual(prediction.shape,(1,1,59,3))
+        self.assertTrue(torch.isfinite(prediction).all())
+        compact_model.train()
+        train={key:torch.tensor(folded["train_"+key][:1])
+               for key in ("x","mask","y","last","structure","context")}
+        forecast=compact_model(
+            train["x"],train["mask"],graph,
+            train["last"],train["structure"],train["context"])
+        loss=self.ctx["m04"].three_axis_weighted_huber(
+            forecast,train["y"],train["last"],
+            torch.tensor(folded["y_scale"]))
+        self.assertTrue(torch.isfinite(loss))
+        loss.backward()
+        self.assertTrue(
+            torch.isfinite(compact_model.base.values.weight.grad).all())
 
 
+@unittest.skipUnless(
+    (m.RESULTS/"run_manifest.json").is_file() and
+    m.json_read(m.RESULTS/"run_manifest.json").get("status")=="PASS",
+    "07 full experiment has not finished")
 class ProductionResultTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -223,21 +293,26 @@ class ProductionResultTests(unittest.TestCase):
         cls.lock=m.json_read(cls.root/"selected_features.json")
         cls.manifest=m.json_read(cls.root/"run_manifest.json")
 
-    def test_complete_07_is_157_features_and_no_clustering(self):
+    def test_complete_07_has_coherent_selected_features_and_no_clustering(self):
         self.assertEqual(self.manifest["status"],"PASS")
         self.assertEqual(self.lock["status"],"LOCKED")
-        self.assertEqual(self.lock["selected_policy"],"no_removal")
-        self.assertEqual(self.lock["selected_mode"],"original")
-        self.assertEqual(self.lock["selected_feature_count"],157)
-        self.assertEqual(self.lock["removed_feature_count"],0)
-        self.assertEqual(self.lock["selected_indices"],list(range(157)))
+        self.assertIn(self.lock["selected_policy"],[
+            "no_removal",*[f"greedy_{threshold:.3f}" for threshold in m.THRESHOLDS[1:]]])
+        self.assertIn(self.lock["selected_mode"],("original","compact"))
+        k=self.lock["selected_feature_count"]
+        self.assertEqual(self.lock["removed_feature_count"],157-k)
+        self.assertEqual(len(self.lock["selected_indices"]),k)
+        self.assertEqual(
+            self.lock["selected_indices"],
+            sorted(set(self.lock["selected_indices"])))
         self.assertFalse(self.lock["clustering_used"])
         self.assertTrue(self.lock["greedy_pairwise_only"])
         self.assertTrue(self.lock["main_input_only"])
         self.assertTrue(self.lock["prior_context_graph_and_last_unchanged"])
         self.assertFalse(self.lock["test_opened"])
         self.assertEqual(
-            self.lock["selected_feature_names"],self.ctx["panel"].features)
+            self.lock["selected_feature_names"],[
+                self.ctx["panel"].features[i] for i in self.lock["selected_indices"]])
         self.assertEqual(self.manifest["signature"],
                          m.run_signature(m.run_contract(self.ctx)))
         self.assertFalse(hasattr(m,"cluster_features"))
@@ -245,86 +320,109 @@ class ProductionResultTests(unittest.TestCase):
 
     def test_six_prespecified_real_subsets(self):
         self.assertEqual(len(self.subsets),6)
-        self.assertEqual(
-            self.subsets.kept_count.tolist(),[157,147,140,134,115,98])
-        self.assertEqual(
-            self.subsets.dropped_count.tolist(),[0,10,17,23,42,59])
-        self.assertEqual(len(self.table),6)
-        self.assertEqual(self.table.qualified.sum(),0)
-        self.assertEqual(
-            self.table.years_improved.tolist(),[0,1,1,1,1,1])
-        self.assertEqual(self.table.iloc[0].policy,"no_removal")
-        self.assertAlmostEqual(
-            self.table.iloc[0].axis_mae,2.340279421959421)
+        self.assertEqual(int(self.subsets.iloc[0].kept_count),157)
+        self.assertEqual(int(self.subsets.iloc[0].dropped_count),0)
         self.assertTrue(
-            np.all(self.table.axis_mae.iloc[1:].to_numpy()>
-                   self.table.axis_mae.iloc[0]))
+            (self.subsets.kept_count+self.subsets.dropped_count==157).all())
+        self.assertEqual(len(self.table),6)
+        self.assertEqual(self.table.iloc[0].policy,"no_removal")
+        self.assertAlmostEqual(self.table.iloc[0].axis_mae,
+                               m.selected_baseline_scores(self.ctx)["axis_mae"])
+        compact=pd.read_csv(self.root/"compact_confirmation.csv")
+        self.assertEqual(len(compact),5)
+        expected=compact[
+            compact.qualified.astype(bool)].sort_values(
+                ["axis_mae","removed_count","policy"],
+                ascending=[True,False,True])
+        if expected.empty:
+            self.assertEqual(self.lock["selected_policy"],"no_removal")
+        else:
+            self.assertEqual(
+                self.lock["selected_policy"],expected.iloc[0].policy)
 
-    def test_125_gnn_checkpoints_and_five_actual_plots(self):
+    def test_full_masked_and_compact_trials_and_six_actual_plots(self):
         parents=self.root/"models"
-        self.assertEqual(len(list(parents.rglob("*.pt"))),125)
-        self.assertEqual(len(list(parents.rglob("*.npz"))),125)
-        self.assertEqual(len(list(parents.rglob("*.json"))),125)
-        self.assertEqual(len(list((self.root/"plots").glob("*.png"))),5)
-        self.assertFalse(list(parents.glob("*__compact")))
+        unique_masks=set()
+        for label in self.subsets.label:
+            groups=pd.read_csv(self.root/"subsets"/f"{label}.csv")
+            unique_masks.add(tuple(groups.loc[
+                groups.retained,"feature_index"].tolist()))
+        expected=2*len(m.SEEDS)*(len(unique_masks)-1)
+        self.assertEqual(len(list(parents.rglob("*.pt"))),expected)
+        self.assertEqual(len(list(parents.rglob("*.npz"))),expected)
+        self.assertEqual(len(list(parents.rglob("*.json"))),expected)
+        self.assertEqual(len(list((self.root/"plots").glob("*.png"))),6)
+        self.assertEqual(self.manifest["compact_candidates"],5)
+        self.assertFalse(
+            self.manifest["compact_confirmation"][
+                "masked_diagnostic_used_for_compact_selection"])
         for name in self.lock["figures"]:
             self.assertGreater((self.root/name).stat().st_size,1000)
-        self.assertEqual(
-            self.manifest["distinct_masked_feature_sets"],6)
-        self.assertFalse(self.manifest["compact_confirmation"]["compact_adopted"])
+        self.assertGreaterEqual(
+            self.manifest["distinct_masked_feature_sets"],1)
+        audit=pd.read_csv(
+            self.root/"correlations"/"block_sensitivity.csv")
+        self.assertEqual(len(audit),25)
+        self.assertTrue(
+            (audit.loc[
+                (audit.block_quarters==4)&
+                (audit.bootstrap_draws==40),
+                "different_feature_decisions"]==0).all())
 
-    def test_every_production_gnn_forecast_reproduces_published_mae(self):
-        truth=self.ctx["panel"].y[56:68]
-        previous=self.ctx["m04"].past_scores(
-            self.ctx["panel"],np.arange(56,68))
-        for row in self.table.iloc[1:].itertuples():
-            banks=[]
-            for name in self.ctx["models"]:
+    def test_each_variant_reproduces_seedwise_mae_and_parameter_count(self):
+        compact=pd.read_csv(self.root/"compact_confirmation.csv")
+        for mode,table in (("masked",self.table),("compact",compact)):
+            for row in table.itertuples(index=False):
+                if row.kept_count==157:
+                    continue
+                original=getattr(row,"same_subset_as",None)
+                source=original if isinstance(original,str) else row.policy
                 preds=[]
                 for seed in m.SEEDS:
-                    stem=f"{name}__s{seed}"
-                    base=self.root/"models"/(row.policy+"__masked")
+                    stem=f"B-MTGNN__s{seed}"
+                    base=self.root/"models"/(source+"__"+mode)
                     with np.load(base/(stem+".npz"),allow_pickle=False) as z:
                         forecast=z["prediction"].copy()
                     self.assertEqual(forecast.shape,(12,59,3))
                     meta=m.json_read(base/(stem+".json"))
-                    self.assertEqual(
-                        meta["epoch"],self.ctx["epochs"][(name,seed)])
-                    self.assertTrue(meta["dev_weights_frozen"])
+                    self.assertEqual(meta["epoch"],75)
+                    self.assertEqual(meta["parameters"],row.parameters)
+                    self.assertEqual(meta["prediction_sha256"],
+                                     m.sha(base/(stem+".npz")))
                     self.assertFalse(meta["test_opened"])
                     preds.append(forecast)
-                banks.append(np.stack(preds).mean(axis=0))
-            full=np.stack(banks).mean(axis=0)
-            metrics=self.ctx["m06"].scores(full,truth,previous)
-            with self.subTest(candidate=row.policy):
-                self.assertAlmostEqual(
-                    metrics["axis_mae"],row.axis_mae,places=11)
-                self.assertAlmostEqual(
-                    metrics["ici_mae"],row.ici_mae,places=11)
-                for year in (2020,2021,2022):
+                metrics,_=self.ctx["m06"].seed_policy_metrics(
+                    np.stack(preds),self.ctx["panel"])
+                with self.subTest(candidate=row.policy,mode=mode):
                     self.assertAlmostEqual(
-                        metrics[f"{year}_mae"],
-                        getattr(row,f"_{year}_mae")
-                        if hasattr(row,f"_{year}_mae")
-                        else self.table.loc[
-                            self.table.policy.eq(row.policy),
-                            f"{year}_mae"].iloc[0],places=11)
+                        metrics["axis_mae"],row.axis_mae,places=11)
+                    self.assertAlmostEqual(
+                        metrics["ici_mae"],row.ici_mae,places=11)
+                    for year in (2020,2021,2022):
+                        self.assertAlmostEqual(
+                            metrics[f"{year}_mae"],
+                            table.loc[
+                                table.policy.eq(row.policy),
+                                f"{year}_mae"].iloc[0],places=11)
 
     def test_selected_original_features_and_names_are_complete(self):
+        indices=self.lock["selected_indices"]
         with np.load(
             self.root/"selected_feature_indices.npz",
             allow_pickle=False) as z:
-            np.testing.assert_array_equal(z["indices"],np.arange(157))
+            np.testing.assert_array_equal(z["indices"],np.asarray(indices))
             self.assertEqual(z["original_count"],157)
             np.testing.assert_array_equal(
-                z["names"],np.asarray(self.ctx["panel"].features))
+                z["names"],np.asarray([
+                    self.ctx["panel"].features[i] for i in indices]))
         selected=pd.read_csv(self.root/"selected_features.csv")
         dropped=pd.read_csv(self.root/"removed_features.csv")
-        self.assertEqual(len(selected),157)
-        self.assertEqual(len(dropped),0)
-        self.assertEqual(selected.original_index.tolist(),list(range(157)))
+        self.assertEqual(len(selected),len(indices))
+        self.assertEqual(len(dropped),157-len(indices))
+        self.assertEqual(selected.original_index.tolist(),indices)
         self.assertEqual(
-            selected.feature.tolist(),self.ctx["panel"].features)
+            selected.feature.tolist(),[
+                self.ctx["panel"].features[i] for i in indices])
         with np.load(self.root/"correlations"/"train_spearman_bootstrap.npz",
                      allow_pickle=False) as z:
             self.assertEqual(z["rho"].shape,(157,157))

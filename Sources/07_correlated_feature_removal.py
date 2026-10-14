@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-"""PRISM Stage07 — stable-correlation GREEDY feature pruning (NO clustering).
+"""PRISM Stage07 — Train-only stable-correlation, greedy feature pruning.
 
-Purpose: remove only a redundant INPUT FEATURE while keeping the Stage04
-Structural forecasting policy, its independent 9D as-of context, target
-anchor, graph, five selected GNNs, five matched seeds, twelve-quarter
-lookback and one-quarter horizon unchanged. The previous 56-node/B-MTGNN
-single/12-horizon Stage07 script is superseded.
+MAIN EXPERIMENT: Stage06-selected Structural B-MTGNN, L=1, 10 paired seeds,
+75 epochs, 36 common Train origins, 12 Dev quarters, fixed 20-slot core.
+Remove redundant MAIN-INPUT features without changing the economic prior,
+9D as-of score context, target anchor or the learned-graph mechanism.
 
-0. Lock Stage04 and the selected Stage06 preprocessing. Inspect ONLY raw
+0. Lock Stage04 -> Stage05 -> selected Stage06 policy. Inspect ONLY raw
    2006Q1–2019Q4 Train predictors for redundancy. 2020–2022 Dev never fits
    correlation, missing-data statistics, selection representatives or graph.
 1. Compute pairwise Spearman on 66 local (42 target-history, 24 industry)
@@ -22,15 +21,15 @@ single/12-horizon Stage07 script is superseded.
 3. Evaluate thresholds None, .995, .990, .980, .950, .900. For every
    distinct candidate, zero only pruned input values and corresponding
    input missing indicators, preserving the 157-slot GNN parameter count.
-   Train on the SAME full 2006–19 Train using Stage04's locked Train-only
-   epochs; Frozen Dev forecasts for 2020–22. A subset that drops nothing
-   reuses the original full-157 model predictions.
-4. A candidate must improve actual 5-GNN x 5-seed 3-axis ensemble MAE,
-   avoid ICI MAE regression and improve at least two of the three Dev
-   years. If a masked candidate qualifies, retrain a genuinely compact
-   K-input version with the SAME remaining features and fixed epochs.
-   Adopt it ONLY if the compact model ALSO passes those 3 safeguards.
-   Otherwise preserve all 157 inputs. There is no Dev refit or Test read.
+   Train on the SAME 36 common 2011–19 origins, with Stage06's 75-epoch
+   recipe; frozen Dev forecasts for 2020–22. The no-removal reference
+   reuses all ten selected Stage06 seed predictions.
+4. Every threshold is independently retrained as a genuinely compact
+   K-input version, irrespective of masked screening performance. A
+   compact candidate must improve 10-seed MEAN of individual three-axis
+   MAEs, avoid mean seed-level ICI regression, and improve two Dev years. If
+   none pass, preserve all 157 inputs. Masked results are diagnostic
+   ONLY, not a gate that could incorrectly reject a compact winner.
 
 These are CONDITIONAL main-input pruning experiments: Stage04's Structural
 prior, graph, lagged target anchor and 9D as-of context deliberately remain
@@ -44,7 +43,9 @@ Command:
     py -u Sources/07_correlated_feature_removal.py --run --max-minutes 25
     py Sources/07_correlated_feature_removal.py --status
 
-Any completed jobs remain resumable. No writes to Stages04/05/06 or Stage08.
+These are descriptive repeated-Dev selection results, NOT independent Test
+evidence or statistical significance. No legacy 07 cache is accepted.
+Completed current jobs are resumable. No writes to Stages04/05/06 or 08.
 """
 
 from __future__ import annotations
@@ -81,9 +82,9 @@ FEATURE_COUNT=157
 HISTORY_END=42
 INDUSTRY_END=66
 GLOBAL_COUNT=91
-LOOKBACK=12
+LOOKBACK=1
 HORIZON=1
-SEEDS=(2026,2027,2028,2029,2030)
+SEEDS=tuple(range(2026,2036))
 THRESHOLDS=(None,.995,.990,.980,.950,.900)
 BLOCK_QUARTERS=4
 BOOTSTRAPS=40
@@ -139,52 +140,63 @@ def role(index:int)->str:
 
 
 def upstream():
-    """The ONLY data/model path is locked Stage04 -> Stage06, never legacy 05."""
+    """Validate the canonical 04/05/06 locks and all 10 seed forecasts."""
     m06=stage06()
-    m,panel,models,epochs,lock04,manifest04=m06.verify_04_and_load()
+    m,m05,panel,selection05,manifest05=m06.verify_upstream_and_load()
     names=("selected_preprocessing.json","run_manifest.json")
     paths=[RESULT06/name for name in names]
     if not all(p.is_file() for p in paths):
-        raise RuntimeError("Stage06 must be fully completed first")
+        raise RuntimeError("Completed Stage06 selected policy required")
     lock,manifest=map(json_read,paths)
+    contract,signature=m06.configuration(
+        m,m05,selection05,manifest05,panel)
     if (lock.get("status")!="LOCKED"
             or manifest.get("status")!="PASS"
+            or manifest.get("candidates_complete")!=216
+            or lock.get("evaluated_policy_count")!=216
             or lock.get("policy_id")!=manifest.get("selected_policy")
-            or lock.get("stage06_signature")!=manifest.get("signature")
-            or manifest.get("contract",{}).get("code_sha256")!=sha(SOURCE06)
-            or lock.get("stage04_model_pool_sha256")!=sha(
-                m06.RESULT04/"selected_ensemble_pool.json")
-            or tuple(lock.get("gnn_models",()))!=tuple(models)
-            or tuple(lock.get("matched_seeds",()))!=SEEDS
-            or lock.get("input_length_quarters")!=LOOKBACK
-            or lock.get("forecast_horizon_quarters")!=HORIZON
+            or lock.get("signature")!=signature
+            or manifest.get("signature")!=signature
+            or manifest.get("contract")!=contract
+            or contract.get("source_sha256")!=sha(SOURCE06)
+            or lock.get("model")!=m06.MODEL
+            or lock.get("seed_count")!=len(SEEDS)
+            or tuple(contract["seed_grid"])!=SEEDS
+            or lock.get("selected_upstream_lookback")!=LOOKBACK
+            or contract.get("lookback")!=LOOKBACK
+            or contract.get("fixed_epochs")!=75
+            or m06.MODEL!="B-MTGNN"
+            or m06.MODE!="structural"
             or lock.get("test_opened") is not False):
-        raise RuntimeError("Stage06 model, data or policy lock changed")
+        raise RuntimeError("Stage06 L1/10-seed/factorial lock changed")
     policy=m06.Policy(**lock["preprocessing"])
     policy.validate()
     if policy.id!=lock["policy_id"]:
         raise RuntimeError("Stage06 preprocessing fields/identifier disagree")
     prior=m06.structural_prior(panel)
     folded,_=m06.prepare_policy(panel,policy,prior)
-    if (folded["train_x"].shape!=(44,LOOKBACK,INDUSTRIES,FEATURE_COUNT)
+    if (folded["train_x"].shape!=(36,LOOKBACK,INDUSTRIES,FEATURE_COUNT)
             or folded["val_x"].shape!=(DEV_COUNT,LOOKBACK,INDUSTRIES,FEATURE_COUNT)):
         raise RuntimeError("Stage06 selected model input contract differs")
-    with np.load(RESULT06/"frozen_selected_vs_04_dev.npz",
+    bank=m06.load_policy_forecasts(RESULT06,policy)
+    with np.load(RESULT06/"selected_vs_stage05_dev.npz",
                  allow_pickle=False) as z:
-        baseline=z["prediction"].copy()
-        dev_truth=z["truth"].copy()
-    if (baseline.shape!=(DEV_COUNT,INDUSTRIES,3)
-            or not np.array_equal(dev_truth,panel.y[TRAIN_COUNT:])
-            or not np.isfinite(baseline).all()):
-        raise RuntimeError("Stage06 frozen baseline is inconsistent")
-    if policy==m06.ORIGINAL:
-        official=m06.original_stage04_prediction(panel,models)
-        if not np.allclose(baseline,official,rtol=0,atol=1e-12):
-            raise RuntimeError("No-removal cannot reproduce Stage04 baseline")
+        if (not np.array_equal(bank,z["selected_seed_predictions"])
+                or not np.array_equal(z["truth"],panel.y[TRAIN_COUNT:])):
+            raise RuntimeError("Stage06 frozen seed forecasts drifted")
+    baseline,individual=m06.seed_policy_metrics(bank,panel)
+    if any(abs(baseline[key]-float(expected))>1e-10
+           for key,expected in lock["selected_dev_metrics"].items()):
+        raise RuntimeError("Stage06 locked 10-seed Dev scores drifted")
+    model=m05.instantiate(
+        m,"B-MTGNN",SEEDS[0],LOOKBACK,folded,"structural")
+    full_params=sum(p.numel() for p in model.parameters())
     return dict(
-        m04=m,panel=panel,m06=m06,models=tuple(models),epochs=epochs,
+        m04=m,m05=m05,panel=panel,m06=m06,
+        models=("B-MTGNN",),epochs=75,
         locked_policy=policy,prior=prior,full_fold=folded,
-        original_forecast=baseline,
+        original_forecasts=bank,baseline_metrics=baseline,
+        baseline_seed_metrics=individual,baseline_parameters=full_params,
         upstream06_lock_sha256=sha(paths[0]),
         upstream06_manifest_sha256=sha(paths[1]),
         stage04_sha256=sha(m06.SOURCE04),
@@ -267,14 +279,16 @@ class CorrelationAudit:
 
 def assess_train_correlations(raw_train:np.ndarray,
                               draws:int=BOOTSTRAPS,
-                              seed:int=BOOTSTRAP_SEED)->CorrelationAudit:
+                              seed:int=BOOTSTRAP_SEED,
+                              width:int=BLOCK_QUARTERS)->CorrelationAudit:
     if draws<2:
         raise ValueError("Need repeated quarter-block draws")
     rho,support=correlation_views(raw_train)
     rng=np.random.default_rng(seed)
     samples=np.empty((draws,FEATURE_COUNT,FEATURE_COUNT),np.float32)
     for i in range(draws):
-        quarter_indices=moving_block_indices(len(raw_train),rng)
+        quarter_indices=moving_block_indices(
+            len(raw_train),rng,width=width)
         samples[i]=correlation_views(raw_train[quarter_indices])[0]
     lower=np.quantile(np.abs(samples),LOWER_QUANTILE,axis=0)
     sign=(np.sign(samples)==np.sign(rho)[None]).mean(axis=0)
@@ -431,9 +445,9 @@ def adapt_inputs(full:dict,subset:Subset,mode:str)->dict:
         else:
             changed[key]=v
     channels=(FEATURE_COUNT if mode=="masked" else len(indices))
-    if (changed["train_x"].shape!=(44,LOOKBACK,INDUSTRIES,channels)
+    if (changed["train_x"].shape!=(36,LOOKBACK,INDUSTRIES,channels)
             or changed["val_x"].shape!=(12,LOOKBACK,INDUSTRIES,channels)):
-        raise RuntimeError("Changed the 04 forecast dataset shapes")
+        raise RuntimeError("Changed the Stage06 L1 model-input shapes")
     for key in ("train_y","val_y","train_last","val_last",
                 "train_context","val_context",
                 "train_structure","val_structure",
@@ -461,11 +475,7 @@ def dataset_sha(data:dict)->str:
 
 
 def selected_baseline_scores(ctx):
-    return ctx["m06"].scores(
-        ctx["original_forecast"],
-        ctx["panel"].y[TRAIN_COUNT:],
-        ctx["m04"].past_scores(
-            ctx["panel"],np.arange(TRAIN_COUNT,TRAIN_COUNT+DEV_COUNT)))
+    return dict(ctx["baseline_metrics"])
 
 
 def selection_safeguards(candidate:dict,baseline:dict)->dict:
@@ -486,116 +496,203 @@ def selection_safeguards(candidate:dict,baseline:dict)->dict:
                        and year_wins>=STAGE07_MIN_YEARS_BETTER))
 
 
+def select_compact_candidate(subsets,compact_rows,baseline):
+    """Select from REAL K-input model predictions, not masked proxies."""
+    if len(compact_rows)!=len(subsets)-1:
+        raise ValueError("All five compact candidates must complete")
+    by_label={row["policy"]:row for row in compact_rows}
+    if len(by_label)!=len(compact_rows):
+        raise ValueError("Duplicate compact candidate")
+    valid=[]
+    for subset in subsets[1:]:
+        record=by_label.get(subset.label)
+        if record is None or record["kept_count"]!=len(subset.kept):
+            raise RuntimeError("Incomplete compact candidate contract")
+        if selection_safeguards(record,baseline)["qualified"]:
+            valid.append((subset,record))
+    if not valid:
+        return subsets[0],baseline
+    winner,score=min(valid,key=lambda pair:(
+        pair[1]["axis_mae"],-len(pair[0].dropped),pair[0].label))
+    return winner,score
+
+
 def _candidate_folder(root:Path,subset:Subset,mode:str):
     return root/"models"/f"{subset.label}__{mode}"
 
 
+def instantiate_subset(ctx,subset:Subset,seed:int,compact:bool):
+    """Share all retained initial weights with the seeded 157-input model."""
+    m=ctx["m04"]
+    m05=ctx["m05"]
+    net=m05.instantiate(
+        m,"B-MTGNN",seed,LOOKBACK,ctx["full_fold"],"structural")
+    k=len(subset.kept) if compact else FEATURE_COUNT
+    if k!=FEATURE_COUNT:
+        if k!=len(subset.kept):
+            raise RuntimeError("Compact input dimension disagrees with subset")
+        old_values=net.base.values
+        old_missing=net.base.missing
+        rng=torch.get_rng_state()
+        values=torch.nn.Linear(k,old_values.out_features)
+        missing=torch.nn.Linear(
+            k,old_missing.out_features,bias=False)
+        with torch.no_grad():
+            values.weight.copy_(old_values.weight[:,list(subset.kept)])
+            values.bias.copy_(old_values.bias)
+            missing.weight.copy_(old_missing.weight[:,list(subset.kept)])
+        net.base.values=values
+        net.base.missing=missing
+        torch.set_rng_state(rng)
+    parameters=sum(p.numel() for p in net.parameters())
+    expected=(ctx["baseline_parameters"]-
+              2*m.STAGE04_ACTIVE_WIDTH*(FEATURE_COUNT-k))
+    if parameters!=expected:
+        raise RuntimeError("Unexpected B-MTGNN compact parameter count")
+    return net
+
+
+def fit_subset_model(ctx,subset:Subset,data:dict,seed:int,device):
+    """Stage06 75-epoch Train recipe with Stage05's fixed 20-slot core."""
+    m=ctx["m04"]
+    k=data["train_x"].shape[-1]
+    if k not in (FEATURE_COUNT,len(subset.kept)):
+        raise RuntimeError("Subset dataset/model channels disagree")
+    net=instantiate_subset(ctx,subset,seed,compact=k!=FEATURE_COUNT).to(device)
+    parameters=sum(p.numel() for p in net.parameters())
+    z={key:torch.as_tensor(data[key],device=device)
+       for key in ("train_x","train_mask","train_y","train_last",
+                   "train_context","train_structure","val_x","val_mask",
+                   "val_last","val_context","val_structure")}
+    graph=torch.eye(m.NODE_COUNT,device=device)
+    scale=torch.as_tensor(data["y_scale"],device=device)
+    optim=torch.optim.AdamW(
+        net.parameters(),lr=m.FIXED_LEARNING_RATE,weight_decay=1e-4)
+    started=time.perf_counter()
+    for _ in range(m.STAGE04_ACTIVE_EPOCHS):
+        net.train()
+        optim.zero_grad(set_to_none=True)
+        output=net(z["train_x"],z["train_mask"],graph,
+                   z["train_last"],z["train_structure"],z["train_context"])
+        loss=m.three_axis_weighted_huber(
+            output,z["train_y"],z["train_last"],scale)
+        if not torch.isfinite(loss):
+            raise RuntimeError("Nonfinite Stage07 Train loss")
+        loss.backward()
+        torch.nn.utils.clip_grad_norm_(
+            net.parameters(),5.,error_if_nonfinite=True)
+        optim.step()
+    with m.isolated_snapshot_inference(net):
+        prediction=m.mtgnn_bayesian_inference(
+            net,z,graph,"B-MTGNN",seed,
+            data["y_center"],data["y_scale"])["prediction"]
+    state={key:value.detach().cpu().clone()
+           for key,value in net.state_dict().items()}
+    seconds=float(time.perf_counter()-started)
+    del net,optim,z
+    if device.type=="cuda":
+        torch.cuda.empty_cache()
+    if prediction.shape!=(DEV_COUNT,INDUSTRIES,3) or not np.isfinite(prediction).all():
+        raise RuntimeError("Invalid Stage07 10-seed member forecast")
+    return dict(
+        prediction=prediction,state_dict=state,parameters=parameters,
+        seconds=seconds,inference_draws=m.STAGE04_BMTGNN_MC_SAMPLES,
+        inference_regime="B_MTGNN_MC_DROPOUT")
+
+
 def run_subset(ctx,root,subset:Subset,mode:str,signature:str,
                device,start,budget_minutes):
-    """Train 25 matched GNN jobs, with strict weights-only checkpoint cache.
-
-    The full original 157-input candidate always reuses the frozen
-    Stage06 approved 04 model forecasts, not a second noisy baseline fit.
-    """
+    """Fit or resume exactly ten matched seed jobs; score seeds separately."""
     if mode=="compact" and not subset.dropped:
         raise ValueError("Nothing to compact")
-    baseline=(not subset.dropped)
-    if baseline:
+    if not subset.dropped:
         return dict(
             **selected_baseline_scores(ctx),
-            model_count=len(ctx["models"]),seed_count=len(SEEDS),
+            parameters=ctx["baseline_parameters"],
+            model_count=1,seed_count=len(SEEDS),
             feature_count=FEATURE_COUNT,removed_count=0,
             reused_upstream=True),None
     changed=adapt_inputs(ctx["full_fold"],subset,mode)
     provenance=dataset_sha(changed)
     folder=_candidate_folder(root,subset,mode)
-    architecture=ctx["m04"]
     panel=ctx["panel"]
     predictions=[]
-    for name in ctx["models"]:
-        seeds=[]
-        for seed in SEEDS:
-            stem=f"{name}__s{seed}"
-            meta=folder/(stem+".json")
-            npz=folder/(stem+".npz")
-            ck=folder/(stem+".pt")
-            if meta.is_file() and npz.is_file() and ck.is_file():
-                saved=json_read(meta)
-                if (saved.get("contract_sha256")!=signature
-                        or saved.get("input_sha256")!=provenance
-                        or saved.get("model")!=name or saved.get("seed")!=seed
-                        or saved.get("epoch")!=ctx["epochs"][(name,seed)]
-                        or saved.get("variant")!=mode
-                        or saved.get("subset")!=subset.label):
-                    raise RuntimeError("Stage07 cache from a different run")
-                with np.load(npz,allow_pickle=False) as z:
-                    result=z["prediction"].copy()
-                if result.shape!=(12,59,3) or not np.isfinite(result).all():
-                    raise RuntimeError("Damaged Stage07 prediction")
-                chk=torch.load(ck,map_location="cpu",weights_only=True)
-                if (chk["contract_sha256"]!=signature
-                        or chk["model"]!=name or chk["seed"]!=seed
-                        or chk["feature_count"]!=changed["train_x"].shape[-1]
-                        or chk["input_sha256"]!=provenance):
-                    raise RuntimeError("Checkpoint does not match cached prediction")
-            elif meta.exists() or npz.exists() or ck.exists():
-                raise RuntimeError(
-                    f"Incomplete model checkpoint {folder}/{stem}; "
-                    "do not re-use incomplete training")
-            else:
-                if time.perf_counter()-start>=budget_minutes*60:
-                    return None,dict(
-                        next_subset=subset.label,variant=mode,
-                        next_model=name,next_seed=seed)
-                fitted=architecture.fit_three_axis_gnn(
-                    panel,changed,name,seed,device,
-                    ctx["epochs"][(name,seed)],prediction_mode="structural")
-                result=fitted["prediction"]
-                if result.shape!=(12,59,3) or not np.isfinite(result).all():
-                    raise RuntimeError("GNN produced invalid Stage07 prediction")
-                folder.mkdir(parents=True,exist_ok=True)
-                checkpoint=dict(
-                    contract_sha256=signature,subset=subset.label,
-                    variant=mode,model=name,seed=seed,
-                    feature_count=changed["train_x"].shape[-1],
-                    input_sha256=provenance,
-                    original_train_epoch_count=ctx["epochs"][(name,seed)],
-                    state_dict=fitted["state_dict"])
-                temp=ck.with_suffix(".pt.writing")
-                torch.save(checkpoint,temp)
-                torch.load(temp,map_location="cpu",weights_only=True)
-                os.replace(temp,ck)
-                atomic_npz(npz,prediction=result)
-                atomic_json(meta,dict(
-                    contract_sha256=signature,
-                    input_sha256=provenance,
-                    subset=subset.label,variant=mode,
-                    model=name,seed=seed,
-                    epoch=ctx["epochs"][(name,seed)],
-                    training="2006Q1-2019Q4 ONLY",
-                    dev_weights_frozen=True,
-                    parameters=int(fitted["parameters"]),
-                    fit_seconds=float(fitted["seconds"]),
-                    inference_draws=int(fitted["inference_draws"]),
-                    inference_regime=fitted["inference_regime"],
-                    test_opened=False))
-                print("07_FIT",subset.label,mode,
-                      name,seed,
-                      "K",changed["train_x"].shape[-1],
-                      "EPOCH",ctx["epochs"][(name,seed)],flush=True)
-            seeds.append(result)
-        predictions.append(np.mean(np.stack(seeds),axis=0))
-    ensemble=np.mean(np.stack(predictions),axis=0)
-    # Original target/ICI and true as-of Persistence, no labels changed.
-    scores=ctx["m06"].scores(
-        ensemble,panel.y[TRAIN_COUNT:],
-        architecture.past_scores(panel,np.arange(TRAIN_COUNT,TRAIN_COUNT+DEV_COUNT)))
+    parameters=(ctx["baseline_parameters"]-
+                2*ctx["m04"].STAGE04_ACTIVE_WIDTH*len(subset.dropped)
+                if mode=="compact" else ctx["baseline_parameters"])
+    for seed in SEEDS:
+        stem=f"B-MTGNN__s{seed}"
+        meta=folder/(stem+".json")
+        npz=folder/(stem+".npz")
+        ck=folder/(stem+".pt")
+        if meta.is_file() and npz.is_file() and ck.is_file():
+            saved=json_read(meta)
+            if (saved.get("contract_sha256")!=signature
+                    or saved.get("input_sha256")!=provenance
+                    or saved.get("model")!="B-MTGNN"
+                    or saved.get("seed")!=seed
+                    or saved.get("epoch")!=ctx["epochs"]
+                    or saved.get("parameters")!=parameters
+                    or saved.get("variant")!=mode
+                    or saved.get("subset")!=subset.label
+                    or saved.get("prediction_sha256")!=sha(npz)
+                    or saved.get("checkpoint_sha256")!=sha(ck)):
+                raise RuntimeError("Stage07 cache from a different run")
+            with np.load(npz,allow_pickle=False) as z:
+                result=z["prediction"].copy()
+            if result.shape!=(12,59,3) or not np.isfinite(result).all():
+                raise RuntimeError("Damaged Stage07 prediction")
+            chk=torch.load(ck,map_location="cpu",weights_only=True)
+            if (chk["contract_sha256"]!=signature
+                    or chk["model"]!="B-MTGNN" or chk["seed"]!=seed
+                    or chk["parameters"]!=parameters
+                    or chk["feature_count"]!=changed["train_x"].shape[-1]
+                    or chk["input_sha256"]!=provenance):
+                raise RuntimeError("Checkpoint does not match cached prediction")
+        elif meta.exists() or npz.exists() or ck.exists():
+            raise RuntimeError(f"Incomplete Stage07 checkpoint {folder}/{stem}")
+        else:
+            if time.perf_counter()-start>=budget_minutes*60:
+                return None,dict(
+                    next_subset=subset.label,variant=mode,
+                    next_model="B-MTGNN",next_seed=seed)
+            fitted=fit_subset_model(ctx,subset,changed,seed,device)
+            result=fitted["prediction"]
+            folder.mkdir(parents=True,exist_ok=True)
+            checkpoint=dict(
+                contract_sha256=signature,subset=subset.label,
+                variant=mode,model="B-MTGNN",seed=seed,
+                feature_count=changed["train_x"].shape[-1],
+                parameters=parameters,input_sha256=provenance,
+                state_dict=fitted["state_dict"])
+            temp=ck.with_suffix(".pt.writing")
+            torch.save(checkpoint,temp)
+            torch.load(temp,map_location="cpu",weights_only=True)
+            os.replace(temp,ck)
+            atomic_npz(npz,prediction=result)
+            atomic_json(meta,dict(
+                contract_sha256=signature,input_sha256=provenance,
+                prediction_sha256=sha(npz),checkpoint_sha256=sha(ck),
+                subset=subset.label,variant=mode,
+                model="B-MTGNN",seed=seed,epoch=ctx["epochs"],
+                training="36 common origins, 2011Q1-2019Q4",
+                parameters=parameters,fit_seconds=float(fitted["seconds"]),
+                inference_draws=int(fitted["inference_draws"]),
+                inference_regime=fitted["inference_regime"],
+                test_opened=False))
+            print("07_FIT",subset.label,mode,
+                  "B-MTGNN",seed,"K",changed["train_x"].shape[-1],
+                  "EPOCH",ctx["epochs"],flush=True)
+        predictions.append(result)
+    scores,individual=ctx["m06"].seed_policy_metrics(
+        np.stack(predictions),panel)
     scores.update(
-        feature_count=len(subset.kept),
+        feature_count=(FEATURE_COUNT if mode=="masked" else len(subset.kept)),
         removed_count=len(subset.dropped),
-        model_count=len(ctx["models"]),
+        parameters=parameters,
+        model_count=1,
         seed_count=len(SEEDS),
-        reused_upstream=False)
+        reused_upstream=False,seed_metrics=individual)
     return scores,None
 
 
@@ -611,29 +708,38 @@ def run_contract(ctx)->dict:
         stage03_panel_hashes=ctx["panel_hashes"],
         stage06_model_input_sha256=ctx["upstream06_input_sha256"],
         stage06_policy=ctx["locked_policy"].id,
-        selected_models=list(ctx["models"]),
+        selected_models=["B-MTGNN"],
         seeds=list(SEEDS),
-        epochs={f"{name}__s{seed}":int(ctx["epochs"][(name,seed)])
-                for name in ctx["models"] for seed in SEEDS},
+        epochs=ctx["epochs"],
+        baseline_parameters=ctx["baseline_parameters"],
         feature_count=FEATURE_COUNT,industries=INDUSTRIES,
         train_quarters=TRAIN_COUNT,dev_quarters=DEV_COUNT,
+        train_origins=list(range(20,TRAIN_COUNT)),
         lookback=LOOKBACK,forecast_horizon=HORIZON,
+        fixed_temporal_core=ctx["m05"].CORE_LOOKBACK,
+        mc_dropout_draws=ctx["m04"].STAGE04_BMTGNN_MC_SAMPLES,
         output_mode="structural",
         thresholds=list(THRESHOLDS),
         bootstraps=BOOTSTRAPS,
         bootstrap_quarters=BLOCK_QUARTERS,
         bootstrap_seed=BOOTSTRAP_SEED,
+        descriptive_bootstrap_sensitivity=[
+            [2,40],[4,20],[4,40],[4,80],[8,40]],
         min_support_unique_train_quarters=MIN_PAIR_QUARTERS,
         bootstrap_abs_q10=LOWER_QUANTILE,
         stable_sign_fraction=SIGN_STABILITY,
         semantic_groups=[role for _,_,role in FEATURE_ROLES],
         cluster_algorithms_used=False,
         pruning_method="fixed_order_greedy_direct_to_kept",
-        validation_metric="5GNNx5seed_ensemble_axis_mae",
+        validation_metric="TEN_INDIVIDUAL_SEED_METRICS_THEN_MEAN",
         selection_safeguards="MAE better, ICI nonworse, >=2 of 3 years",
         first_pass_157_dim_masked=True,
-        second_pass_selected_K_dim_compact=True,
-        unchanged_context_prior_graph_anchor=True,
+        primary_selection_all_five_real_K_dim_compact=True,
+        masked_results_diagnostic_not_compact_gate=True,
+        compact_initialization="ORIGINAL_157_SEEDED_WEIGHTS_SUBSET_COLUMNS",
+        unchanged_context_prior_learned_graph_anchor=True,
+        dev_reused_from_stages_04_05_06=True,
+        independent_future_validation=False,
         test_opened=False)
 
 
@@ -702,12 +808,41 @@ def candidate_subsets(audit,ctx,root):
     return subsets
 
 
-def plots(root,ctx,audit,subsets,comparisons,
+def save_bootstrap_sensitivity(ctx,root,audit,subsets):
+    """Train-only sensitivity of the chosen greedy subsets, not a new gate."""
+    raw=ctx["panel"].x[:TRAIN_COUNT]
+    names=ctx["panel"].features
+    records=[]
+    for width,draws in ((2,40),(4,20),(4,40),(4,80),(8,40)):
+        alternate=(audit if (width,draws)==(BLOCK_QUARTERS,BOOTSTRAPS)
+                   else assess_train_correlations(
+                       raw,draws=draws,seed=BOOTSTRAP_SEED,width=width))
+        for reference in subsets[1:]:
+            candidate=greedy_prune(
+                alternate,names,reference.threshold)
+            original=set(reference.kept)
+            current=set(candidate.kept)
+            records.append(dict(
+                block_quarters=width,bootstrap_draws=draws,
+                threshold=reference.threshold,
+                reference_kept=len(original),
+                sensitivity_kept=len(current),
+                different_feature_decisions=len(original^current),
+                retained_jaccard=len(original&current)/len(original|current)))
+    target=root/"correlations"/"block_sensitivity.csv"
+    target.parent.mkdir(parents=True,exist_ok=True)
+    pd.DataFrame(records).to_csv(
+        target,index=False,encoding="utf-8-sig")
+    return str(target.relative_to(root)).replace("\\","/")
+
+
+def plots(root,ctx,audit,subsets,comparisons,compact_comparisons,
           chosen:Subset,final_mode:str,final_metrics:dict):
-    """Five plots from REAL Train correlation and frozen Dev forecasts."""
+    """Six descriptive plots for masked and real compact candidates."""
     dest=root/"plots"
     dest.mkdir(parents=True,exist_ok=True)
     df=pd.DataFrame(comparisons)
+    compact=pd.DataFrame(compact_comparisons).set_index("policy")
     ordered=[subset.label for subset in subsets]
     df=df.set_index("policy").loc[ordered].reset_index()
     tags=["none" if s.threshold is None else f"{s.threshold:.3f}"
@@ -721,15 +856,18 @@ def plots(root,ctx,audit,subsets,comparisons,
         figures.append("plots/"+target.name)
 
     fig,ax=plt.subplots(figsize=(11.6,5.5))
-    ax.plot(df.kept_count,df.axis_mae,"o-",lw=1.3)
+    ax.plot(df.kept_count,df.axis_mae,"o--",lw=1.2,
+            label="Masked 157-input diagnostic")
+    ax.plot(compact.kept_count,compact.axis_mae,"s-",lw=1.7,
+            label="Actual compact K-input GNNs")
     for k,r in enumerate(df.itertuples(index=False)):
         ax.annotate(tags[k],(r.kept_count,r.axis_mae),
                     xytext=(2,6),textcoords="offset points",fontsize=8)
     ax.axhline(float(df.iloc[0].axis_mae),ls="--",lw=1,
-               label="Unchanged 157-feature Stage04/06 benchmark")
+               label="Frozen 10-seed Stage06 baseline")
     ax.set(xlabel="Number of main-input features kept",
-           ylabel="2020–2022 Frozen Dev 3-axis MAE",
-           title="Stable-correlation Greedy pruning: equal-capacity masked inputs")
+           ylabel="2020–2022 mean of seed-wise Dev 3-axis MAEs",
+           title="Masked diagnostic vs compact B-MTGNN feature removal")
     ax.grid(alpha=.3);ax.legend()
     save(fig,"07_01_kept_features_vs_dev_mae")
 
@@ -754,7 +892,12 @@ def plots(root,ctx,audit,subsets,comparisons,
     fig,ax=plt.subplots(figsize=(11.8,5.2))
     for year in (2020,2021,2022):
         ax.plot(xx,df[f"{year}_mae"]-df.iloc[0][f"{year}_mae"],
-                "o-",label=f"{year}")
+                "o--",alpha=.45,label=f"{year} masked diagnostic")
+        compact_values=[float(compact.loc[s.label,f"{year}_mae"])
+                        for s in subsets[1:]]
+        ax.plot(xx[1:],np.asarray(compact_values)-
+                float(df.iloc[0][f"{year}_mae"]),
+                "s-",label=f"{year} actual compact")
     ax.axhline(0,color="black",lw=1)
     ax.set_xticks(xx,tags)
     ax.set(xlabel="Greedy redundancy threshold",
@@ -787,6 +930,20 @@ def plots(root,ctx,audit,subsets,comparisons,
     ax.set(title="TRAIN-only correlations (not clustered)",
            xlabel="Original ordered features",ylabel="Original ordered features")
     save(fig,"07_05_train_spearman_overview")
+
+    fig,ax=plt.subplots(figsize=(8.5,6.2))
+    pareto=pd.read_csv(root/"compact_pareto.csv")
+    ax.scatter(pareto.axis_mae,pareto.ici_mae,c=pareto.kept_count,
+               s=90,cmap="viridis",edgecolor="black",linewidth=.5)
+    for row in pareto.itertuples(index=False):
+        ax.annotate(row.policy.replace("greedy_",""),
+                    (row.axis_mae,row.ici_mae),
+                    xytext=(5,5),textcoords="offset points",fontsize=8)
+    ax.set(xlabel="10-seed mean Dev 3-axis MAE",
+           ylabel="10-seed mean Dev ICI MAE",
+           title="Compact-policy MAE / ICI / feature-count trade-off")
+    ax.grid(alpha=.25)
+    save(fig,"07_06_compact_mae_ici_pareto")
     return figures
 
 
@@ -827,6 +984,12 @@ def write_selected(root,ctx,subsets,masked_rows,
         removed_feature_names=removed,
         baseline_157_dev=selected_baseline_scores(ctx),
         final_dev=final_metrics,
+        baseline_parameter_count=ctx["baseline_parameters"],
+        selected_parameter_count=int(final_metrics.get(
+            "parameters",ctx["baseline_parameters"])),
+        saved_parameter_count=int(
+            ctx["baseline_parameters"]-final_metrics.get(
+                "parameters",ctx["baseline_parameters"])),
         masked_comparisons=masked_rows,
         compact_candidate_review=compact_examination,
         stage06_selected_policy=ctx["locked_policy"].id,
@@ -834,7 +997,7 @@ def write_selected(root,ctx,subsets,masked_rows,
         stage06_lock_sha256=ctx["upstream06_lock_sha256"],
         stage07_signature=signature,
         original_data_sha256=ctx["panel_hashes"],
-        gnn_models=list(ctx["models"]),seeds=list(SEEDS),
+        gnn_models=["B-MTGNN"],seeds=list(SEEDS),epochs=ctx["epochs"],
         lookback_quarters=LOOKBACK,horizon_quarters=HORIZON,
         output="Structural",train="2006Q1–2019Q4",
         dev="2020Q1–2022Q4",frozen=True,
@@ -846,6 +1009,10 @@ def write_selected(root,ctx,subsets,masked_rows,
         all_preprocessing_statistics_fit_from_train=True,
         test_opened=False,
         dev_used_for_selection_not_independent_test=True,
+        score_semantics="INDIVIDUAL_SEED_MAE_THEN_MEAN",
+        compact_initialization="SUBSET_FULL_MODEL_INITIAL_WEIGHTS",
+        pareto_results="compact_pareto.csv",
+        block_sensitivity_results="correlations/block_sensitivity.csv",
         figures=figures,
         completed_utc=datetime.now(timezone.utc).isoformat())
     atomic_json(root/"selected_features.json",summary)
@@ -862,9 +1029,6 @@ def run(args):
     if args.status and not (RESULTS/"run_manifest.json").is_file():
         print("07_GREEDY_READY_NO_EXPERIMENT_YET",flush=True)
         return None
-    ctx=upstream()
-    contract=run_contract(ctx)
-    signature=run_signature(contract)
     if args.dry_run:
         print("07_GREEDY_NO_CLUSTERING")
         print("ORIGINAL 59 NODES, 157 FEATURES: 42 HIST + 24 NODE + 91 GLOBAL")
@@ -872,11 +1036,14 @@ def run(args):
         print("PAIRWISE |rho| thresholds:",THRESHOLDS)
         print("BOOTSTRAP",BOOTSTRAPS,"4-QUARTER BLOCKS; lower q10 & sign >=90%")
         print("GREEDY ONLY: drop if directly redundant with ALREADY KEPT peer")
-        print("MODELS",ctx["models"],"SEEDS",SEEDS)
-        print("FIXED 04 EPOCHS; FULL Train ONCE; FROZEN 2020-22 Dev")
-        print("MASKED SCREEN: 157-SLOT MODELS; COMPACT RETRAIN ONLY IF QUALIFIED")
+        print("B-MTGNN Structural, L=1, CORE=20, SEEDS",SEEDS)
+        print("75 EPOCHS; 36 Train origins; 2020-22 Dev; seed-wise MAE")
+        print("MASKED 157-SLOT DIAGNOSTIC + ALL FIVE TRUE COMPACT K FITS")
         print("KEEP 157 OTHERWISE; TEST NEVER OPENED")
         return None
+    ctx=upstream()
+    contract=run_contract(ctx)
+    signature=run_signature(contract)
     path=RESULTS/"run_manifest.json"
     previous=json_read(path) if path.is_file() else None
     if previous is not None and previous.get("signature")!=signature:
@@ -913,6 +1080,8 @@ def run(args):
     torch.set_num_threads(4)
     audit=cached_audit(ctx,RESULTS,signature)
     subsets=candidate_subsets(audit,ctx,RESULTS/"subsets")
+    sensitivity_file=save_bootstrap_sensitivity(
+        ctx,RESULTS,audit,subsets)
     for s in subsets:
         print("07_GREEDY_CANDIDATE",s.label,
               "kept",len(s.kept),"removed",len(s.dropped),
@@ -920,6 +1089,7 @@ def run(args):
     if args.analyze_only:
         manifest.update(
             status="ANALYZED_TRAIN_ONLY",
+            bootstrap_sensitivity=sensitivity_file,
             candidate_feature_counts={
                 s.label:len(s.kept) for s in subsets},
             elapsed_seconds=time.perf_counter()-started)
@@ -960,12 +1130,14 @@ def run(args):
             mode="masked_157",
             kept_count=len(subset.kept),
             removed_count=len(subset.dropped),
+            parameters=int(result["parameters"]),
             stable_edge_count=subset.stable_edge_count,
             same_subset_as=alias,
             **{k:result[k] for k in (
                 "axis_mae","ici_mae","profitability_mae",
                 "productivity_mae","growth_mae",
-                "2020_mae","2021_mae","2022_mae")},
+                "2020_mae","2021_mae","2022_mae",
+                "axis_mae_seed_sd","ici_mae_seed_sd")},
             **candidate)
         rows.append(row)
         print("07_MASKED_RESULT",subset.label,
@@ -980,53 +1152,91 @@ def run(args):
     pd.DataFrame(rows).to_csv(
         RESULTS/"masked_threshold_comparison.csv",
         index=False,encoding="utf-8-sig")
-    qualified=[
-        (subset,row) for subset,row in zip(subsets,rows)
-        if row["qualified"] and subset.dropped]
-    if qualified:
-        candidate,row=min(qualified,key=lambda pair:(
-            pair[1]["axis_mae"],-pair[1]["removed_count"],
-            str(pair[0].label)))
-        print("07_COMPACT_CONFIRMATION_START",candidate.label,
+    compact_results=[]
+    compact_by_kept={}
+    for candidate in subsets[1:]:
+        print("07_COMPACT_INDEPENDENT_CANDIDATE",candidate.label,
               "K",len(candidate.kept),flush=True)
-        compact,paused=run_subset(
-            ctx,RESULTS,candidate,"compact",signature,
-            device,started,args.max_minutes)
+        alias=compact_by_kept.get(candidate.kept)
+        if alias is not None:
+            compact=alias["scores"]
+            paused=None
+        elif candidate.dropped:
+            compact,paused=run_subset(
+                ctx,RESULTS,candidate,"compact",signature,
+                device,started,args.max_minutes)
+        else:
+            compact=dict(current_baseline,
+                         parameters=ctx["baseline_parameters"])
+            paused=None
         if paused:
             manifest.update(
                 status="PARTIAL_TIME_BUDGET",current_phase="COMPACT",
-                selected_masked_candidate=candidate.label,next_job=paused,
+                current_compact_candidate=candidate.label,next_job=paused,
                 elapsed_seconds=time.perf_counter()-started)
             atomic_json(path,manifest)
             print("07_PARTIAL_COMPACT",paused,flush=True)
             return manifest
+        if alias is None:
+            compact_by_kept[candidate.kept]=dict(
+                label=candidate.label,scores=compact)
         compact_gate=selection_safeguards(compact,current_baseline)
-        examination=dict(
-            candidate=candidate.label,masked_metrics={
-                "axis_mae":row["axis_mae"],"ici_mae":row["ici_mae"]},
-            compact_metrics=compact,
-            compact_safeguards=compact_gate,
-            compact_adopted=compact_gate["qualified"])
-        if compact_gate["qualified"]:
-            winner=candidate
-            mode="compact"
-            final=compact
-        else:
-            winner=subsets[0]
-            mode="original"
-            final=current_baseline
-    else:
-        winner=subsets[0]
-        mode="original"
-        final=current_baseline
-        examination=dict(
-            candidate=None,compact_adopted=False,
-            reason="No masked candidate passed all three safeguards",
-            trained_compact_models=0)
-    pd.DataFrame([examination]).to_csv(
+        record=dict(
+            policy=candidate.label,
+            kept_count=len(candidate.kept),
+            removed_count=len(candidate.dropped),
+            parameters=int(compact["parameters"]),
+            parameter_savings=int(
+                ctx["baseline_parameters"]-compact["parameters"]),
+            same_subset_as=alias["label"] if alias is not None else None,
+            **{k:compact[k] for k in (
+                "axis_mae","ici_mae","profitability_mae",
+                "productivity_mae","growth_mae",
+                "2020_mae","2021_mae","2022_mae",
+                "axis_mae_seed_sd","ici_mae_seed_sd")},
+            **compact_gate)
+        compact_results.append(record)
+        print("07_COMPACT_RESULT",candidate.label,
+              "K",len(candidate.kept),
+              "MAE",round(record["axis_mae"],6),
+              "QUALIFIED",record["qualified"],flush=True)
+        pd.DataFrame(compact_results).to_csv(
+            RESULTS/"compact_comparison_partial.csv",
+            index=False,encoding="utf-8-sig")
+    winner,final=select_compact_candidate(
+        subsets,compact_results,current_baseline)
+    mode="original" if winner is subsets[0] else "compact"
+    examination=dict(
+        candidates=compact_results,
+        compact_adopted=(mode=="compact"),
+        selected_policy=winner.label,
+        masked_diagnostic_used_for_compact_selection=False,
+        trained_compact_models=len(SEEDS)*sum(
+            bool(x["scores"].get("removed_count",0))
+            for x in compact_by_kept.values()))
+    pd.DataFrame(compact_results).to_csv(
         RESULTS/"compact_confirmation.csv",
         index=False,encoding="utf-8-sig")
-    figs=plots(RESULTS,ctx,audit,subsets,rows,winner,mode,final)
+    pareto=pd.DataFrame([
+        dict(policy="no_removal",kept_count=FEATURE_COUNT,
+             parameters=ctx["baseline_parameters"],
+             axis_mae=current_baseline["axis_mae"],
+             ici_mae=current_baseline["ici_mae"]),
+        *[dict(policy=r["policy"],kept_count=r["kept_count"],
+               parameters=r["parameters"],axis_mae=r["axis_mae"],
+               ici_mae=r["ici_mae"]) for r in compact_results]])
+    pareto["nondominated"]=[
+        not any(
+            q.kept_count<=p.kept_count and
+            q.axis_mae<=p.axis_mae and q.ici_mae<=p.ici_mae and
+            (q.kept_count<p.kept_count or q.axis_mae<p.axis_mae or
+             q.ici_mae<p.ici_mae)
+            for q in pareto.itertuples(index=False))
+        for p in pareto.itertuples(index=False)]
+    pareto.to_csv(
+        RESULTS/"compact_pareto.csv",index=False,encoding="utf-8-sig")
+    figs=plots(RESULTS,ctx,audit,subsets,rows,
+              compact_results,winner,mode,final)
     selected=write_selected(
         RESULTS,ctx,subsets,rows,winner,mode,final,
         signature,figs,examination)
@@ -1035,7 +1245,13 @@ def run(args):
         selected_mode=mode,kept=len(winner.kept),
         removed=len(winner.dropped),
         masked_candidates=len(rows),
+        compact_candidates=len(compact_results),
         distinct_masked_feature_sets=len(record_by_kept),
+        distinct_compact_feature_sets=len(compact_by_kept),
+        bootstrap_sensitivity=sensitivity_file,
+        baseline_parameters=ctx["baseline_parameters"],
+        selected_parameters=int(final.get(
+            "parameters",ctx["baseline_parameters"])),
         compact_confirmation=examination,
         figures=figs,
         elapsed_seconds=time.perf_counter()-started,
@@ -1045,7 +1261,7 @@ def run(args):
           "mode",mode,"kept",len(winner.kept),
           "removed",len(winner.dropped),
           "MAE",round(final["axis_mae"],6),
-          "04_06_ORIGINAL_MAE",round(current_baseline["axis_mae"],6),
+          "06_SELECTED_MAE",round(current_baseline["axis_mae"],6),
           "PLOTS",len(figs),flush=True)
     return selected
 
