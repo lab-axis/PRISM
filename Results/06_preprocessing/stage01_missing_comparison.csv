@@ -1,7 +1,0 @@
-﻿policy,stage,component,missing,normalization,outlier,status,axis_mae,ici_mae,delta_mae,delta_ici,better_years,qualifies_as_change,previously_active,stage_result
-m-raw_zero__n-standard__o-none,1,missing,raw_zero,standard,none,PASS,2.340279421959421,1.7894925355233664,0.0,0.0,0,False,True,True
-m-scaled_zero__n-standard__o-none,1,missing,scaled_zero,standard,none,PASS,2.3529153262816616,1.789924526975609,0.012635904322240599,0.00043199145224259716,1,False,False,False
-m-train_median__n-standard__o-none,1,missing,train_median,standard,none,PASS,2.351651361503185,1.7886958758888123,0.011371939543764142,-0.0007966596345541088,1,False,False,False
-m-train_mean__n-standard__o-none,1,missing,train_mean,standard,none,PASS,2.352616453427607,1.789180134476623,0.012337031468185877,-0.00031240104674346014,1,False,False,False
-m-causal_ffill__n-standard__o-none,1,missing,causal_ffill,standard,none,PASS,2.351651361503185,1.7886958758888123,0.011371939543764142,-0.0007966596345541088,1,False,False,False
-m-causal_seasonal__n-standard__o-none,1,missing,causal_seasonal,standard,none,PASS,2.351651361503185,1.7886958758888123,0.011371939543764142,-0.0007966596345541088,1,False,False,False

@@ -1,0 +1,12 @@
+{
+  "signature": "a45cfa005b1bfc58c153def3c6105f6ec1d977b847f330247e74a902d6eebb26",
+  "policy": "m-train_median__n-maxabs__d-winsor01",
+  "seed": 2026,
+  "model": "B-MTGNN",
+  "epoch": 75,
+  "input_sha256": "35927df54686a4f166ff761945a1d0d606b31173ed6fc5ca9308632a8daba9a5",
+  "prediction_sha256": "607f3b9086df7770e7bf77f71eaaa968d31bbae9c5e60f0227fe5d89df8712d9",
+  "checkpoint_sha256": "bddfcdabd4a360b6ea91a96809228d4cbbbf8f8c985cd3eda7ebeaa04f08bf6a",
+  "fit_seconds": 3.165641700004926,
+  "test_opened": false
+}

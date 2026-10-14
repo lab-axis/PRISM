@@ -1,0 +1,12 @@
+{
+  "signature": "a45cfa005b1bfc58c153def3c6105f6ec1d977b847f330247e74a902d6eebb26",
+  "policy": "m-train_median__n-quantile_normal__d-signed_log1p",
+  "seed": 2035,
+  "model": "B-MTGNN",
+  "epoch": 75,
+  "input_sha256": "a177a224bf13a71c91bb9b9bda322289a5802d5b57454f70579ade3c214c426f",
+  "prediction_sha256": "4b324400488d0c7b2d8689f0b8a157cb0201a32ede924e1df077514559ea9d02",
+  "checkpoint_sha256": "011b75a4d34111d6e46ae209c02c2a6ce1a23a68fbec92f2d497691291696bd3",
+  "fit_seconds": 3.1136409000027925,
+  "test_opened": false
+}
