@@ -1,15 +1,15 @@
 {
   "stage": 8,
   "status": "PASS",
-  "study_signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "study_signature": "aa92deca95b79653980e2181387edeb2ab8d36d4cdf9ef0d4cf75d32cc75f903",
   "contract": {
     "stage": "08_SINGLE_CANONICAL_BMTGNN_EXHAUSTIVE_RANKED_K",
-    "source_sha256": "3188ab1abe07893e83655b574bed746524546744219402137ceb6c76ce951adc",
-    "stage07_source_sha256": "ce86a85b7b7b95fed1b9a80a9565f42aafaae3cf2aed531d6637b51f073d6c16",
-    "stage07_selection_sha256": "5c0d04e35d994afe5044575f3b04179ce181db00bacd8a41bcdf92a810fed339",
-    "stage07_manifest_sha256": "f9323e5a29ae8e61dcb1cf63f57a8552d99475924df7679fb52d2db708b8d17c",
-    "stage06_selection_sha256": "e55cc36f87e33cd999fb44c4494f71e1cadbffbdae200711b164d307ff548d20",
-    "stage06_manifest_sha256": "be26d9bc7e144a17ed099f30b20000f88c1d905ec0e7e8cd18050df748c3d8fd",
+    "source_sha256": "a8331097d891cd047679a169218539178b80f0278bac26f7f39748b2ff509d63",
+    "stage07_source_sha256": "0ee40630e0c5218d5851ace9fb2fc11b8364a1f8cf7cdeb1e1a7849cfa09e062",
+    "stage07_selection_sha256": "8ffaad710182592a3858a8e6fd2a748b30df55304acc407291faf04fee5e1192",
+    "stage07_manifest_sha256": "2a8da9d9049e732748a24614bd001387627d662708181f465d0079af58dc2b30",
+    "stage06_selection_sha256": "2cd7f0568bf323b258f7a7e4720094f79e3ee79dc6ac80f6e41c7e26d8e50b72",
+    "stage06_manifest_sha256": "37de62aae7b06e8d8f3da9b810ca512be94a0278640299b4b7225f29f21380f0",
     "original_train_dev_hashes": {
       "Data/03_integrated_dataset/raw_train.csv": "37ce33440d77b22176458a47c02e1e50166d09dfd2062cfd365e416a603b51ed",
       "Data/03_integrated_dataset/raw_val.csv": "c3b7cd3a10523d804f3e8cec013c25f25ba42d083116035003d228c778a55b35"
@@ -271,7 +271,7 @@
   },
   "started_utc": "2026-10-14T03:39:03.868352+00:00",
   "test_opened": false,
-  "resume": "py -u Sources/08_feature_selection.py --run --max-minutes 25",
+  "resume": "py -u Sources/08_feature_selection.py --run",
   "selected_K": 157,
   "complete_K": 157,
   "new_compact_fit_count": 1560,

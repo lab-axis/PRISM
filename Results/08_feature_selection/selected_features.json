@@ -542,8 +542,8 @@
     ],
     "interpretation": "Train in-sample stability; not independent validation"
   },
-  "stage07_lock_sha256": "5c0d04e35d994afe5044575f3b04179ce181db00bacd8a41bcdf92a810fed339",
-  "stage08_signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "stage07_lock_sha256": "8ffaad710182592a3858a8e6fd2a748b30df55304acc407291faf04fee5e1192",
+  "stage08_signature": "aa92deca95b79653980e2181387edeb2ab8d36d4cdf9ef0d4cf75d32cc75f903",
   "plots": [
     "plots/08_01_train_attribution.png",
     "plots/08_02_ranking_period_sensitivity.png",

@@ -157,7 +157,7 @@
   "model": "B-MTGNN",
   "lookback": 1,
   "epoch": 75,
-  "signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "signature": "aa92deca95b79653980e2181387edeb2ab8d36d4cdf9ef0d4cf75d32cc75f903",
   "input_sha256": "c71071f4b410c6678afa80a571323f0f4266518782da30fd66e0de67c9be212e",
   "reused_stage06_baseline": false,
   "seed_metrics": [

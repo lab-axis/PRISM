@@ -40,7 +40,7 @@
   "model": "B-MTGNN",
   "lookback": 1,
   "epoch": 75,
-  "signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "signature": "aa92deca95b79653980e2181387edeb2ab8d36d4cdf9ef0d4cf75d32cc75f903",
   "input_sha256": "7a6ed56ffbd2b32a6d7cc821865a5502767c7d9f91190819cb59da9f55da3e2d",
   "reused_stage06_baseline": false,
   "seed_metrics": [

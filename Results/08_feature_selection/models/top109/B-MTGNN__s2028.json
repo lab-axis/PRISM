@@ -1,5 +1,5 @@
 {
-  "signature": "0ef5c01169d1d21a664b3d768d8f68b8e41d171c458bf0d240f72f0e87880bb4",
+  "signature": "aa92deca95b79653980e2181387edeb2ab8d36d4cdf9ef0d4cf75d32cc75f903",
   "policy": "top109",
   "kind": "TOPK",
   "original_indices": [
@@ -117,7 +117,7 @@
   "input_sha256": "3809b15c736ec12459e0afff205804b335474258ac387197946b5a7632cb60a7",
   "epoch": 75,
   "parameters": 65654,
-  "checkpoint_sha256": "338bdade27b9a3d1c17a0090298b7db0cafbbd4adc245aac956e5a59c97deda7",
+  "checkpoint_sha256": "34e2d30fcd43351a77e8d8fdf59e042947e3eb40273f07cffebe3f2b6f2c9da3",
   "prediction_sha256": "6b81060d65d8e7f64d92722ede0e57f2f7393368ab694d65e69abada6e3372fd",
   "fit_seconds": 2.8965310999774374,
   "inference_draws": 30,
