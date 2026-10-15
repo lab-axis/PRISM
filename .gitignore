@@ -1,3 +1,8 @@
 __pycache__
 .idea
 Docs/References
+
+# The complete Stage09 checkpoint grid is ~20 GiB; only the
+# selected ten-seed bank and all summary results are versioned.
+Results/09_hyperparameter_tuning/trajectories/*
+!Results/09_hyperparameter_tuning/trajectories/w32_lr0300_a025_010_000/

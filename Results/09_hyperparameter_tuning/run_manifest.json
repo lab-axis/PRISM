@@ -1,0 +1,32 @@
+{
+  "stage": 9,
+  "status": "PASS",
+  "signature": "3d5a3e3ea82c3711d1ebaf67d78dab34825bb9241e595e68b2ab926edf3825e0",
+  "design_sha256": "e07c576de7c597e91288f7a5f0c9f78003ca591662a5b821279b1bd668bedd03",
+  "started_utc": "2026-10-14T10:22:13.109397+00:00",
+  "target_trajectories": 3240,
+  "completed_trajectories": 3240,
+  "test_opened": false,
+  "resume": "py -u Sources/09_hyperparameter_tuning.py --run",
+  "reference_parity": {
+    "max_absolute_prediction_diff": 0.0,
+    "max_absolute_metric_diff": 0.0,
+    "all_ten_seed_forecasts_checked": true,
+    "reference_parameters": 67190,
+    "tolerance": 3e-05
+  },
+  "evaluated_policy_count": 2268,
+  "selected_policy": "w32_lr0300_a025_010_000_e025",
+  "selected_width": 32,
+  "selected_epoch": 25,
+  "selected_structural_alpha": [
+    0.25,
+    0.1,
+    0.0
+  ],
+  "eligible_policy_count": 373,
+  "numeric_infeasible_policy_count": 0,
+  "selection_sha256": "e53f50ae93019e24224b7771d313a93a9fe8fe6d0f7fdd1b81858e021dd14476",
+  "elapsed_seconds": 12109.259297200013,
+  "completed_utc": "2026-10-15T05:29:59.435456+00:00"
+}

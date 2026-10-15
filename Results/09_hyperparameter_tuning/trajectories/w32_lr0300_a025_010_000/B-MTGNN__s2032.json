@@ -1,0 +1,39 @@
+{
+  "signature": "3d5a3e3ea82c3711d1ebaf67d78dab34825bb9241e595e68b2ab926edf3825e0",
+  "trajectory": "w32_lr0300_a025_010_000",
+  "seed": 2032,
+  "width": 32,
+  "learning_rate": 0.0003,
+  "alpha": [
+    0.25,
+    0.1,
+    0.0
+  ],
+  "model": "B-MTGNN",
+  "lookback": 1,
+  "epochs_requested": [
+    10,
+    25,
+    50,
+    75,
+    100,
+    150,
+    200
+  ],
+  "epochs_complete": [
+    10,
+    25,
+    50,
+    75,
+    100,
+    150,
+    200
+  ],
+  "parameters": 192262,
+  "pred_sha256": "da89bf7691acdd36dadc16482520404821c2c49e11aa3547083d5db69152965f",
+  "checkpoint_sha256": "760e93925a2f33c48a723a4011c961812796b772de0099b93dbd9d5e5a23987e",
+  "seconds": 9.841194000007818,
+  "failure": null,
+  "mc_dropout_draws": 30,
+  "test_opened": false
+}
