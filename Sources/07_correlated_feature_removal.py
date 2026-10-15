@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """PRISM Stage07 — Train-only stable-correlation, greedy feature pruning.
 
-MAIN EXPERIMENT: Stage06-selected Structural B-MTGNN, L=1, 10 paired seeds,
-75 epochs, 36 common Train origins, 12 Dev quarters, fixed 20-slot core.
+MAIN EXPERIMENT: Stage06-selected B-MTGNN formulation, lookback and
+preprocessing; 10 paired seeds, 75 epochs, all admissible Train origins,
+12 Dev quarters and the existing fixed 20-slot core.
 Remove redundant MAIN-INPUT features without changing the economic prior,
 9D as-of score context, target anchor or the learned-graph mechanism.
 
@@ -21,7 +22,7 @@ Remove redundant MAIN-INPUT features without changing the economic prior,
 3. Evaluate thresholds None, .995, .990, .980, .950, .900. For every
    distinct candidate, zero only pruned input values and corresponding
    input missing indicators, preserving the 157-slot GNN parameter count.
-   Train on the SAME 36 common 2011–19 origins, with Stage06's 75-epoch
+   Train on the SAME full-Train refit origins, with Stage06's 75-epoch
    recipe; frozen Dev forecasts for 2020–22. The no-removal reference
    reuses all ten selected Stage06 seed predictions.
 4. Every threshold is independently retrained as a genuinely compact
@@ -82,7 +83,6 @@ FEATURE_COUNT=157
 HISTORY_END=42
 INDUSTRY_END=66
 GLOBAL_COUNT=91
-LOOKBACK=1
 HORIZON=1
 SEEDS=tuple(range(2026,2036))
 THRESHOLDS=(None,.995,.990,.980,.950,.900)
@@ -162,21 +162,23 @@ def upstream():
             or lock.get("model")!=m06.MODEL
             or lock.get("seed_count")!=len(SEEDS)
             or tuple(contract["seed_grid"])!=SEEDS
-            or lock.get("selected_upstream_lookback")!=LOOKBACK
-            or contract.get("lookback")!=LOOKBACK
+            or lock.get("selected_upstream_lookback")!=m06.selected_lookback()
+            or contract.get("lookback")!=m06.selected_lookback()
             or contract.get("fixed_epochs")!=75
             or m06.MODEL!="B-MTGNN"
-            or m06.MODE!="structural"
+            or contract.get("output_mode")!=m06.selected_mode()
             or lock.get("test_opened") is not False):
-        raise RuntimeError("Stage06 L1/10-seed/factorial lock changed")
+        raise RuntimeError("Stage06 selected input/model/factorial lock changed")
     policy=m06.Policy(**lock["preprocessing"])
     policy.validate()
     if policy.id!=lock["policy_id"]:
         raise RuntimeError("Stage06 preprocessing fields/identifier disagree")
     prior=m06.structural_prior(panel)
     folded,_=m06.prepare_policy(panel,policy,prior)
-    if (folded["train_x"].shape!=(36,LOOKBACK,INDUSTRIES,FEATURE_COUNT)
-            or folded["val_x"].shape!=(DEV_COUNT,LOOKBACK,INDUSTRIES,FEATURE_COUNT)):
+    lookback=m06.selected_lookback()
+    mode=m06.selected_mode()
+    if (folded["train_x"].shape!=(len(m06.train_origins()),lookback,INDUSTRIES,FEATURE_COUNT)
+            or folded["val_x"].shape!=(DEV_COUNT,lookback,INDUSTRIES,FEATURE_COUNT)):
         raise RuntimeError("Stage06 selected model input contract differs")
     bank=m06.load_policy_forecasts(RESULT06,policy)
     with np.load(RESULT06/"selected_vs_stage05_dev.npz",
@@ -189,11 +191,12 @@ def upstream():
            for key,expected in lock["selected_dev_metrics"].items()):
         raise RuntimeError("Stage06 locked 10-seed Dev scores drifted")
     model=m05.instantiate(
-        m,"B-MTGNN",SEEDS[0],LOOKBACK,folded,"structural")
+        m,"B-MTGNN",SEEDS[0],lookback,folded,mode)
     full_params=sum(p.numel() for p in model.parameters())
     return dict(
         m04=m,m05=m05,panel=panel,m06=m06,
-        models=("B-MTGNN",),epochs=75,
+        models=("B-MTGNN",),epochs=m.STAGE04_ACTIVE_EPOCHS,
+        lookback=lookback,output_mode=mode,
         locked_policy=policy,prior=prior,full_fold=folded,
         original_forecasts=bank,baseline_metrics=baseline,
         baseline_seed_metrics=individual,baseline_parameters=full_params,
@@ -445,13 +448,14 @@ def adapt_inputs(full:dict,subset:Subset,mode:str)->dict:
         else:
             changed[key]=v
     channels=(FEATURE_COUNT if mode=="masked" else len(indices))
-    if (changed["train_x"].shape!=(36,LOOKBACK,INDUSTRIES,channels)
-            or changed["val_x"].shape!=(12,LOOKBACK,INDUSTRIES,channels)):
-        raise RuntimeError("Changed the Stage06 L1 model-input shapes")
+    lookback=full["train_x"].shape[1]
+    if (changed["train_x"].shape!=(len(full["train_origins"]),lookback,INDUSTRIES,channels)
+            or changed["val_x"].shape!=(12,lookback,INDUSTRIES,channels)):
+        raise RuntimeError("Changed the Stage06 selected model-input shapes")
     for key in ("train_y","val_y","train_last","val_last",
                 "train_context","val_context",
                 "train_structure","val_structure",
-                "y_center","y_scale","train_origins","val_origins"):
+                "y_center","y_scale","train_origins","val_origins","anchor_biases"):
         if not np.array_equal(changed[key],full[key]):
             raise RuntimeError("Subset pruning silently changed a non-input path")
     if mode=="masked":
@@ -467,7 +471,7 @@ def dataset_sha(data:dict)->str:
                 "train_context","train_structure",
                 "val_x","val_mask","val_y","val_last",
                 "val_context","val_structure","x_center","x_scale",
-                "y_center","y_scale","train_origins","val_origins"):
+                "y_center","y_scale","train_origins","val_origins","anchor_biases"):
         array=np.ascontiguousarray(data[key])
         hasher.update(key.encode()+b"\0"+str(array.shape).encode()+b"\0")
         hasher.update(str(array.dtype).encode()+array.tobytes())
@@ -526,7 +530,7 @@ def instantiate_subset(ctx,subset:Subset,seed:int,compact:bool):
     m=ctx["m04"]
     m05=ctx["m05"]
     net=m05.instantiate(
-        m,"B-MTGNN",seed,LOOKBACK,ctx["full_fold"],"structural")
+        m,"B-MTGNN",seed,ctx["lookback"],ctx["full_fold"],ctx["output_mode"])
     k=len(subset.kept) if compact else FEATURE_COUNT
     if k!=FEATURE_COUNT:
         if k!=len(subset.kept):
@@ -574,8 +578,7 @@ def fit_subset_model(ctx,subset:Subset,data:dict,seed:int,device):
         optim.zero_grad(set_to_none=True)
         output=net(z["train_x"],z["train_mask"],graph,
                    z["train_last"],z["train_structure"],z["train_context"])
-        loss=m.three_axis_weighted_huber(
-            output,z["train_y"],z["train_last"],scale)
+        loss=m.joint_axis_ici_loss(output,z["train_y"],scale)
         if not torch.isfinite(loss):
             raise RuntimeError("Nonfinite Stage07 Train loss")
         loss.backward()
@@ -670,7 +673,7 @@ def run_subset(ctx,root,subset:Subset,mode:str,signature:str,device):
                 prediction_sha256=sha(npz),checkpoint_sha256=sha(ck),
                 subset=subset.label,variant=mode,
                 model="B-MTGNN",seed=seed,epoch=ctx["epochs"],
-                training="36 common origins, 2011Q1-2019Q4",
+                training_origins=changed["train_origins"].tolist(),
                 parameters=parameters,fit_seconds=float(fitted["seconds"]),
                 inference_draws=int(fitted["inference_draws"]),
                 inference_regime=fitted["inference_regime"],
@@ -709,11 +712,11 @@ def run_contract(ctx)->dict:
         baseline_parameters=ctx["baseline_parameters"],
         feature_count=FEATURE_COUNT,industries=INDUSTRIES,
         train_quarters=TRAIN_COUNT,dev_quarters=DEV_COUNT,
-        train_origins=list(range(20,TRAIN_COUNT)),
-        lookback=LOOKBACK,forecast_horizon=HORIZON,
+        train_origins=ctx["full_fold"]["train_origins"].tolist(),
+        lookback=ctx["lookback"],forecast_horizon=HORIZON,
         fixed_temporal_core=ctx["m05"].CORE_LOOKBACK,
         mc_dropout_draws=ctx["m04"].STAGE04_BMTGNN_MC_SAMPLES,
-        output_mode="structural",
+        output_mode=ctx["output_mode"],
         thresholds=list(THRESHOLDS),
         bootstraps=BOOTSTRAPS,
         bootstrap_quarters=BLOCK_QUARTERS,
@@ -942,6 +945,44 @@ def plots(root,ctx,audit,subsets,comparisons,compact_comparisons,
     return figures
 
 
+def load_selected_seed(ctx,lock,seed):
+    """Read the deployed Stage07 member, not a model with merely the same K."""
+    indices=tuple(lock["selected_indices"])
+    if (not indices or indices!=tuple(sorted(set(indices)))
+            or indices[0]<0 or indices[-1]>=FEATURE_COUNT):
+        raise RuntimeError("Invalid Stage07 selected original feature indices")
+    if lock["selected_mode"]=="original":
+        if indices!=tuple(range(FEATURE_COUNT)):
+            raise RuntimeError("Original Stage07 model must retain all features")
+        return ctx["m06"].load_policy_seed(RESULT06,ctx["locked_policy"],seed)
+    if lock["selected_mode"]!="compact":
+        raise RuntimeError("Stage07 selected an invalid deployment mode")
+    selected=next(row for row in lock["compact_candidate_review"]["candidates"]
+                  if row["policy"]==lock["selected_policy"])
+    label=selected["same_subset_as"] or selected["policy"]
+    subset=Subset(label,None,indices,
+                  tuple(i for i in range(FEATURE_COUNT) if i not in indices),
+                  pd.DataFrame(),0)
+    changed=adapt_inputs(ctx["full_fold"],subset,"compact")
+    folder=_candidate_folder(RESULTS,subset,"compact")
+    name=f"B-MTGNN__s{seed}"
+    meta=json_read(folder/(name+".json"))
+    pred,ck=(folder/(name+ext) for ext in (".npz",".pt"))
+    signature=run_signature(run_contract(ctx))
+    if (meta["contract_sha256"]!=signature or meta["seed"]!=seed
+            or meta["input_sha256"]!=dataset_sha(changed)
+            or meta["prediction_sha256"]!=sha(pred)
+            or meta["checkpoint_sha256"]!=sha(ck)):
+        raise RuntimeError("Stage07 selected compact member failed verification")
+    saved=torch.load(ck,map_location="cpu",weights_only=True)
+    if (saved["contract_sha256"]!=signature or saved["seed"]!=seed
+            or saved["feature_count"]!=len(indices)):
+        raise RuntimeError("Stage07 selected checkpoint metadata mismatch")
+    with np.load(pred,allow_pickle=False) as bank:
+        prediction=bank["prediction"].copy()
+    return prediction,saved["state_dict"]
+
+
 def write_selected(root,ctx,subsets,masked_rows,
                    chosen:Subset,final_mode,final_metrics,
                    signature,figures,compact_examination):
@@ -993,8 +1034,8 @@ def write_selected(root,ctx,subsets,masked_rows,
         stage07_signature=signature,
         original_data_sha256=ctx["panel_hashes"],
         gnn_models=["B-MTGNN"],seeds=list(SEEDS),epochs=ctx["epochs"],
-        lookback_quarters=LOOKBACK,horizon_quarters=HORIZON,
-        output="Structural",train="2006Q1–2019Q4",
+        lookback_quarters=ctx["lookback"],horizon_quarters=HORIZON,
+        output=ctx["output_mode"],train="2006Q1–2019Q4",
         dev="2020Q1–2022Q4",frozen=True,
         greedy_pairwise_only=True,clustering_used=False,
         no_cross_role_feature_pruning=True,
@@ -1021,6 +1062,8 @@ def write_selected(root,ctx,subsets,masked_rows,
 
 
 def run(args):
+    if args.restart and not args.run:
+        raise ValueError("--restart requires --run")
     if args.status and not (RESULTS/"run_manifest.json").is_file():
         print("07_GREEDY_READY_NO_EXPERIMENT_YET",flush=True)
         return None
@@ -1031,14 +1074,16 @@ def run(args):
         print("PAIRWISE |rho| thresholds:",THRESHOLDS)
         print("BOOTSTRAP",BOOTSTRAPS,"4-QUARTER BLOCKS; lower q10 & sign >=90%")
         print("GREEDY ONLY: drop if directly redundant with ALREADY KEPT peer")
-        print("B-MTGNN Structural, L=1, CORE=20, SEEDS",SEEDS)
-        print("75 EPOCHS; 36 Train origins; 2020-22 Dev; seed-wise MAE")
+        print("B-MTGNN SELECTED MODE/L, CORE=20, SEEDS",SEEDS)
+        print("75 EPOCHS; SAME FULL-TRAIN SUPPORT; 2020-22 Dev; seed-wise MAE")
         print("MASKED 157-SLOT DIAGNOSTIC + ALL FIVE TRUE COMPACT K FITS")
         print("KEEP 157 OTHERWISE; TEST NEVER OPENED")
         return None
     ctx=upstream()
     contract=run_contract(ctx)
     signature=run_signature(contract)
+    if args.restart:
+        ctx["m04"].reset_stage_results(RESULTS)
     path=RESULTS/"run_manifest.json"
     previous=json_read(path) if path.is_file() else None
     if previous is not None and previous.get("signature")!=signature:
@@ -1244,6 +1289,7 @@ def main():
     parser.add_argument("--dry-run",action="store_true")
     parser.add_argument("--analyze-only",action="store_true")
     parser.add_argument("--run",action="store_true")
+    parser.add_argument("--restart",action="store_true")
     parser.add_argument("--status",action="store_true")
     parser.add_argument("--device",choices=("cpu","cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")

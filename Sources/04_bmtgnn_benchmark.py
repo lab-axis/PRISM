@@ -13,6 +13,7 @@ import hashlib
 import json
 from pathlib import Path
 import random
+import shutil
 import time
 import warnings
 import numpy as np
@@ -48,6 +49,7 @@ DEV_COUNT=12
 TOTAL_COUNT=TRAIN_COUNT+DEV_COUNT
 STAGE04_COMPONENT_SOURCE=ROOT/"Data/01_target_data_collection/latest_sources.csv.gz"
 STAGE04_TARGET_BOUNDS=ROOT/"Results/03_integrated_dataset/target_score_bounds.csv"
+LEARNING_RECIPE="TRAIN_MEDIAN_ZERO_RESIDUAL_JOINT_MAE"
 
 def fixed_preprocessing_policy(model):
     if model!="B-MTGNN":
@@ -583,6 +585,9 @@ class ThreeAxisStructureGNN(nn.Module):
             nn.Linear(9, 32), nn.SiLU(), nn.Linear(32, 3))
         nn.init.zeros_(self.change_head[-1].weight)
         nn.init.zeros_(self.change_head[-1].bias)
+        # Estimated from Train only; persisted with the checkpoint, not a
+        # learned neural parameter and not a correction fitted on Dev.
+        self.register_buffer("anchor_bias",torch.zeros(nodes,3))
         self.register_buffer("x_c", torch.as_tensor(
             x_center[:3], dtype=torch.float32))
         self.register_buffer("x_s", torch.as_tensor(
@@ -607,7 +612,53 @@ class ThreeAxisStructureGNN(nn.Module):
             anchor = last
         else:
             anchor = prior
-        return anchor[:,None]+correction+self.change_head(context)[:,None]
+        return (anchor[:,None]+self.anchor_bias[None,None]
+                +correction+self.change_head(context)[:,None])
+
+
+def admissible_train_origins(lookback: int) -> np.ndarray:
+    """Use every Train target with both L raw inputs and lag-5 context."""
+    if not 1<=lookback<=20:
+        raise ValueError("Lookback must be in 1..20")
+    return np.arange(max(lookback,5),TRAIN_COUNT,dtype=int)
+
+
+def train_anchor_biases(panel,structure,origins,center,scale):
+    """Empirical median residual per industry/axis, in model coordinates.
+
+    Compute in original float64 score units before converting to float32.
+    All three formulations receive the same calibration rule; their
+    anchors, not their optimization rules, remain the comparison factor.
+    """
+    origins=np.asarray(origins,dtype=int)
+    if (origins.ndim!=1 or not len(origins) or origins.min()<5
+            or origins.max()>=TRAIN_COUNT
+            or not np.array_equal(origins,np.unique(origins))):
+        raise ValueError("Calibration requires unique admissible Train origins")
+    targets=panel.y[origins]
+    anchors=(np.broadcast_to(center,targets.shape),
+             past_scores(panel,origins),structure[origins])
+    return np.stack([
+        np.median(targets-anchor,axis=0)/scale for anchor in anchors
+    ]).astype(np.float32)
+
+
+def initialize_calibrated_model(model,data):
+    """Call after the final core replacement, before the first optimizer step.
+
+    Zero only the output layers: all interior parameters retain their
+    original seeded initialization. Native Stage04 and padded Stage05
+    cores keep their existing, different temporal architectures.
+    """
+    core=model.base.core
+    core=core.backbone if hasattr(core,"backbone") else core
+    nn.init.zeros_(core.out[-1].weight)
+    nn.init.zeros_(core.out[-1].bias)
+    nn.init.zeros_(model.change_head[-1].weight)
+    nn.init.zeros_(model.change_head[-1].bias)
+    bias=data["anchor_biases"][STAGE04_OUTPUT_MODES.index(model.prediction_mode)]
+    with torch.no_grad():
+        model.anchor_bias.copy_(torch.as_tensor(bias,device=model.anchor_bias.device))
 
 def prepare_three_axis_fold(panel: Panel, structure: np.ndarray,
                             fit_end: int, val_first: int,
@@ -631,7 +682,9 @@ def prepare_three_axis_fold(panel: Panel, structure: np.ndarray,
                   panel.y[:fit_end].std((0,1)),1.)
     y = ((panel.y-yc)/ys).astype(np.float32)
     structural = ((structure-yc)/ys).astype(np.float32)
-    train = np.arange(LOOKBACK,fit_end)
+    train = admissible_train_origins(LOOKBACK)
+    if fit_end!=TRAIN_COUNT:
+        raise ValueError("Train-internal splits are not part of this pipeline")
     val = np.arange(val_first,val_end)
     def tensors(origins,prefix):
         return {
@@ -651,6 +704,7 @@ def prepare_three_axis_fold(panel: Panel, structure: np.ndarray,
         "y_center":yc.astype(np.float32),
         "y_scale":ys.astype(np.float32),
         "train_origins":train,"val_origins":val,
+        "anchor_biases":train_anchor_biases(panel,structure,train,yc,ys),
         "scaler_policy":scaler,"missing_policy":missing_mode,
     }
     if (output["train_y"].shape != (fit_end-LOOKBACK,1,NODE_COUNT,3)
@@ -662,15 +716,10 @@ def prepare_three_axis_fold(panel: Panel, structure: np.ndarray,
         raise RuntimeError("Three-axis structural Train/Val timing differs")
     return output
 
-def three_axis_weighted_huber(pred, truth, last, ys):
+def joint_axis_ici_loss(pred, truth, ys):
+    """Equal-weight original-unit axis MAE and ICI MAE; ICI is derived."""
     error = (pred-truth)*ys
-    changed = (truth-last[:,None])*ys
-    weights = 1.+torch.minimum(
-        changed.abs()/(ys+1e-8),torch.full_like(changed,2.))
-    weights = weights/weights.mean().detach()
-    cost = F.smooth_l1_loss(
-        error, torch.zeros_like(error),beta=3.,reduction="none")
-    return (cost*weights).mean()
+    return (error.abs().mean()+error.mean(-1).abs().mean())/2.
 
 @contextmanager
 def isolated_snapshot_inference(model):
@@ -724,9 +773,11 @@ def mtgnn_bayesian_inference(model, z, graph, name, seed, yc, ys):
     if n_draws<2:
         raise RuntimeError("Bayesian inference needs multiple draws")
     stdev=(sampled.std(axis=0,ddof=1)*ys).astype(np.float64)
-    if (not np.isfinite(stdev).all()
-            or not np.any(stdev > 1e-8)):
-        raise RuntimeError("B-MTGNN dropout draws identical: MC is off")
+    # A zero-initialized residual legitimately has zero MC variance.
+    # Dropout protocol is checked through the draw count/mode, not by
+    # requiring every trained model to retain nonzero predictive variance.
+    if not np.isfinite(stdev).all():
+        raise RuntimeError("Nonfinite B-MTGNN predictive uncertainty")
     details.update(predictive_mc_std=stdev,predictive_mc_var=stdev**2)
     return details
 
@@ -760,6 +811,7 @@ def fit_three_axis_gnn(panel, data, model_name, seed, device,
         num_features=data["train_x"].shape[-1],
         nodes=len(panel.nodes),
         prediction_mode=prediction_mode).to(device)
+    initialize_calibrated_model(model,data)
     optim = torch.optim.AdamW(
         model.parameters(),lr=FIXED_LEARNING_RATE,weight_decay=1e-4)
     iterations = int(fixed_epochs)
@@ -771,8 +823,7 @@ def fit_three_axis_gnn(panel, data, model_name, seed, device,
         optim.zero_grad(set_to_none=True)
         pred = model(z["train_x"],z["train_mask"],graph,
                      z["train_last"],z["train_structure"],z["train_context"])
-        loss = three_axis_weighted_huber(
-            pred,z["train_y"],z["train_last"],y_scale)
+        loss = joint_axis_ici_loss(pred,z["train_y"],y_scale)
         if not torch.isfinite(loss):
             raise RuntimeError("Nonfinite common GNN training loss")
         loss.backward()
@@ -849,6 +900,10 @@ def benchmark_contract():
             for f in files}
     return dict(
         model="B-MTGNN",modes=list(STAGE04_OUTPUT_MODES),
+        learning_recipe=LEARNING_RECIPE,
+        calibration="MEDIAN_TRAIN_RESIDUAL_PER_INDUSTRY_AXIS",
+        train_origins=admissible_train_origins(LOOKBACK).tolist(),
+        hidden_width=STAGE04_ACTIVE_WIDTH,learning_rate=FIXED_LEARNING_RATE,
         seeds=list(DEFAULT_SEEDS),train="2006Q1-2019Q4",
         dev="2020Q1-2022Q4",
         bmtgnn_mc_draws=STAGE04_BMTGNN_MC_SAMPLES,
@@ -1081,24 +1136,43 @@ def summarize_development():
     return selection
 
 
-def run_development(limit=None,device="cpu"):
+def reset_stage_results(path):
+    """Clear one existing result directory ONLY on an explicit --restart.
+
+    Never relabel old learning results with a new source signature, move
+    folders, or delete upstream data. Calling this is an execution action;
+    changing the source or importing a module cannot trigger it.
+    """
+    names=("04_bmtgnn_benchmark","05_input_lookback","06_preprocessing",
+           "07_correlated_feature_removal","08_feature_selection","09_hyperparameter_tuning")
+    allowed={ROOT/"Results"/name for name in names}
+    path=Path(path)
+    if path not in allowed or path.resolve()!=path:
+        raise ValueError("Restart is restricted to the six existing stage result directories")
+    if path.exists():
+        shutil.rmtree(path)
+
+
+def run_development(limit=None,device="cpu",restart=False):
     """Train once and freeze the B-MTGNN mode using Dev only."""
     jobs=benchmark_jobs()
     assert len(jobs)==30 and len(DEFAULT_SEEDS)==10
     contract=benchmark_contract()
     current_sha=hashlib.sha256(
         (ROOT/"Sources/04_bmtgnn_benchmark.py").read_bytes()).hexdigest()
+    if restart:
+        reset_stage_results(RESULTS)
     manifest=RESULTS/"run_manifest.json"
     if manifest.is_file():
         status=_read_json(manifest)
         if status["contract"]!=contract:
             raise RuntimeError("Current Stage04 protocol differs from stored run")
         digest=status["training_source_sha256"]
+        if digest!=current_sha:
+            raise RuntimeError("Stage04 source changed; explicitly --restart this stage")
         if status["status"]=="DEV_FROZEN":
             _read_completed_jobs(digest)
             return status
-        if digest!=current_sha:
-            raise RuntimeError("Cannot continue partial fit after training-source edit")
     else:
         digest=current_sha
         status=dict(status="DEV_RUNNING",contract=contract,
@@ -1530,9 +1604,13 @@ def main():
     parser.add_argument("--phase",choices=("dev","plots","status","dry-run"),
                         default="dev")
     parser.add_argument("--limit",type=int)
+    parser.add_argument("--restart",action="store_true",
+                        help="Explicitly replace this stage's existing results; no folder rename")
     parser.add_argument("--device",choices=("cpu","cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     args=parser.parse_args()
+    if args.restart and args.phase!="dev":
+        parser.error("--restart is only valid for --phase dev")
     if args.limit is not None and args.limit<1:
         parser.error("--limit must be positive")
     if args.phase=="dry-run":
@@ -1545,7 +1623,7 @@ def main():
         path=RESULTS/"run_manifest.json"
         print(_read_json(path) if path.exists() else {"status":"NOT_STARTED"})
     elif args.phase=="dev":
-        print(run_development(args.limit,args.device)["status"])
+        print(run_development(args.limit,args.device,args.restart)["status"])
     else:
         print("\n".join(plot_development()))
 

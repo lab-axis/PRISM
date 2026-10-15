@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """PRISM Stage09: full-Train Structural B-MTGNN hyperparameter experiment.
 
-Conditional on the Stage05–08 locks: Structural B-MTGNN, L=1, 157 inputs,
-Stage06 selected preprocessing, 36 common Train origins, ten paired seeds.
-No Train split/CV, no Test. All 2,268 candidate policies use the same
+Conditional on actual Stage04–08 mode, lookback, preprocessing and retained
+inputs, all admissible Train origins and ten paired seeds.
+No Train split/CV, no Test. All candidate policies use the same
 2020–22 Dev observations. These scores are development-selection results,
 NOT independent estimates of generalization or global hyperparameter optima.
 
@@ -58,7 +58,6 @@ EPOCHS = (10, 25, 50, 75, 100, 150, 200)
 ALPHAS = tuple(product((0., .25, .5), (0., .1, .2), (0., .25, .5)))
 REFERENCE = (16, .001, (.25, .1, .25))
 SEEDS = tuple(range(2026, 2036))
-TRAIN_ORIGINS = tuple(range(20, 56))
 DEV_ORIGINS = tuple(range(56, 68))
 MODEL = "B-MTGNN"
 SCORE_FIELDS = ("axis_mae", "ici_mae", "profitability_mae",
@@ -109,32 +108,42 @@ def upstream() -> dict:
     ctx = m08.upstream()
     lock = read_json(RESULT08 / "selected_features.json")
     manifest = read_json(RESULT08 / "run_manifest.json")
+    indices=tuple(lock.get("selected_original_indices",()))
     if (manifest.get("status") != "PASS"
             or lock.get("status") != "LOCKED"
-            or manifest.get("selected_K") != 157
-            or lock.get("selected_K") != 157
-            or lock.get("selected_original_indices") != list(range(157))
+            or not indices or indices!=tuple(sorted(set(indices)))
+            or not set(indices).issubset(ctx["active_indices"])
+            or manifest.get("selected_K")!=len(indices)
+            or lock.get("selected_K")!=len(indices)
             or lock.get("stage08_signature") != manifest.get("study_signature")
+            or manifest.get("contract") != m08.contract(ctx)
+            or manifest.get("study_signature") != m08.signature(manifest["contract"])
             or manifest["contract"]["source_sha256"] != sha(SOURCE08)
             or lock.get("stage07_lock_sha256") != ctx["stage07_lock_hash"]
             or not lock.get("all_ranked_prefixes_exhausted")
             or lock.get("test_opened") is not False
             or manifest.get("test_opened") is not False
-            or ctx["full_fold"]["train_x"].shape != (36, 1, 59, 157)
-            or ctx["full_fold"]["val_x"].shape != (12, 1, 59, 157)
-            or not np.array_equal(ctx["full_fold"]["train_origins"], TRAIN_ORIGINS)
+            or lock.get("lookback")!=ctx["lookback"]
+            or lock.get("output_mode")!=ctx["output_mode"]
             or not np.array_equal(ctx["full_fold"]["val_origins"], DEV_ORIGINS)
-            or ctx["stage07_lock"]["selected_mode"] != "original"
             or ctx["epochs"] != 75
-            or ctx["models"] != (MODEL,)
-            or ctx["locked_policy"].id !=
-            "m-scaled_zero__n-standard__d-winsor005"):
+            or ctx["models"] != (MODEL,)):
         raise RuntimeError("Stage09 upstream Stage06–08 canonical lock mismatch")
+    subset=m08.subset(ctx,indices,"stage08_selected")
+    data=ctx["m07"].adapt_inputs(ctx["full_fold"],subset,"compact")
+    prediction_path=RESULT08/"selected_seed_predictions.npz"
+    if lock["selected_predictions_sha256"]!=sha(prediction_path):
+        raise RuntimeError("Stage08 selected forecast bank changed")
+    with np.load(prediction_path,allow_pickle=False) as saved:
+        bank=saved["seed_predictions"].copy()
+    baseline,_=ctx["m06"].seed_policy_metrics(bank,ctx["panel"])
     for key in SCORE_FIELDS:
         if abs(float(lock["selected_dev"][key]) -
-               float(ctx["baseline"][key])) > 1e-10:
-            raise RuntimeError("Stage08 baseline metrics differ from Stage06")
+               float(baseline[key])) > 1e-10:
+            raise RuntimeError("Stage08 selected forecast bank differs from its metrics")
     ctx.update(m08=m08, selected08=lock, manifest08=manifest,
+               selected_indices=indices,selected_subset=subset,selected_fold=data,
+               baseline=baseline,reference_forecasts=bank,
                stage08_lock_hash=sha(RESULT08 / "selected_features.json"),
                stage08_manifest_hash=sha(RESULT08 / "run_manifest.json"))
     return ctx
@@ -154,17 +163,21 @@ def configuration(ctx: dict) -> dict:
         stage06_input_sha256=ctx["upstream06_input_sha256"],
         source_component_sha256=sha(m04.STAGE04_COMPONENT_SOURCE),
         raw_panel_hashes=ctx["panel_hashes"],
-        model=MODEL, output_mode="structural", lookback=1,
+        model=MODEL,output_mode=ctx["output_mode"],lookback=ctx["lookback"],
+        selected_feature_indices=list(ctx["selected_indices"]),
+        selected_input_sha256=ctx["m07"].dataset_sha(ctx["selected_fold"]),
         hidden_widths=list(WIDTHS), learning_rates=list(LEARNING_RATES),
         snapshots=list(EPOCHS),
-        alpha_triples=[list(alpha) for alpha in ALPHAS],
+        alpha_triples=[list(alpha) for alpha in active_alphas(ctx["output_mode"])],
+        structural_alpha_active=ctx["output_mode"]=="structural",
+        policy_count=len(grid(ctx["output_mode"])),
         baseline_width=16, baseline_lr=.001, baseline_epoch=75,
         baseline_alpha=list(REFERENCE[2]),
-        training_origins=list(TRAIN_ORIGINS),
+        training_origins=ctx["selected_fold"]["train_origins"].tolist(),
         dev_origins=list(DEV_ORIGINS), seeds=list(SEEDS),
-        training_full_common_train_only=True,
+        training_full_admissible_train_only=True,
         internal_train_split=False, test_opened=False,
-        preprocessing="scaled_zero__standard__winsor005",
+        preprocessing=ctx["locked_policy"].id,
         fixed_core_slots=20, fixed_dropout=.1,
         fixed_graph_top_k=8, fixed_graph_embedding=8,
         fixed_weight_decay=.0001, fixed_grad_clip=5.,
@@ -193,38 +206,49 @@ def policy_id(width: int, lr: float, alpha: tuple[float, ...], epoch: int) -> st
     return trajectory_id(width, lr, alpha) + f"_e{epoch:03d}"
 
 
-def grid():
+def active_alphas(mode):
+    """Alpha changes only a Structural anchor, not Direct/Residual models."""
+    if mode not in ("direct","residual","structural"):
+        raise ValueError("Unknown Stage04-selected formulation")
+    return ALPHAS if mode=="structural" else (REFERENCE[2],)
+
+
+def grid(mode="structural"):
     return tuple((width, lr, alpha, epoch)
                  for width, lr, alpha, epoch in
-                 product(WIDTHS, LEARNING_RATES, ALPHAS, EPOCHS))
+                 product(WIDTHS, LEARNING_RATES, active_alphas(mode), EPOCHS))
 
 
-def trajectories():
+def trajectories(mode="structural"):
     """Reference first; no alternative evaluated before reference parity."""
     reference = REFERENCE
-    rest = tuple(item for item in product(WIDTHS, LEARNING_RATES, ALPHAS)
+    rest = tuple(item for item in product(WIDTHS, LEARNING_RATES, active_alphas(mode))
                  if item != reference)
     return (reference,) + rest
 
 
-def model_factory(ctx, width: int, seed: int):
+def model_factory(ctx, width: int, seed: int, data: dict):
     """Stage05/06 exact reference at W16; pure variable-width replacements.
 
     Do not monkeypatch mutable Stage04 module constants.
     """
     if width not in WIDTHS or seed not in SEEDS:
         raise ValueError("Unregistered model/seed")
-    ref = ctx["m07"].Subset(
-        "no_removal", None, tuple(range(157)), (), pd.DataFrame(), 0)
-    net = ctx["m07"].instantiate_subset(ctx, ref, seed, compact=False)
+    count=len(ctx["selected_indices"])
+    net=ctx["m07"].instantiate_subset(
+        ctx,ctx["selected_subset"],seed,compact=count<157)
     if width != 16:
         m04, m05 = ctx["m04"], ctx["m05"]
         net.base = m04.ForecastModel(
-            MODEL, 157, 59, width, 20, 1)
+            MODEL,count,59,width,20,1)
         net.base.core = m05.FixedTemporalInput(net.base.core)
         net.context_adapter = nn.Sequential(
             nn.Linear(9, width), nn.SiLU(), nn.Linear(width, width))
-    expected = {8: 26926, 16: 67190, 32: 192262, 64: 620582}[width]
+    # Re-estimate the selected anchor's median for each candidate alpha,
+    # and zero the output AFTER replacing the width-dependent core.
+    ctx["m04"].initialize_calibrated_model(net,data)
+    expected=({8:26926,16:67190,32:192262,64:620582}[width]
+              -2*width*(157-count))
     if sum(parameter.numel() for parameter in net.parameters()) != expected:
         raise RuntimeError("Stage09 expected model parameter count changed")
     return net
@@ -250,7 +274,7 @@ def alpha_prior(ctx: dict, component_bank, alpha: tuple[float, ...]):
 
 def alpha_inputs(ctx: dict, prior: np.ndarray):
     """Only Structural prior differs; original target labels stay fixed."""
-    base = ctx["full_fold"]
+    base = ctx["selected_fold"]
     result = dict(base)
     # Stage06 normalized with float64 TRAIN statistics before exporting
     # float32 buffers. Never re-normalize using those rounded buffers.
@@ -262,16 +286,18 @@ def alpha_inputs(ctx: dict, prior: np.ndarray):
         scale = ctx["panel"].y[:56].std((0, 1))
         scale = np.where(scale > 1e-8, scale, 1.)
         result["train_structure"] = (
-            (prior[list(TRAIN_ORIGINS)] - center) / scale).astype(np.float32)
+            (prior[base["train_origins"]] - center) / scale).astype(np.float32)
         result["val_structure"] = (
             (prior[list(DEV_ORIGINS)] - center) / scale).astype(np.float32)
-    if (result["train_structure"].shape != (36, 59, 3)
+        result["anchor_biases"]=ctx["m04"].train_anchor_biases(
+            ctx["panel"],prior,base["train_origins"],center,scale)
+    if (result["train_structure"].shape != (len(base["train_origins"]),59,3)
             or result["val_structure"].shape != (12, 59, 3)
             or not all(np.isfinite(result[key]).all()
                        for key in ("train_structure", "val_structure"))):
         raise RuntimeError("Invalid alpha-dependent structural tensor")
     for key, value in base.items():
-        if key not in ("train_structure", "val_structure") and (
+        if key not in ("train_structure", "val_structure","anchor_biases") and (
                 result[key] is not value):
             raise RuntimeError("Stage09 changed a non-Structural input")
     if np.allclose(prior, ctx["prior"], atol=1e-10, rtol=0):
@@ -290,7 +316,7 @@ def fit_trajectory(ctx: dict, data: dict, width: int, lr: float, seed: int,
             or snapshots[0] < 1 or snapshots[-1] > 200):
         raise ValueError("Invalid Stage09 training trajectory")
     m04 = ctx["m04"]
-    model = model_factory(ctx, width, seed).to(device)
+    model = model_factory(ctx,width,seed,data).to(device)
     params = sum(p.numel() for p in model.parameters())
     keys = ("train_x", "train_mask", "train_y", "train_last",
             "train_context", "train_structure", "val_x", "val_mask",
@@ -309,8 +335,7 @@ def fit_trajectory(ctx: dict, data: dict, width: int, lr: float, seed: int,
         output = model(z["train_x"], z["train_mask"], graph,
                        z["train_last"], z["train_structure"],
                        z["train_context"])
-        loss = m04.three_axis_weighted_huber(
-            output, z["train_y"], z["train_last"], yscale)
+        loss = m04.joint_axis_ici_loss(output,z["train_y"],yscale)
         if not torch.isfinite(loss):
             failure = f"Nonfinite Train loss at epoch {epoch}"
             break
@@ -371,6 +396,9 @@ def load_or_fit(ctx: dict, root: Path, width: int, lr: float,
         if (record.get("signature") != study_sig
                 or record.get("trajectory") != label
                 or record.get("seed") != seed
+                or record.get("lookback") != ctx["lookback"]
+                or record.get("output_mode") != ctx["output_mode"]
+                or record.get("selected_indices") != list(ctx["selected_indices"])
                 or record.get("epochs_requested") != list(EPOCHS)
                 or record.get("pred_sha256") != sha(pred_file)
                 or record.get("checkpoint_sha256") != sha(weight_file)):
@@ -396,6 +424,8 @@ def load_or_fit(ctx: dict, root: Path, width: int, lr: float,
     checkpoint = dict(
         signature=study_sig, trajectory=label, seed=seed,
         width=width, learning_rate=lr, alpha=list(alpha),
+        lookback=ctx["lookback"],output_mode=ctx["output_mode"],
+        selected_indices=list(ctx["selected_indices"]),
         epoch_snapshots=outcome["epochs"].tolist(),
         parameters=outcome["parameters"], states=outcome["states"])
     writing = weight_file.with_suffix(".pt.writing")
@@ -406,7 +436,8 @@ def load_or_fit(ctx: dict, root: Path, width: int, lr: float,
     atomic_json(metadata_file, dict(
         signature=study_sig, trajectory=label, seed=seed,
         width=width, learning_rate=lr, alpha=list(alpha),
-        model=MODEL, lookback=1,
+        model=MODEL,lookback=ctx["lookback"],output_mode=ctx["output_mode"],
+        selected_indices=list(ctx["selected_indices"]),
         epochs_requested=list(EPOCHS),
         epochs_complete=outcome["epochs"].tolist(),
         parameters=outcome["parameters"],
@@ -419,11 +450,11 @@ def load_or_fit(ctx: dict, root: Path, width: int, lr: float,
 
 def assert_reference_seed(ctx: dict, result: dict, seed: int):
     epochs = result["epochs"].tolist()
-    if 75 not in epochs or result["parameters"] != 67190:
+    if 75 not in epochs or result["parameters"] != ctx["selected08"]["selected_parameters"]:
         raise RuntimeError(f"Stage09 baseline seed {seed} lacks epoch 75")
     index = epochs.index(75)
     actual = result["predictions"][index]
-    expected = ctx["original_forecasts"][SEEDS.index(seed)]
+    expected = ctx["reference_forecasts"][SEEDS.index(seed)]
     if (actual.shape != (12, 59, 3)
             or not np.allclose(actual, expected, atol=PARITY_ATOL, rtol=0)):
         maximum = float(np.max(np.abs(actual - expected)))
@@ -455,12 +486,13 @@ def baseline_parity(ctx: dict, root: Path, study_sig: str):
         np.stack(forecasts), ctx["panel"])
     if any(abs(scores[key] - ctx["baseline"][key]) > PARITY_ATOL
            for key in SCORE_FIELDS):
-        raise RuntimeError("Stage09 baseline 10-seed metrics differ from Stage06")
+        raise RuntimeError("Stage09 baseline 10-seed metrics differ from selected Stage08")
     return dict(max_absolute_prediction_diff=max(differences),
                 max_absolute_metric_diff=max(abs(
                     scores[key] - ctx["baseline"][key]) for key in SCORE_FIELDS),
                 all_ten_seed_forecasts_checked=True,
-                reference_parameters=67190, tolerance=PARITY_ATOL)
+                reference_parameters=ctx["selected08"]["selected_parameters"],
+                tolerance=PARITY_ATOL)
 
 
 def qualification(row: dict, baseline: dict):
@@ -476,10 +508,10 @@ def qualification(row: dict, baseline: dict):
         qualified=bool(improvement and ici and annual_wins >= 2))
 
 
-def policy_selection(rows: list[dict]) -> dict:
-    if (len(rows) != 2268 or
+def policy_selection(rows: list[dict],mode="structural") -> dict:
+    if (len(rows) != len(grid(mode)) or
             len({r["policy"] for r in rows}) != len(rows)):
-        raise ValueError("Need all 2,268 unique policies, not a partial search")
+        raise ValueError("Need every unique policy in the active grid")
     eligible = [r for r in rows
                 if r["status"] == "PASS" and r["qualified"]]
     baseline_id = policy_id(*REFERENCE, 75)
@@ -503,7 +535,7 @@ def scoring_table(ctx: dict, root: Path, study_sig: str) -> list[dict]:
     """Reproduce ALL scored policies from persisted individual forecasts."""
     baseline = ctx["baseline"]
     records = []
-    for width, lr, alpha in product(WIDTHS, LEARNING_RATES, ALPHAS):
+    for width, lr, alpha in product(WIDTHS, LEARNING_RATES,active_alphas(ctx["output_mode"])):
         entries = []
         for seed in SEEDS:
             meta, path, weight = job_paths(root, width, lr, alpha, seed)
@@ -546,13 +578,17 @@ def economic_only(ctx: dict, component_bank):
     truth = ctx["panel"].y[list(DEV_ORIGINS)]
     past = ctx["m04"].past_scores(ctx["panel"], np.asarray(DEV_ORIGINS))
     records = []
-    for alpha in ALPHAS:
+    origins=ctx["selected_fold"]["train_origins"]
+    for alpha in active_alphas(ctx["output_mode"]):
         prior = alpha_prior(ctx, component_bank, alpha)
         metrics = ctx["m06"].scores(prior[list(DEV_ORIGINS)], truth, past)
+        bias=np.median(ctx["panel"].y[origins]-prior[origins],axis=0)
+        calibrated=ctx["m06"].scores(prior[list(DEV_ORIGINS)]+bias,truth,past)
         records.append(dict(alpha=list(alpha),
                             alpha_profitability=alpha[0],
                             alpha_productivity=alpha[1],
-                            alpha_growth=alpha[2], **metrics))
+                            alpha_growth=alpha[2], **metrics,
+                            **{"calibrated_"+key:value for key,value in calibrated.items()}))
     return records
 
 
@@ -635,7 +671,7 @@ def write_final(ctx: dict, root: Path, records: list[dict],
                 chosen: dict, economic: list[dict], study_sig: str,
                 parity: dict):
     frame = pd.DataFrame(records)
-    frame.to_csv(root / "dev_all_2268.csv",
+    frame.to_csv(root / f"dev_all_{len(records)}.csv",
                  index=False, encoding="utf-8-sig")
     econ = pd.DataFrame(economic)
     econ.to_csv(root / "economic_only_alpha.csv",
@@ -652,7 +688,10 @@ def write_final(ctx: dict, root: Path, records: list[dict],
         numeric_infeasible_policy_count=sum(
             r["status"] != "PASS" for r in records),
         evaluated_grid_count=len(records), all_policies_present=True,
-        scope="BEST_ELIGIBLE_OF_2268_BOUNDED_GRID_NOT_GLOBAL",
+        scope="BEST_ELIGIBLE_OF_ACTIVE_GRID_NOT_GLOBAL",
+        output_mode=ctx["output_mode"],lookback=ctx["lookback"],
+        selected_original_indices=list(ctx["selected_indices"]),
+        learning_recipe=ctx["m04"].LEARNING_RECIPE,
         baseline_parity=parity,
         baseline_dev={key: ctx["baseline"][key] for key in SCORE_FIELDS},
         selected_dev={key: chosen[key] for key in SCORE_FIELDS},
@@ -687,19 +726,25 @@ def write_final(ctx: dict, root: Path, records: list[dict],
                          learning_rate=None, epoch=None,
                          alpha=list(alpha),
                          **{key: econ[key] for key in SCORE_FIELDS}))
+        rows.append(dict(comparator=label+"_train_median",width=None,
+                         learning_rate=None,epoch=None,alpha=list(alpha),
+                         **{key:econ["calibrated_"+key] for key in SCORE_FIELDS}))
     pd.DataFrame(rows).to_csv(
         root / "dev_comparison.csv", index=False, encoding="utf-8-sig")
     return selection
 
 
 def run(args):
+    if args.restart and not args.run:
+        raise ValueError("--restart requires --run")
     if args.dry_run:
         print("09: bounded Structural B-MTGNN hyperparameter study")
         print("Width", WIDTHS, "LR", LEARNING_RATES, "Epochs", EPOCHS)
         print("Alpha triples", len(ALPHAS),
               "Policies", len(grid()), "Fitting trajectories",
               len(trajectories()) * len(SEEDS))
-        print("Train: 36 common origins; Dev: 12 quarters; NO CV/TEST")
+        print("Train: Stage08's actual full-Train inputs; Dev: 12 quarters; NO CV/TEST")
+        print("Structural mode: 2268 policies; other modes: alpha inactive, 84 policies")
         return None
     manifest_file = RESULTS / "run_manifest.json"
     if args.status:
@@ -711,6 +756,8 @@ def run(args):
     ctx = upstream()
     spec = configuration(ctx)
     study_sig = signature(spec)
+    if args.restart:
+        ctx["m04"].reset_stage_results(RESULTS)
     previous = read_json(manifest_file) if manifest_file.exists() else None
     if previous and previous["signature"] != study_sig:
         raise RuntimeError("Stage09 upstream/source changed; refuse legacy cache")
@@ -734,7 +781,7 @@ def run(args):
         design_sha256=sha(config_file),
         started_utc=(previous or {}).get(
             "started_utc", datetime.now(timezone.utc).isoformat()),
-        target_trajectories=len(trajectories()) * len(SEEDS),
+        target_trajectories=len(trajectories(ctx["output_mode"])) * len(SEEDS),
         completed_trajectories=(previous or {}).get(
             "completed_trajectories", 0),
         test_opened=False,
@@ -749,7 +796,7 @@ def run(args):
     prepared = {}
     completed = 0
     parity = None
-    for index, (width, lr, alpha) in enumerate(trajectories()):
+    for index, (width, lr, alpha) in enumerate(trajectories(ctx["output_mode"])):
         if alpha not in prepared:
             prepared[alpha] = alpha_inputs(ctx, alpha_prior(ctx, bank, alpha))
         for seed in SEEDS:
@@ -776,7 +823,7 @@ def run(args):
             atomic_json(manifest_file, manifest)
             print("09_REFERENCE_PARITY_PASS", parity, flush=True)
     records = scoring_table(ctx, RESULTS, study_sig)
-    chosen = policy_selection(records)
+    chosen = policy_selection(records,ctx["output_mode"])
     economic = economic_only(ctx, bank)
     selection = write_final(
         ctx, RESULTS, records, chosen, economic, study_sig, parity)
@@ -806,6 +853,7 @@ def main():
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--status", action="store_true")
     parser.add_argument("--run", action="store_true")
+    parser.add_argument("--restart",action="store_true")
     parser.add_argument(
         "--device", choices=("cpu", "cuda"),
         default="cuda" if torch.cuda.is_available() else "cpu")

@@ -7,16 +7,16 @@ feature distribution/tail transformation. This is ONE canonical full-
 factorial experiment. No old Stage06 sequential code, old result readers,
 compatibility shims or alternative study versions are supported.
 
-FIXED CONTROLS: Stage04 Structural B-MTGNN and Stage05 Dev-selected raw
-feature-window L=1. Every candidate has the SAME 67,190-parameter,
+FIXED CONTROLS: Stage04-selected B-MTGNN formulation and Stage05-selected
+raw feature-window L. Every candidate has the SAME 67,190-parameter,
 20-slot temporal model, ten matched seeds 2026–2035, fixed 75 epochs,
 30 MC-dropout samples, target definitions, original missing mask and
 strictly as-of 9D target context. Training uses all 2006–2019 data for
-distribution statistics, with the SAME 36 supervised target origins
-2011–2019. Dev 2020–2022 has 12 matched evaluation quarters.
+distribution statistics and the SAME full-Train refit support from
+Stage05, t=max(L,5)..55. Dev 2020–2022 has 12 matched quarters.
 
 POLICY SELECTION: score each seed's Dev three-axis MAE before averaging.
-Relative to the Stage05 L1 raw_zero/standard/none baseline, a candidate
+Relative to the Stage05 full-Train raw_zero/standard/none baseline, a candidate
 is eligible only if mean MAE strictly improves, mean seed-level ICI MAE
 does not worsen, and MAE improves in >=2 of 2020/2021/2022. The baseline
 is always eligible as fallback. Choose the feasible grid policy with
@@ -76,15 +76,12 @@ SOURCE05=ROOT/"Sources/05_input_lookback.py"
 RESULT05=ROOT/"Results/05_input_lookback"
 RESULTS=ROOT/"Results/06_preprocessing"
 
-LOOKBACK=1
 TRAIN_END=56
 DEV_END=68
 SOURCE_FIRST=42
 THREE_AXES=("profitability","productivity","growth")
 SEEDS=tuple(range(2026,2036))
 MODEL="B-MTGNN"
-MODE="structural"
-TRAIN_ORIGINS=np.arange(20,TRAIN_END,dtype=int)
 MIN_YEARS_BETTER=2 # 2020,2021,2022; no 4-year 2016-19 internal evaluation
 SELECTION_TOL=1e-9
 MISSING=("raw_zero","scaled_zero","train_median","train_mean",
@@ -141,6 +138,21 @@ def stage05():
     return mod
 
 
+def selected_lookback():
+    length=int(json_read(RESULT05/"lookback_dev_selection.json")["selected_lookback_quarters"])
+    if length not in stage05().LENGTHS:
+        raise RuntimeError("Stage05 selected an unregistered lookback")
+    return length
+
+
+def selected_mode():
+    return stage05().selected_mode()
+
+
+def train_origins():
+    return stage04().admissible_train_origins(selected_lookback())
+
+
 @dataclass(frozen=True)
 class Policy:
     missing:str="raw_zero"
@@ -170,18 +182,21 @@ def enumerate_policies()->tuple[Policy,...]:
 
 
 def verify_upstream_and_load():
-    """Fail closed on selected Stage05 L=1 and the original 200 source jobs."""
+    """Verify the 200-job L search and its selected full-Train refit."""
     m=stage04()
     s5=stage05()
     canonical_m,panel,lock,manifest04=s5.upstream()
     selection=json_read(RESULT05/"lookback_dev_selection.json")
     run05=json_read(RESULT05/"run_manifest.json")
+    expected05,signature05=s5.run_contract(canonical_m,panel,lock,manifest04)
     if (manifest04.get("status")!="DEV_FROZEN"
             or run05.get("status")!="COMPLETE_MAIN_DEV_ANALYSIS"
+            or run05.get("contract")!=expected05
+            or run05.get("signature")!=signature05
             or run05.get("completed_runs")!=200
-            or selection.get("selected_lookback_quarters")!=LOOKBACK
+            or selection.get("selected_lookback_quarters") not in s5.LENGTHS
             or selection.get("model")!=MODEL
-            or selection.get("mode")!=MODE
+            or selection.get("mode")!=lock["selected_mode"]
             or selection.get("seed_count")!=len(SEEDS)
             or selection.get("selection_data")!="DEV_2020Q1_2022Q4"
             or selection.get("selection_rule")!=s5.DEV_SELECTION_RULE
@@ -189,9 +204,9 @@ def verify_upstream_and_load():
             or run05.get("test_opened") is not False
             or s5.SEEDS!=SEEDS
             ):
-        raise RuntimeError("Stage06 requires the current completed L=1 Stage05")
+        raise RuntimeError("Stage06 requires the current completed Stage05 selection")
     if (s5.CORE_LOOKBACK!=20 or s5.MODEL!=MODEL
-            or s5.MODE!=MODE or tuple(s5.COMMON_TRAIN_ORIGINS)!=tuple(TRAIN_ORIGINS)
+            or len(s5.COMMON_TRAIN_ORIGINS)!=36
             or m.STAGE04_ACTIVE_EPOCHS!=75
             or panel.x.shape!=(68,59,157) or panel.y.shape!=(68,59,3)
             or panel.train_count!=TRAIN_END):
@@ -210,32 +225,16 @@ def verify_upstream_and_load():
         seen.add((entry["L"],entry["seed"]))
     if seen!=expected:
         raise RuntimeError("Stage05 trial/seed coverage not complete")
+    # Common-support selection is not the deployed model: Stage06 must
+    # compare against the selected L refitted on full admissible support.
+    s5.load_selected_refit(RESULT05,panel)
     return m,s5,panel,selection,run05
 
 
 def original_stage05_seed_predictions(panel):
-    """Return 10 individually trained L=1 forecasts without seed averaging."""
-    model=stage05()
-    stored=json_read(RESULT05/"run_manifest.json")
-    bank=[]
-    for seed in SEEDS:
-        stem=f"L{LOOKBACK:02d}__{MODEL}__s{seed}"
-        meta=RESULT05/"trials"/(stem+".json")
-        file=RESULT05/"trials"/(stem+".npz")
-        row=json_read(meta)
-        if (row.get("signature")!=stored["signature"]
-                or row.get("L")!=LOOKBACK or row.get("seed")!=seed
-                or row.get("model")!=MODEL or
-                row.get("fixed_epochs")!=75
-                or row.get("prediction_sha256")!=sha(file)):
-            raise RuntimeError("Stage05 original selected-L job modified")
-        with np.load(file,allow_pickle=False) as z:
-            prediction=z["prediction"].copy()
-        if (prediction.shape!=(12,59,3) or
-                not np.isfinite(prediction).all()):
-            raise RuntimeError("Stage05 original L=1 forecast invalid")
-        bank.append(prediction)
-    return np.stack(bank)
+    """Ten actual full-Train refit forecasts, not the 36-origin L search."""
+    bank,_=stage05().load_selected_refit(RESULT05,panel)
+    return bank
 
 
 def _observed_train_quantile(values,q):
@@ -415,7 +414,7 @@ def normalize_inputs(raw,obs,policy:Policy,fit_end):
 
 
 def prepare_policy(panel,policy:Policy,prior:np.ndarray,fit_end:int=TRAIN_END):
-    """Create Stage05-comparable L1 windows, fit preprocessing on Train only."""
+    """Match the selected Stage05 full-Train refit, fitting scalers on Train."""
     policy.validate()
     if (fit_end!=TRAIN_END or panel.x.shape!=(68,59,157)
             or prior.shape!=panel.y.shape):
@@ -431,13 +430,14 @@ def prepare_policy(panel,policy:Policy,prior:np.ndarray,fit_end:int=TRAIN_END):
     ys=np.where(ys>1e-8,ys,1.)
     y=((panel.y-yc)/ys).astype(np.float32)
     structured=((prior-yc)/ys).astype(np.float32)
-    train=TRAIN_ORIGINS
+    lookback=selected_lookback()
+    train=train_origins()
     dev=np.arange(fit_end,DEV_END,dtype=int)
     m=stage04()
     def pack(ids,prefix):
         return {
-            f"{prefix}_x":np.stack([x[t-LOOKBACK:t] for t in ids]),
-            f"{prefix}_mask":np.stack([mask[t-LOOKBACK:t] for t in ids]),
+            f"{prefix}_x":np.stack([x[t-lookback:t] for t in ids]),
+            f"{prefix}_mask":np.stack([mask[t-lookback:t] for t in ids]),
             f"{prefix}_y":np.stack([y[t:t+1] for t in ids]),
             f"{prefix}_last":((m.past_scores(panel,ids)-yc)/ys).astype(np.float32),
             f"{prefix}_context":m.known_score_context(panel,ids,yc,ys),
@@ -447,9 +447,10 @@ def prepare_policy(panel,policy:Policy,prior:np.ndarray,fit_end:int=TRAIN_END):
               x_scale=xs.astype(np.float32),
               y_center=yc.astype(np.float32),
               y_scale=ys.astype(np.float32),
-              train_origins=train,val_origins=dev)
-    if (data["train_x"].shape!=(36,1,59,157)
-            or data["val_x"].shape!=(12,1,59,157)
+              train_origins=train,val_origins=dev,
+              anchor_biases=m.train_anchor_biases(panel,prior,train,yc,ys))
+    if (data["train_x"].shape!=(len(train),lookback,59,157)
+            or data["val_x"].shape!=(12,lookback,59,157)
             or not all(np.isfinite(v).all() for v in data.values())):
         raise RuntimeError("Stage06 data shapes/finite contract invalid")
     audit=dict(
@@ -458,7 +459,7 @@ def prepare_policy(panel,policy:Policy,prior:np.ndarray,fit_end:int=TRAIN_END):
         source_predictors_touched_only=True,
         original_missingness_preserved=np.array_equal(
             data["val_mask"][-1],
-            mask[DEV_END-LOOKBACK-1:DEV_END-1]),
+            mask[DEV_END-lookback-1:DEV_END-1]),
         train_original_missing_cells=int((~observed[:fit_end]).sum()),
         original_train_observed_cells=int(observed[:fit_end].sum()),
         raw_test_opened=False,
@@ -477,24 +478,25 @@ def structural_prior(panel):
 
 
 def original_stage05_parity(panel,prior):
-    """Bytewise parity with L1 Train/Dev tensors used to fit Stage05.
+    """Bytewise parity with the selected full-Train Stage05 refit tensors.
 
     If this fails the original policy cannot be reused; do not compare
-    unpaired training protocols or silently re-fit the L=1 baseline.
+    unpaired training protocols or silently substitute the common-support model.
     """
     actual,_=prepare_policy(panel,ORIGINAL,prior)
-    canonical=stage05().Inputs(panel).fold(LOOKBACK)
+    canonical=stage05().Inputs(panel).fold(selected_lookback(),full_train=True)
     keys=("train_x","train_mask","train_y","train_last","train_context",
           "train_structure","val_x","val_mask","val_y","val_last",
           "val_context","val_structure",
-          "x_center","x_scale","y_center","y_scale","train_origins","val_origins")
+          "x_center","x_scale","y_center","y_scale","train_origins","val_origins",
+          "anchor_biases")
     differences=[]
     for key in keys:
         if not np.array_equal(actual[key],canonical[key]):
             differences.append(key)
     if differences:
         raise RuntimeError(
-            "Stage06 nominal Stage05 L1 baseline IS NOT identical: "
+            "Stage06/Stage05 full-Train reference inputs differ: "
             +str(differences))
     return True
 
@@ -505,7 +507,7 @@ def input_fingerprint(data:dict)->str:
         "train_x","train_mask","train_y","train_last","train_context",
         "train_structure","val_x","val_mask","val_y","val_last",
         "val_context","val_structure","x_center","x_scale",
-        "y_center","y_scale","train_origins","val_origins"):
+        "y_center","y_scale","train_origins","val_origins","anchor_biases"):
         a=np.ascontiguousarray(data[key])
         hasher.update(key.encode()+b"\0")
         hasher.update(str(a.shape).encode()+str(a.dtype).encode())
@@ -536,11 +538,11 @@ def scores(pred,truth,past):
 
 
 def fit_policy_model(data,seed,device):
-    """Same 75-epoch L1/B-MTGNN recipe and identical seed init as Stage05."""
+    """Same calibrated 75-epoch B-MTGNN recipe and seed init as Stage05."""
     m=stage04()
     module=stage05()
     m.seed_all(seed)
-    net=module.instantiate(m,MODEL,seed,LOOKBACK,data,MODE).to(device)
+    net=module.instantiate(m,MODEL,seed,selected_lookback(),data,selected_mode()).to(device)
     z={k:torch.as_tensor(data[k],device=device)
        for k in ("train_x","train_mask","train_y","train_last",
                  "train_context","train_structure","val_x","val_mask",
@@ -556,8 +558,7 @@ def fit_policy_model(data,seed,device):
         predicted=net(z["train_x"],z["train_mask"],graph,
                       z["train_last"],z["train_structure"],
                       z["train_context"])
-        loss=m.three_axis_weighted_huber(
-            predicted,z["train_y"],z["train_last"],scale)
+        loss=m.joint_axis_ici_loss(predicted,z["train_y"],scale)
         if not torch.isfinite(loss):
             raise RuntimeError("nonfinite Stage06 Train loss")
         loss.backward()
@@ -616,7 +617,7 @@ def evaluate_policy_trials(root,policy,panel,prior,device,signature,input_cache)
     if policy==ORIGINAL:
         original_stage05_parity(panel,prior)
         forecasts=original_stage05_seed_predictions(panel)
-        print("06_BASELINE_REUSED_EXACT_STAGE05_L1",flush=True)
+        print("06_BASELINE_REUSED_EXACT_STAGE05_FULL_REFIT",flush=True)
         base=True
     else:
         forecasts=[]
@@ -753,7 +754,7 @@ def policy_summary(root,policy,panel,prior,device,signature,input_cache):
 
 
 def eligible_policy_table(policies, rows):
-    """Score every one of the 216 grid cells against ONE fixed L1 baseline.
+    """Score the 216 grid cells against one matched full-Train baseline.
 
     The acceptance criteria are policy-selection heuristics, NOT tests of
     statistical significance or future-year generalization.
@@ -763,7 +764,7 @@ def eligible_policy_table(policies, rows):
         raise RuntimeError("Cannot select from an incomplete 216-policy grid")
     original=rows[ORIGINAL.id]
     if original.get("status")!="PASS":
-        raise RuntimeError("Stage05 L1 reference must have a PASS score")
+        raise RuntimeError("Stage05 full-Train reference must have a PASS score")
     records=[]
     for policy in policies:
         result=rows[policy.id]
@@ -972,7 +973,7 @@ def chart_full_factorial(root,table,rows,chosen,panel):
         means=table.groupby(factor).axis_mae.mean().reindex(labels)
         ax.bar(np.arange(6),means)
         ax.axhline(float(base.axis_mae),ls="--",color="tab:orange",
-                   label="Original L1")
+                   label="Stage05 full-Train reference")
         ax.set_xticks(range(6),labels,rotation=55,ha="right")
         ax.set(title=factor,ylabel="Marginal mean MAE over other factors")
         ax.grid(axis="y",alpha=.2)
@@ -1113,7 +1114,7 @@ def chart_full_factorial(root,table,rows,chosen,panel):
         method="min",ascending=True)
     fig,ax=plt.subplots(figsize=(10,5))
     for pol,color,label in (
-            (ORIGINAL.id,"tab:orange","Original L1"),
+            (ORIGINAL.id,"tab:orange","Stage05 full-Train reference"),
             (chosen.id,"tab:blue","Grid-selected")):
         target=seed_frame[seed_frame.policy.eq(pol)].sort_values("seed")
         ax.plot(target.seed,target.within_seed_rank,"o-",
@@ -1129,8 +1130,8 @@ def configuration(m,m5,selection05,manifest05,panel):
     """One canonical FULL-FACTORIAL signature: no older 06 result support."""
     baselines={}
     for seed in SEEDS:
-        stem=f"L{LOOKBACK:02d}__{MODEL}__s{seed}.npz"
-        baselines[str(seed)]=sha(RESULT05/"trials"/stem)
+        stem=f"selected_full__L{selected_lookback():02d}__{MODEL}__s{seed}.npz"
+        baselines[str(seed)]=sha(RESULT05/stem)
     contract=dict(
         experiment="PRISM06_FULL_FACTORIAL_216_SINGLE_CANONICAL",
         source_sha256=sha(SOURCE),
@@ -1140,14 +1141,15 @@ def configuration(m,m5,selection05,manifest05,panel):
         upstream_stage05_manifest_sha256=sha(RESULT05/"run_manifest.json"),
         upstream_stage05_selection_sha256=sha(
             RESULT05/"lookback_dev_selection.json"),
-        stage05_L1_baseline_npz_sha256=baselines,
+        stage05_full_train_baseline_npz_sha256=baselines,
+        stage05_refit_sha256=sha(RESULT05/"full_train_refit.json"),
         original_train_dev_data_sha256=panel.hashes,
-        model=MODEL,output_mode=MODE,lookback=LOOKBACK,
+        model=MODEL,output_mode=selection05["mode"],lookback=selected_lookback(),
         original_reference_lookback=selection05["reference_lookback_quarters"],
         fixed_temporal_core=m5.CORE_LOOKBACK,
         seed_grid=list(SEEDS),fixed_epochs=m.STAGE04_ACTIVE_EPOCHS,
         mc_dropout_draws=m.STAGE04_BMTGNN_MC_SAMPLES,
-        train_origin_indices=TRAIN_ORIGINS.tolist(),
+        train_origin_indices=train_origins().tolist(),
         dev_origin_indices=list(range(TRAIN_END,DEV_END)),
         all_train_through="2019Q4",dev_from="2020Q1",dev_end="2022Q4",
         no_train_cv=True,train_fits_only=True,test_opened=False,
@@ -1187,8 +1189,65 @@ def load_policy_forecasts(root,policy):
     return forecast
 
 
+def load_policy_seed(root,policy,seed):
+    """Resolve the actual trained checkpoint, including input deduplication.
+
+    A selected policy need not have its own jobs directory: identical
+    tensors can reuse another policy, and ORIGINAL reuses Stage05's
+    full-Train refit. This is current experiment provenance, not legacy
+    file-format compatibility.
+    """
+    if seed not in SEEDS:
+        raise ValueError("Unknown paired seed")
+    manifest=json_read(root/"run_manifest.json")
+    seen=set()
+    input_sha=None
+    while True:
+        policy.validate()
+        if policy.id in seen:
+            raise RuntimeError("Cyclic Stage06 input-equivalence provenance")
+        seen.add(policy.id)
+        record=json_read(root/"policies"/(policy.id+".json"))
+        if (record["signature"]!=manifest["signature"]
+                or record["status"]!="PASS" or record["policy"]!=policy.id
+                or (input_sha is not None and record["input_sha256"]!=input_sha)):
+            raise RuntimeError("Stage06 selected policy provenance changed")
+        input_sha=record["input_sha256"]
+        alias=record.get("identical_input_reused_from")
+        if not alias:
+            break
+        other=json_read(root/"policies"/(alias+".json"))
+        policy=Policy(**{key:other[key] for key in SLOTS})
+        if policy.id!=alias:
+            raise RuntimeError("Stage06 input-equivalence policy ID mismatch")
+    if record["baseline_from_stage05"]:
+        bank,refit=stage05().load_selected_refit(RESULT05,None)
+        member=refit["members"][SEEDS.index(seed)]
+        saved=torch.load(RESULT05/member["checkpoint"],map_location="cpu",weights_only=True)
+        if saved["signature"]!=refit["signature"] or saved["seed"]!=seed:
+            raise RuntimeError("Stage05 refit checkpoint metadata mismatch")
+        return bank[SEEDS.index(seed)],saved["model_state_dict"]
+    folder=root/"jobs"/policy.id
+    name=f"{MODEL}__s{seed}"
+    meta=json_read(folder/(name+".json"))
+    pred,ck=(folder/(name+extension) for extension in (".npz",".pt"))
+    if (meta["signature"]!=manifest["signature"] or meta["seed"]!=seed
+            or meta["input_sha256"]!=input_sha
+            or meta["prediction_sha256"]!=sha(pred)
+            or meta["checkpoint_sha256"]!=sha(ck)):
+        raise RuntimeError("Stage06 selected model artifacts changed")
+    saved=torch.load(ck,map_location="cpu",weights_only=True)
+    if saved["signature"]!=manifest["signature"] or saved["seed"]!=seed:
+        raise RuntimeError("Stage06 checkpoint metadata mismatch")
+    with np.load(pred,allow_pickle=False) as bank:
+        prediction=bank["prediction"].copy()
+    return prediction,saved["model_state_dict"]
+
+
 def run(args):
     """One fully registered 216-policy experiment; seed-wise resumable."""
+    if args.restart and not args.run:
+        raise ValueError("--restart requires --run")
     if args.dry_run:
         grid=enumerate_policies()
         print("06_CANONICAL_FULL_FACTORIAL",len(grid),"POLICIES")
@@ -1197,8 +1256,8 @@ def run(args):
         print("RAW_FIT_UPPER_BOUND",len(grid)*len(SEEDS),
               "ACTUAL_LOWER_DUE_TO_BASELINE_AND_IDENTICAL_INPUTS")
         print("BASELINE",ORIGINAL.id,"SOURCE",RESULT05)
-        print("TRAIN FULL 2006-2019, 36 COMMON ORIGINS 2011-2019")
-        print("DEV 2020-2022, L1, B-MTGNN STRUCTURAL, 10 SEEDS, EPOCH 75")
+        print("TRAIN: SAME FULL-TRAIN REFIT SUPPORT AS STAGE05")
+        print("DEV 2020-2022, SELECTED L/MODE, 10 SEEDS, EPOCH 75")
         print("GLOBAL_OPTIMUM_WITHIN_ELIGIBLE_REGISTERED_GRID_ONLY")
         print("NO LEGACY SEQUENTIAL MODE; NO TRAIN CV; NO TEST")
         print("PLOTS design + 10 full-grid descriptive result plots")
@@ -1227,6 +1286,8 @@ def run(args):
         raise RuntimeError("CUDA device requested but unavailable")
     m,m5,panel,selection05,manifest05=verify_upstream_and_load()
     spec,signature=configuration(m,m5,selection05,manifest05,panel)
+    if args.restart:
+        m.reset_stage_results(RESULTS)
     old=json_read(manifest_file) if manifest_file.is_file() else None
     if old and (old.get("contract",{}).get("experiment")!=
                 spec["experiment"] or old.get("signature")!=signature):
@@ -1258,7 +1319,7 @@ def run(args):
     source_forecasts=original_stage05_seed_predictions(panel)
     source_means,source_individual=seed_policy_metrics(
         source_forecasts,panel)
-    print("06_FULL_GRID_ORIGINAL_STAGE05_L1",source_means["axis_mae"],
+    print("06_FULL_GRID_STAGE05_FULL_REFIT",source_means["axis_mae"],
           "ICI",source_means["ici_mae"],"GRID",GRID_SIZE,flush=True)
     grid=enumerate_policies()
     results={}
@@ -1294,7 +1355,7 @@ def run(args):
         selected_forecasts,panel)
     reference_forecasts=load_policy_forecasts(RESULTS,ORIGINAL)
     if not np.array_equal(reference_forecasts,source_forecasts):
-        raise RuntimeError("Stage05 L1 baseline drifted during exhaustive search")
+        raise RuntimeError("Stage05 full-Train baseline drifted during exhaustive search")
     if any(abs(current_scores[k]-results[chosen.id][k])>1e-10
            for k in current_scores):
         raise RuntimeError("Stage06 selected ten-seed forecast/score mismatch")
@@ -1326,7 +1387,8 @@ def run(args):
         selected_dev_metrics=current_scores,
         selected_seed_metrics=current_individual,
         original_stage05_seed_metrics=source_individual,
-        model=MODEL,selected_upstream_lookback=LOOKBACK,
+        model=MODEL,selected_upstream_lookback=selected_lookback(),
+        selected_output_mode=selected_mode(),
         train_through="2019Q4",
         dev="2020Q1-2022Q4",
         seed_count=len(SEEDS),fixed_epochs=75,
@@ -1367,6 +1429,7 @@ def main():
     parser.add_argument("--status",action="store_true")
     parser.add_argument("--design-plot",action="store_true")
     parser.add_argument("--run",action="store_true")
+    parser.add_argument("--restart",action="store_true")
     parser.add_argument("--device",choices=("cpu","cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     args=parser.parse_args()

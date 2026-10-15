@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 """PRISM Stage08: Train-only B-MTGNN ablation ranking and exhaustive ranked Top-K.
 
-Frozen parent: Stage06/07 Structural B-MTGNN, L=1, 10 paired seeds,
-36 common 2011-2019 Train origins, 75 epochs, selected Stage06 preprocessing.
-Stage07 selected no removal: all 157 main-input features are available.
+Frozen parent: the ACTUAL Stage07-selected B-MTGNN and retained feature
+indices, Stage05-selected L and all admissible Train origins; 75 epochs,
+10 paired seeds and Stage06-selected preprocessing.
 
-1. Load the ACTUAL Stage06 seed checkpoints. Rank 157 main-input features
+1. Load the ACTUAL Stage07 seed checkpoints. Rank its retained main-input features
    using signed Train IN-SAMPLE change in three-axis MAE after individually
    zeroing both normalized values and missing indicators. A frozen model
    is evaluated with dropout OFF for attribution; deployment uses 30-draw
    MC dropout. Also record seed and three-epoch Train-block sensitivity.
-2. Freeze that single ranking. Fit ALL 156 smaller ranked prefixes K=1..156
+2. Freeze that ranking of K0 retained inputs. Fit every smaller prefix K=1..K0-1
    with Stage07's exact compact K-input training function, initialization,
    fixed structural prior, context, anchor and MC inference; reuse the ten
-   Stage06 K=157 forecasts without retraining. No coarse/fine shortcut.
+   Stage07 K=K0 forecasts without retraining. No coarse/fine shortcut.
 3. Compute original-unit Dev errors for EACH of ten matched seed forecasts,
    then average the seed metrics. Only adopt a smaller K if mean three-axis
    MAE improves, mean ICI MAE does not worsen, and >=2 Dev years improve.
-4. At a predeclared fixed K=79, train ten independent random subsets with
+4. At K=ceil(K0/2), sample ten random subsets only from the retained inputs, with
    exactly the same ten fitting seeds. They are descriptive controls,
    evaluated regardless of whether any compact K is adopted.
 
 Optimality means the best eligible prefix of ONE fixed ranking on the 157-K
-grid, NEVER the best of 2^157 subsets. All Dev conclusions are conditional:
+grid of the retained parent, NEVER the best of all subsets. All Dev conclusions are conditional:
 Stages04-08 repeatedly use the 2020-22 Dev period. Train attribution is
 in-sample, not causal, held-out or statistical evidence of importance.
 The future Test split is not opened here. No legacy Stage08 compatibility.
@@ -62,10 +62,7 @@ RESULT07 = ROOT / "Results/07_correlated_feature_removal"
 
 FEATURE_COUNT = 157
 SEEDS = tuple(range(2026, 2036))
-TRAIN_ORIGINS = tuple(range(20, 56))
 TRAIN_BLOCKS = ((20, 32), (32, 44), (44, 56))  # 2011-13, 2014-16, 2017-19
-ALL_K = tuple(range(1, FEATURE_COUNT + 1))
-RANDOM_K = 79
 RANDOM_SUBSET_SEEDS = tuple(range(20261013, 20261023))
 EPS = 1e-9
 KEYS = ("axis_mae", "ici_mae", "profitability_mae",
@@ -111,32 +108,34 @@ def upstream() -> dict:
     ctx = m07.upstream()
     lock = read_json(RESULT07 / "selected_features.json")
     manifest = read_json(RESULT07 / "run_manifest.json")
-    baseline, individual = ctx["m06"].seed_policy_metrics(
-        ctx["original_forecasts"], ctx["panel"])
     if (lock.get("status") != "LOCKED"
             or manifest.get("status") != "PASS"
-            or lock.get("selected_policy") != "no_removal"
-            or lock.get("selected_mode") != "original"
-            or lock.get("selected_indices") != list(range(FEATURE_COUNT))
-            or lock.get("selected_feature_count") != FEATURE_COUNT
+            or lock.get("selected_mode") not in ("original","compact")
+            or len(lock.get("selected_indices",[]))!=lock.get("selected_feature_count")
             or lock.get("gnn_models") != ["B-MTGNN"]
             or lock.get("seeds") != list(SEEDS)
-            or lock.get("lookback_quarters") != 1
-            or lock.get("epochs") != 75
+            or lock.get("lookback_quarters") != ctx["lookback"]
+            or lock.get("epochs") != ctx["epochs"]
             or lock.get("stage07_signature") != manifest.get("signature")
             or manifest.get("signature") != m07.run_signature(m07.run_contract(ctx))
             or manifest["contract"]["source_sha256"] != digest(SOURCE07)
-            or ctx["full_fold"]["train_x"].shape != (36, 1, 59, 157)
-            or ctx["full_fold"]["val_x"].shape != (12, 1, 59, 157)
-            or not np.array_equal(ctx["full_fold"]["train_origins"], TRAIN_ORIGINS)
-            or ctx["epochs"] != 75
             or lock.get("test_opened") is not False):
-        raise RuntimeError("Stage08 requires the exact locked Stage07 no-removal L1 contract")
+        raise RuntimeError("Stage08 requires the current locked Stage07 selection")
+    indices=tuple(lock["selected_indices"])
+    active=m07.Subset(lock["selected_policy"],None,indices,
+                     tuple(i for i in range(FEATURE_COUNT) if i not in indices),
+                     pd.DataFrame(),0)
+    active_fold=m07.adapt_inputs(ctx["full_fold"],active,"compact")
+    bank=np.stack([m07.load_selected_seed(ctx,lock,seed)[0] for seed in SEEDS])
+    baseline,individual=ctx["m06"].seed_policy_metrics(bank,ctx["panel"])
     for key in KEYS:
         if abs(baseline[key] - lock["final_dev"][key]) > 1e-10:
             raise RuntimeError("Stage07 individual-seed baseline mismatch")
     ctx.update(m07=m07, stage07_lock=lock, baseline=baseline,
                baseline_individual=individual,
+               active_indices=indices,active_subset=active,active_fold=active_fold,
+               active_parameters=lock["selected_parameter_count"],
+               active_forecasts=bank,active_input_sha256=m07.dataset_sha(active_fold),
                stage07_lock_hash=digest(RESULT07 / "selected_features.json"),
                stage07_manifest_hash=digest(RESULT07 / "run_manifest.json"))
     return ctx
@@ -153,17 +152,19 @@ def contract(ctx: dict) -> dict:
         stage06_manifest_sha256=ctx["upstream06_manifest_sha256"],
         original_train_dev_hashes=ctx["panel_hashes"],
         stage06_model_input_sha256=ctx["upstream06_input_sha256"],
-        model="B-MTGNN", structural=True, lookback=1,
-        core_lookback=20, train_origins=list(TRAIN_ORIGINS),
-        epochs=75, seeds=list(SEEDS), dropout_draws=30,
-        trained_on="2011Q1-2019Q4 common 36 Train origins",
-        ranking_on="TRAIN_IN_SAMPLE_36_ORIGINS_DROPOUT_OFF",
+        model="B-MTGNN", output_mode=ctx["output_mode"], lookback=ctx["lookback"],
+        active_original_indices=list(ctx["active_indices"]),
+        active_input_sha256=ctx["active_input_sha256"],
+        core_lookback=20, train_origins=ctx["active_fold"]["train_origins"].tolist(),
+        epochs=ctx["epochs"], seeds=list(SEEDS), dropout_draws=30,
+        trained_on="ALL_ADMISSIBLE_TRAIN_ORIGINS",
+        ranking_on="TRAIN_IN_SAMPLE_DROPOUT_OFF",
         ranking_blocks=[list(x) for x in TRAIN_BLOCKS],
         ranking="SIGNED_MAE_INCREASE_ZERO_INPUT_AND_MISSING_MASK",
-        ranked_prefixes=list(ALL_K), globally_optimal_subset=False,
+        ranked_prefixes=list(range(1,len(ctx["active_indices"])+1)), globally_optimal_subset=False,
         per_seed_metric_then_mean=True,
         safeguards="MAE improve AND ICI nonworse AND >=2 of 3 Dev years",
-        random_control_k=RANDOM_K,
+        random_control_k=(len(ctx["active_indices"])+1)//2,
         random_subset_seeds=list(RANDOM_SUBSET_SEEDS),
         random_controls_independent_of_dev_adoption=True,
         original_prior_context_anchor_and_internal_graph_preserved=True,
@@ -181,6 +182,8 @@ def subset(ctx: dict, indices: tuple[int, ...], label: str):
             or indices[0] < 0 or indices[-1] >= FEATURE_COUNT):
         raise ValueError("Expected sorted unique Stage08 original feature indices")
     kept = set(indices)
+    if not kept.issubset(ctx["active_indices"]):
+        raise ValueError("Stage08 cannot reintroduce a feature removed by Stage07")
     return ctx["m07"].Subset(
         label, None, indices,
         tuple(i for i in range(FEATURE_COUNT) if i not in kept),
@@ -188,56 +191,35 @@ def subset(ctx: dict, indices: tuple[int, ...], label: str):
 
 
 def load_frozen_seed(ctx: dict, seed: int, device):
-    """Restore an actual Stage06-selected 75-epoch checkpoint, never Stage04."""
+    """Restore the exact selected Stage07 model, including a compact parent."""
     if seed not in SEEDS:
-        raise ValueError("Unknown frozen Stage06 seed")
-    root = ctx["m06"].RESULTS / "jobs" / ctx["locked_policy"].id
-    stem = f"B-MTGNN__s{seed}"
-    meta = read_json(root / (stem + ".json"))
-    path = root / (stem + ".pt")
-    stage06_manifest = read_json(ctx["m06"].RESULTS / "run_manifest.json")
-    if (meta.get("signature") != stage06_manifest["signature"]
-            or meta.get("policy") != ctx["locked_policy"].id
-            or meta.get("seed") != seed
-            or meta.get("model") != "B-MTGNN"
-            or meta.get("epoch") != 75
-            or meta.get("input_sha256") != ctx["upstream06_input_sha256"]
-            or meta.get("checkpoint_sha256") != digest(path)):
-        raise RuntimeError("Stage06 frozen checkpoint does not match selected policy")
-    frozen = torch.load(path, map_location="cpu", weights_only=True)
-    if (frozen.get("signature") != meta["signature"]
-            or frozen.get("policy") != meta["policy"]
-            or frozen.get("model") != "B-MTGNN"
-            or frozen.get("seed") != seed
-            or frozen.get("epoch") != 75
-            or frozen.get("input_sha256") != meta["input_sha256"]):
-        raise RuntimeError("Stage06 frozen checkpoint contents drifted")
-    original = subset(ctx, tuple(range(FEATURE_COUNT)), "no_removal")
-    net = ctx["m07"].instantiate_subset(ctx, original, seed, compact=False)
-    net.load_state_dict(frozen["model_state_dict"], strict=True)
+        raise ValueError("Unknown frozen Stage07 seed")
+    _,state=ctx["m07"].load_selected_seed(ctx,ctx["stage07_lock"],seed)
+    net=ctx["m07"].instantiate_subset(
+        ctx,ctx["active_subset"],seed,compact=len(ctx["active_indices"])<FEATURE_COUNT)
+    net.load_state_dict(state,strict=True)
     return net.to(device).eval()
 
 
 def ranking_tensors(ctx: dict, device):
-    fold = ctx["full_fold"]
-    if (not np.array_equal(fold["train_origins"], TRAIN_ORIGINS)
-            or tuple(ctx["panel"].quarters[t] for t in
-                     (20, 31, 32, 43, 44, 55)) !=
-            ("2011Q1", "2013Q4", "2014Q1", "2016Q4", "2017Q1", "2019Q4")):
+    fold = ctx["active_fold"]
+    if not np.array_equal(fold["train_origins"],ctx["m06"].train_origins()):
         raise RuntimeError("Train-only attribution period changed")
     z = {key: torch.as_tensor(fold["train_" + key], device=device)
          for key in ("x", "mask", "last", "structure", "context")}
-    truth = ctx["panel"].y[np.asarray(TRAIN_ORIGINS)]
+    truth = ctx["panel"].y[fold["train_origins"]]
     return z, truth
 
 
 def seed_importance(net, z: dict, truth: np.ndarray,
-                    center: np.ndarray, scale: np.ndarray) -> tuple[np.ndarray, float]:
+                    center: np.ndarray, scale: np.ndarray,
+                    origins: np.ndarray) -> tuple[np.ndarray, float]:
     """Signed change in original-unit MAE, across all Train and 3 blocks."""
-    if (z["x"].shape != (36, 1, 59, 157)
-            or truth.shape != (36, 59, 3)
+    count=z["x"].shape[-1]
+    if (truth.shape != (len(origins), 59, 3)
+            or z["x"].shape[0]!=len(origins) or not 1<=count<=FEATURE_COUNT
             or net.training):
-        raise ValueError("Train ranking requires 36 frozen L1 observations")
+        raise ValueError("Train ranking requires the complete selected parent inputs")
     graph = torch.eye(59, device=z["x"].device)
     x, mask = z["x"].clone(), z["mask"].clone()
 
@@ -249,13 +231,16 @@ def seed_importance(net, z: dict, truth: np.ndarray,
         return np.abs(prediction - truth).mean(axis=(1, 2))
 
     reference = errors()
-    effects = np.empty((FEATURE_COUNT, 4), np.float64)
-    for j in range(FEATURE_COUNT):
+    effects = np.empty((count, 4), np.float64)
+    for j in range(count):
         original_x, original_mask = x[..., j].clone(), mask[..., j].clone()
         x[..., j], mask[..., j] = 0., 0.
         delta = errors() - reference
-        effects[j] = (delta.mean(),
-                      delta[:12].mean(), delta[12:24].mean(), delta[24:].mean())
+        # Preserve the original descriptive calendar blocks. Extra early
+        # Train origins contribute to the overall importance, not to a
+        # newly invented time split or model-selection fold.
+        effects[j] = (delta.mean(),*(delta[(origins>=first)&(origins<last)].mean()
+                                     for first,last in TRAIN_BLOCKS))
         x[..., j], mask[..., j] = original_x, original_mask
     if not np.isfinite(effects).all():
         raise RuntimeError("Nonfinite Train-only ablation")
@@ -263,15 +248,16 @@ def seed_importance(net, z: dict, truth: np.ndarray,
 
 
 def ranking_order(scores: np.ndarray) -> tuple[int, ...]:
-    if scores.shape != (FEATURE_COUNT,) or not np.isfinite(scores).all():
-        raise ValueError("Importance must cover all 157 predictors")
-    return tuple(sorted(range(FEATURE_COUNT), key=lambda i: (-scores[i], i)))
+    if scores.ndim!=1 or not 1<=len(scores)<=FEATURE_COUNT or not np.isfinite(scores).all():
+        raise ValueError("Importance must cover all retained parent predictors")
+    return tuple(sorted(range(len(scores)), key=lambda i: (-scores[i], i)))
 
 
 def rank_stability(samples: np.ndarray) -> dict:
     """Seed and Train-block rank concordance; descriptive, not a p-value."""
-    if samples.shape != (10, FEATURE_COUNT, 4):
-        raise ValueError("Ten seeds, 157 features and 3 temporal blocks required")
+    count=samples.shape[1]
+    if samples.shape != (10,count,4) or not 1<=count<=FEATURE_COUNT:
+        raise ValueError("Ten seeds, retained features and 3 temporal blocks required")
     overall = samples[:, :, 0]
     mean = overall.mean(axis=0)
     orders = [ranking_order(values) for values in overall]
@@ -279,18 +265,20 @@ def rank_stability(samples: np.ndarray) -> dict:
         ranking_order(samples[:, :, i].mean(axis=0)) for i in (1, 2, 3)]
 
     def rank_positions(order):
-        ranks = np.empty(FEATURE_COUNT)
-        ranks[list(order)] = np.arange(FEATURE_COUNT)
+        ranks = np.empty(count)
+        ranks[list(order)] = np.arange(count)
         return ranks
 
     def concordance(orders):
+        if count==1:
+            return 1.0  # A single feature has the same unique rank in every seed.
         ranks = np.stack([rank_positions(order) for order in orders])
         correlations = np.corrcoef(ranks)
         return float(correlations[np.triu_indices(len(orders), 1)].mean())
 
     chosen = ranking_order(mean)
     topk_overlap = {}
-    for k in (40, 79, 120):
+    for k in sorted({min(k,count) for k in (40,79,120)}):
         reference = set(chosen[:k])
         topk_overlap[str(k)] = float(np.mean([
             len(reference & set(order[:k])) /
@@ -303,23 +291,27 @@ def rank_stability(samples: np.ndarray) -> dict:
         interpretation="Train in-sample stability; not independent validation")
 
 
-def validate_ranking(frame: pd.DataFrame, features: list[str]) -> tuple[int, ...]:
-    if (len(frame) != FEATURE_COUNT
-            or frame.feature_rank.tolist() != list(range(1, FEATURE_COUNT + 1))
-            or sorted(frame.original_index.tolist()) != list(range(FEATURE_COUNT))
+def validate_ranking(frame: pd.DataFrame, features: list[str],indices: tuple[int,...]) -> tuple[int, ...]:
+    if (len(frame) != len(indices)
+            or frame.feature_rank.tolist() != list(range(1,len(indices)+1))
+            or sorted(frame.original_index.tolist()) != list(indices)
             or not np.isfinite(frame.mean_train_ablation_delta).all()
             or any(features[int(i)] != name for i, name in
                    zip(frame.original_index, frame.feature))):
-        raise RuntimeError("Stage08 ranking must uniquely cover original 157 features")
+        raise RuntimeError("Stage08 ranking must uniquely cover the selected Stage07 inputs")
     order = tuple(int(i) for i in frame.original_index)
-    if order != ranking_order(np.asarray(
+    positions = ranking_order(np.asarray(
             frame.set_index("original_index")
-            .loc[range(FEATURE_COUNT), "mean_train_ablation_delta"])):
+            .loc[list(indices), "mean_train_ablation_delta"]))
+    if order != tuple(indices[i] for i in positions):
         raise RuntimeError("Ranking no longer matches signed importance")
     return order
 
 
 def build_ranking(ctx, root: Path, study_sig: str, device):
+    indices=ctx["active_indices"]
+    count=len(indices)
+    origins=ctx["active_fold"]["train_origins"]
     ranking_dir = root / "ranking"
     finished = ranking_dir / "feature_importance.csv"
     record = ranking_dir / "provenance.json"
@@ -329,24 +321,20 @@ def build_ranking(ctx, root: Path, study_sig: str, device):
                 or meta.get("csv_sha256") != digest(finished)):
             raise RuntimeError("Old Stage08 ranking cache; no compatibility path")
         frame = pd.read_csv(finished)
-        validate_ranking(frame, ctx["panel"].features)
+        validate_ranking(frame,ctx["panel"].features,indices)
         cached = []
         for seed in SEEDS:
             path = ranking_dir / "seeds" / f"s{seed}.npz"
             proof = read_json(ranking_dir / "seeds" / f"s{seed}.json")
-            frozen_dir = ctx["m06"].RESULTS / "jobs" / ctx["locked_policy"].id
-            name = f"B-MTGNN__s{seed}"
-            source_meta = read_json(frozen_dir / (name + ".json"))
+            ctx["m07"].load_selected_seed(ctx,ctx["stage07_lock"],seed)
             if (proof.get("signature") != study_sig
                     or proof.get("seed") != seed
-                    or proof.get("npz_sha256") != digest(path)
-                    or source_meta.get("checkpoint_sha256") != digest(
-                        frozen_dir / (name + ".pt"))):
+                    or proof.get("npz_sha256") != digest(path)):
                 raise RuntimeError("Frozen checkpoint or ranking seed cache drifted")
             with np.load(path, allow_pickle=False) as stored:
                 cached.append(stored["effects"].copy())
         cached = np.stack(cached)
-        if cached.shape != (10, FEATURE_COUNT, 4):
+        if cached.shape != (10,count,4):
             raise RuntimeError("Saved Train ranking is incomplete")
         means = cached[:, :, 0].mean(axis=0)
         saved_means = frame.sort_values("original_index").mean_train_ablation_delta
@@ -376,14 +364,14 @@ def build_ranking(ctx, root: Path, study_sig: str, device):
             raise RuntimeError("Incomplete Stage08 Train ranking cache")
         else:
             model = load_frozen_seed(ctx, seed, device)
-            effects, reference = seed_importance(model, z, truth, center, scale)
+            effects, reference = seed_importance(model,z,truth,center,scale,origins)
             del model
             write_npz(path, effects=effects, reference=np.asarray(reference))
             write_json(meta_path, dict(
                 signature=study_sig, seed=seed, npz_sha256=digest(path),
-                train_origins=list(TRAIN_ORIGINS), dropout="EVAL_OFF",
+                train_origins=origins.tolist(), dropout="EVAL_OFF",
                 train_in_sample=True, test_opened=False))
-        if effects.shape != (FEATURE_COUNT, 4) or not np.isfinite(effects).all():
+        if effects.shape != (count,4) or not np.isfinite(effects).all():
             raise RuntimeError("Corrupt Stage08 Train feature importance")
         results.append(effects)
         print("08_RANK_SEED", seed, "COMPLETE", flush=True)
@@ -393,10 +381,10 @@ def build_ranking(ctx, root: Path, study_sig: str, device):
     names = ctx["panel"].features
     items = []
     for i in ranking_order(mean[:, 0]):
+        original=indices[i]
         items.append(dict(
-            feature=names[i], original_index=i,
-            feature_role=("target_history" if i < 42 else
-                          "industry_source" if i < 66 else "global_source"),
+            feature=names[original], original_index=original,
+            feature_role=ctx["m07"].role(original),
             mean_train_ablation_delta=float(mean[i, 0]),
             sd_across_ten_seeds=float(samples[:, i, 0].std(ddof=1)),
             positive_seed_fraction=float((samples[:, i, 0] > 0).mean()),
@@ -404,13 +392,14 @@ def build_ranking(ctx, root: Path, study_sig: str, device):
             train_2014_2016_delta=float(mean[i, 2]),
             train_2017_2019_delta=float(mean[i, 3])))
     frame = pd.DataFrame(items)
-    frame.insert(0, "feature_rank", range(1, FEATURE_COUNT + 1))
-    validate_ranking(frame, names)
+    frame.insert(0,"feature_rank",range(1,count+1))
+    validate_ranking(frame,names,indices)
     ranking_dir.mkdir(parents=True, exist_ok=True)
     frame.to_csv(finished, index=False, encoding="utf-8-sig")
     write_json(record, dict(
         signature=study_sig, csv_sha256=digest(finished),
-        model="B-MTGNN", seeds=list(SEEDS), train_origins=list(TRAIN_ORIGINS),
+        model="B-MTGNN", seeds=list(SEEDS), train_origins=origins.tolist(),
+        original_feature_indices=list(indices),
         no_dev_labels_used_in_ranking=True, train_in_sample=True,
         dropout_off_only_for_ranking=True, stability=stability,
         test_opened=False))
@@ -418,18 +407,17 @@ def build_ranking(ctx, root: Path, study_sig: str, device):
 
 
 def topk_indices(order: tuple[int, ...], k: int) -> tuple[int, ...]:
-    if (len(order) != FEATURE_COUNT
-            or set(order) != set(range(FEATURE_COUNT))
-            or not 1 <= k <= FEATURE_COUNT):
+    if (not order or len(set(order))!=len(order)
+            or min(order)<0 or max(order)>=FEATURE_COUNT or not 1<=k<=len(order)):
         raise ValueError("Top-K requires complete frozen ranking")
     return tuple(sorted(order[:k]))
 
 
-def random_indices(seed: int) -> tuple[int, ...]:
+def random_indices(seed: int,indices: tuple[int,...]) -> tuple[int, ...]:
     if seed not in RANDOM_SUBSET_SEEDS:
         raise ValueError("Random comparator must use a predeclared subset seed")
     return tuple(sorted(map(int, np.random.default_rng(seed).choice(
-        FEATURE_COUNT, RANDOM_K, replace=False))))
+        indices,(len(indices)+1)//2,replace=False))))
 
 
 def qualification(trial: dict, baseline: dict) -> dict:
@@ -444,14 +432,14 @@ def qualification(trial: dict, baseline: dict) -> dict:
         qualified=bool(improved and ici_safe and wins >= 2))
 
 
-def select_k(records: list[dict]) -> int:
+def select_k(records: list[dict],parent_count: int) -> int:
     """Exhaustive only over prefixes of one fixed ranking, never all subsets."""
-    if (len(records) != FEATURE_COUNT
-            or sorted(int(r["K"]) for r in records) != list(ALL_K)):
-        raise ValueError("Stage08 selection requires all 157 ranked prefixes")
-    valid = [r for r in records if r["K"] < FEATURE_COUNT and r["qualified"]]
+    if (len(records)!=parent_count
+            or sorted(int(r["K"]) for r in records)!=list(range(1,parent_count+1))):
+        raise ValueError("Stage08 requires every ranked prefix of the selected parent")
+    valid=[r for r in records if r["K"]<parent_count and r["qualified"]]
     if not valid:
-        return FEATURE_COUNT
+        return parent_count
     return int(min(valid, key=lambda r: (r["axis_mae"], r["K"]))["K"])
 
 
@@ -461,12 +449,11 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
     if kind not in ("TOPK", "RANDOM") or not label:
         raise ValueError("Unknown Stage08 policy type")
     current = subset(ctx, indices, label)
-    if not current.dropped:
-        if kind != "TOPK":
-            raise ValueError("Random control cannot be the full baseline")
+    is_parent=indices==ctx["active_indices"]
+    if is_parent:
         metrics = dict(ctx["baseline"])
         individual = ctx["baseline_individual"]
-        data_hash = ctx["upstream06_input_sha256"]
+        data_hash = ctx["active_input_sha256"]
     else:
         changed = ctx["m07"].adapt_inputs(ctx["full_fold"], current, "compact")
         data_hash = ctx["m07"].dataset_sha(changed)
@@ -485,7 +472,7 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
                         or meta.get("seed") != seed
                         or meta.get("original_indices") != list(indices)
                         or meta.get("input_sha256") != data_hash
-                        or meta.get("epoch") != 75
+                        or meta.get("epoch") != ctx["epochs"]
                         or meta.get("checkpoint_sha256") != digest(weights_path)
                         or meta.get("prediction_sha256") != digest(prediction_path)):
                     raise RuntimeError("Invalid Stage08 ten-seed model cache")
@@ -501,7 +488,7 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
                 checkpoint = dict(
                     signature=study_sig, policy=label, kind=kind, seed=seed,
                     input_sha256=data_hash, original_indices=list(indices),
-                    feature_count=len(indices), epoch=75,
+                    feature_count=len(indices), epoch=ctx["epochs"],
                     parameters=fitted["parameters"],
                     state_dict=fitted["state_dict"])
                 tmp = weights_path.with_suffix(".pt.writing")
@@ -511,7 +498,7 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
                 write_json(meta_path, dict(
                     signature=study_sig, policy=label, kind=kind,
                     original_indices=list(indices), seed=seed,
-                    input_sha256=data_hash, epoch=75,
+                    input_sha256=data_hash, epoch=ctx["epochs"],
                     parameters=fitted["parameters"],
                     checkpoint_sha256=digest(weights_path),
                     prediction_sha256=digest(prediction_path),
@@ -533,12 +520,13 @@ def score_policy(ctx, root: Path, indices: tuple[int, ...],
                     - 2 * ctx["m04"].STAGE04_ACTIVE_WIDTH
                     * (FEATURE_COUNT - len(indices))),
         seed_count=len(SEEDS),
-        model="B-MTGNN", lookback=1, epoch=75,
+        model="B-MTGNN", lookback=ctx["lookback"], epoch=ctx["epochs"],
+        output_mode=ctx["output_mode"],
         signature=study_sig, input_sha256=data_hash,
-        reused_stage06_baseline=not current.dropped,
+        reused_stage07_baseline=is_parent,
         seed_metrics=individual,
         **metrics,
-        **(qualification(metrics, ctx["baseline"]) if current.dropped else
+        **(qualification(metrics, ctx["baseline"]) if not is_parent else
            dict(mae_improved=False, ici_nonworsening=True,
                 dev_years_improved=0, qualified=False)))
     location = root / "policies" / (label + ".json")
@@ -560,6 +548,8 @@ def compare_stage07(rows: list[dict], root: Path):
     indexed = {r["K"]: r for r in rows}
     records = []
     for r in previous.itertuples(index=False):
+        if int(r.kept_count) not in indexed:
+            continue  # Stage08 never reintroduces inputs already removed by 07.
         top = indexed[int(r.kept_count)]
         records.append(dict(
             K=int(r.kept_count), correlation_threshold=r.policy,
@@ -632,11 +622,12 @@ def generate_plots(root: Path, ranking: pd.DataFrame,
                           ("ici_mae", "08_04_ranked_k_ici")):
         fig, ax = plt.subplots(figsize=(10.5, 5))
         ax.plot(scores.K, scores[measure], linewidth=1.2)
-        ax.axhline(float(scores.loc[scores.K.eq(157), measure].iloc[0]),
-                   linestyle="--", color="gray", label="Stage07 full 157")
+        parent_count=int(scores.K.max())
+        ax.axhline(float(scores.loc[scores.K.eq(parent_count), measure].iloc[0]),
+                   linestyle="--", color="gray", label=f"Stage07 selected K={parent_count}")
         ax.axvline(chosen, linestyle=":", color="black",
                    label=f"Adopted K={chosen}")
-        ax.set(xlabel="K: all 157 ranked prefixes evaluated",
+        ax.set(xlabel=f"K: all {parent_count} retained-input prefixes evaluated",
                ylabel=measure + " (ten individual-seed MAEs averaged)",
                title="Conditional 2020-22 development comparison")
         ax.legend()
@@ -657,8 +648,9 @@ def generate_plots(root: Path, ranking: pd.DataFrame,
     fig, ax = plt.subplots(figsize=(10, 5))
     values = [r["axis_mae"] for r in controls]
     ax.scatter(range(len(values)), values, label="Fixed-K random subsets")
-    ax.axhline(float(scores.loc[scores.K.eq(RANDOM_K), "axis_mae"].iloc[0]),
-               color="black", label=f"Ranked K={RANDOM_K}")
+    random_k=(int(scores.K.max())+1)//2
+    ax.axhline(float(scores.loc[scores.K.eq(random_k), "axis_mae"].iloc[0]),
+               color="black", label=f"Ranked K={random_k}")
     ax.set(xlabel="Predeclared random subset index",
            ylabel="Ten-seed mean Dev 3-axis MAE",
            title="Descriptive rank vs random at fixed K, no significance claim")
@@ -670,7 +662,8 @@ def generate_plots(root: Path, ranking: pd.DataFrame,
 def write_selection(ctx, root: Path, rank: pd.DataFrame,
                     rows: list[dict], chosen: int, controls: list[dict],
                     stability: dict, study_sig: str, plots: list[str]):
-    order = validate_ranking(rank, ctx["panel"].features)
+    parent_count=len(ctx["active_indices"])
+    order = validate_ranking(rank,ctx["panel"].features,ctx["active_indices"])
     indices = topk_indices(order, chosen)
     ranked = order[:chosen]
     names = ctx["panel"].features
@@ -679,8 +672,7 @@ def write_selection(ctx, root: Path, rank: pd.DataFrame,
     baseline = ctx["baseline"]
     by_k = {row["K"]: row for row in rows}
     final = by_k[chosen]
-    if (len(by_k) != FEATURE_COUNT or
-            final["qualified"] is not (chosen < FEATURE_COUNT)):
+    if (len(by_k)!=parent_count or final["qualified"] is not (chosen<parent_count)):
         raise RuntimeError("Stage08 final policy violates qualification rule")
     pd.DataFrame([dict(original_index=i, feature=names[i],
                        rank=order.index(i) + 1) for i in indices]).to_csv(
@@ -704,9 +696,12 @@ def write_selection(ctx, root: Path, rank: pd.DataFrame,
         selected_qualification={key: final[key] for key in (
             "mae_improved", "ici_nonworsening",
             "dev_years_improved", "qualified")},
-        baseline_parameters=ctx["baseline_parameters"],
+        baseline_parameters=ctx["active_parameters"],
         selected_parameters=final["parameters"],
-        selected_training_reused_stage06=chosen == FEATURE_COUNT,
+        selected_training_reused_stage07=chosen==parent_count,
+        parent_feature_count=parent_count,
+        parent_original_indices=list(ctx["active_indices"]),
+        lookback=ctx["lookback"],output_mode=ctx["output_mode"],epochs=ctx["epochs"],
         all_ranked_prefixes_exhausted=True,
         best_prefix_not_best_arbitrary_subset=True,
         train_attribution_in_sample=True,
@@ -717,24 +712,46 @@ def write_selection(ctx, root: Path, rank: pd.DataFrame,
         main_input_only_context_prior_anchor_graph_unchanged=True,
         dropout_off_only_for_attribution=True,
         deployed_mc_dropout_draws=30,
-        random_controls_at_fixed_k=RANDOM_K,
+        random_controls_at_fixed_k=(parent_count+1)//2,
         random_control_subsets=len(controls),
         rank_stability=stability,
         stage07_lock_sha256=ctx["stage07_lock_hash"],
         stage08_signature=study_sig,
         plots=plots, test_opened=False,
         completed_utc=datetime.now(timezone.utc).isoformat())
+    if chosen==parent_count:
+        bank=ctx["active_forecasts"]
+    else:
+        predictions=[]
+        for seed in SEEDS:
+            folder=root/"models"/f"top{chosen:03d}"
+            path=folder/f"B-MTGNN__s{seed}.npz"
+            meta=read_json(folder/f"B-MTGNN__s{seed}.json")
+            if (meta["signature"]!=study_sig or meta["original_indices"]!=list(indices)
+                    or meta["prediction_sha256"]!=digest(path)):
+                raise RuntimeError("Selected Stage08 forecast provenance mismatch")
+            with np.load(path,allow_pickle=False) as stored:
+                predictions.append(stored["prediction"].copy())
+        bank=np.stack(predictions)
+    scores,_=ctx["m06"].seed_policy_metrics(bank,ctx["panel"])
+    if any(abs(scores[key]-final[key])>1e-10 for key in KEYS):
+        raise RuntimeError("Stage08 final selection differs from its saved seed forecasts")
+    prediction_path=root/"selected_seed_predictions.npz"
+    write_npz(prediction_path,seed_predictions=bank)
+    selected_policy["selected_predictions_sha256"]=digest(prediction_path)
     write_json(root / "selected_features.json", selected_policy)
     return selected_policy
 
 
 def run(args):
+    if args.restart and not args.run:
+        raise ValueError("--restart requires --run")
     path = RESULTS / "run_manifest.json"
     if args.dry_run:
-        print("08: Stage06/07 B-MTGNN Structural, L1, 10 paired seeds")
-        print("Train 36 origins, dropout-off Train in-sample attribution")
-        print("All K=1..157 ranked prefixes; 156 x 10 new fitted seed models")
-        print("Unconditional random K=79: 10 subsets x 10 matched fit seeds")
+        print("08: ACTUAL Stage07 model and retained inputs, 10 paired seeds")
+        print("All admissible Train origins; dropout-off in-sample attribution")
+        print("All prefixes of Stage07's K0 retained inputs, no feature reintroduction")
+        print("Unconditional random K=ceil(K0/2): 10 subsets x 10 fitting seeds")
         print("No independent Test, no arbitrary-subset optimality claim")
         return None
     if args.status:
@@ -745,6 +762,8 @@ def run(args):
     ctx = upstream()
     spec = contract(ctx)
     sig = signature(spec)
+    if args.restart:
+        ctx["m04"].reset_stage_results(RESULTS)
     old = read_json(path) if path.exists() else None
     if old and old["study_signature"] != sig:
         raise RuntimeError("Stage08 code/upstream changed: refuse old caches")
@@ -771,20 +790,21 @@ def run(args):
             stability=stability, elapsed_seconds=time.perf_counter() - start)
         write_json(path, manifest)
         return manifest
-    order = validate_ranking(ranking, ctx["panel"].features)
+    parent_count=len(ctx["active_indices"])
+    order = validate_ranking(ranking,ctx["panel"].features,ctx["active_indices"])
     scores = []
-    for k in ALL_K:
+    for k in range(1,parent_count+1):
         current = score_policy(
             ctx, RESULTS, topk_indices(order, k), f"top{k:03d}",
             "TOPK", sig, device)
         scores.append(current)
         print("08_TOPK", k, "MAE", round(current["axis_mae"], 6),
               "PASS", current["qualified"], flush=True)
-    chosen = select_k(scores)
+    chosen = select_k(scores,parent_count)
     controls = []
     for random_seed in RANDOM_SUBSET_SEEDS:
         current = score_policy(
-            ctx, RESULTS, random_indices(random_seed),
+            ctx, RESULTS, random_indices(random_seed,ctx["active_indices"]),
             f"random_{random_seed}", "RANDOM", sig, device)
         controls.append(dict(subset_seed=random_seed,
                              axis_mae=current["axis_mae"],
@@ -812,14 +832,14 @@ def run(args):
                     controls, stability, sig, plots)
     manifest.update(
         status="PASS", selected_K=chosen,
-        complete_K=FEATURE_COUNT,
-        new_compact_fit_count=(FEATURE_COUNT - 1) * len(SEEDS),
-        random_control_fit_count=len(RANDOM_SUBSET_SEEDS) * len(SEEDS),
+        complete_K=parent_count,
+        new_compact_fit_count=(parent_count-1)*len(SEEDS),
+        random_control_fit_count=(len(RANDOM_SUBSET_SEEDS)*len(SEEDS) if parent_count>1 else 0),
         selected_parameters=scores[chosen-1]["parameters"],
         plots=plots, completed_utc=datetime.now(timezone.utc).isoformat(),
         elapsed_seconds=time.perf_counter() - start)
     write_json(path, manifest)
-    print("08_COMPLETE", "K", chosen, "157_OF_157", flush=True)
+    print("08_COMPLETE", "K", chosen, "PARENT_K",parent_count, flush=True)
     return manifest
 
 
@@ -829,6 +849,7 @@ def main():
     parser.add_argument("--status", action="store_true")
     parser.add_argument("--ranking-only", action="store_true")
     parser.add_argument("--run", action="store_true")
+    parser.add_argument("--restart",action="store_true")
     parser.add_argument("--device", choices=("cpu", "cuda"),
                         default="cuda" if torch.cuda.is_available() else "cpu")
     run(parser.parse_args())

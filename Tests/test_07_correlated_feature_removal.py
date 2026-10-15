@@ -9,6 +9,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import torch
+from pipeline_support import require_current_results
 
 ROOT=Path(__file__).resolve().parents[1]
 SPEC=importlib.util.spec_from_file_location(
@@ -54,7 +55,7 @@ class GreedyLogicTests(unittest.TestCase):
         self.assertEqual(m.FEATURE_ROLES,(
             (0,42,"target_history"),(42,66,"industry_source"),
             (66,157,"global_source")))
-        self.assertEqual(m.LOOKBACK,1)
+        self.assertFalse(hasattr(m,"LOOKBACK"))
         self.assertEqual(m.HORIZON,1)
         self.assertEqual(m.SEEDS,tuple(range(2026,2036)))
 
@@ -114,6 +115,7 @@ class GreedyLogicTests(unittest.TestCase):
 class OriginalDatasetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        require_current_results(6)
         torch.set_num_threads(4)
         cls.ctx=m.upstream()
         cls.panel=cls.ctx["panel"]
@@ -126,8 +128,9 @@ class OriginalDatasetTests(unittest.TestCase):
         self.assertEqual(ctx["models"],("B-MTGNN",))
         self.assertEqual(ctx["epochs"],75)
         self.assertEqual(ctx["original_forecasts"].shape,(10,12,59,3))
-        self.assertEqual(ctx["full_fold"]["train_x"].shape,(36,1,59,157))
-        self.assertEqual(ctx["full_fold"]["val_x"].shape,(12,1,59,157))
+        self.assertEqual(ctx["full_fold"]["train_x"].shape,
+                         (len(ctx["m06"].train_origins()),ctx["lookback"],59,157))
+        self.assertEqual(ctx["full_fold"]["val_x"].shape,(12,ctx["lookback"],59,157))
         self.assertEqual(ctx["panel"].x.shape,(68,59,157))
         self.assertEqual(ctx["panel"].y.shape,(68,59,3))
         self.assertNotIn("Data/03_integrated_dataset/raw_test.csv",
@@ -187,9 +190,9 @@ class OriginalDatasetTests(unittest.TestCase):
             altered=m.adapt_inputs(full,subset,kind)
             channel_count=157 if kind=="masked" else len(subset.kept)
             self.assertEqual(
-                altered["train_x"].shape,(36,1,59,channel_count))
+                altered["train_x"].shape,(len(full["train_origins"]),self.ctx["lookback"],59,channel_count))
             self.assertEqual(
-                altered["val_x"].shape,(12,1,59,channel_count))
+                altered["val_x"].shape,(12,self.ctx["lookback"],59,channel_count))
             for key in ("train_y","val_y","train_last","val_last",
                         "train_context","val_context",
                         "train_structure","val_structure",
@@ -270,8 +273,8 @@ class OriginalDatasetTests(unittest.TestCase):
         forecast=compact_model(
             train["x"],train["mask"],graph,
             train["last"],train["structure"],train["context"])
-        loss=self.ctx["m04"].three_axis_weighted_huber(
-            forecast,train["y"],train["last"],
+        loss=self.ctx["m04"].joint_axis_ici_loss(
+            forecast,train["y"],
             torch.tensor(folded["y_scale"]))
         self.assertTrue(torch.isfinite(loss))
         loss.backward()
@@ -286,6 +289,7 @@ class OriginalDatasetTests(unittest.TestCase):
 class ProductionResultTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        require_current_results(7)
         cls.ctx=m.upstream()
         cls.root=m.RESULTS
         cls.subsets=pd.read_csv(cls.root/"subsets"/"candidate_counts.csv")

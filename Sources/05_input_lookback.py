@@ -9,23 +9,28 @@ RESEARCH QUESTION
 DEV POLICY SELECTION (DESCRIPTIVE)
     For each L and seed, calculate the three-axis Dev MAE individually.
     Choose the L with the lowest average across the 10 matched seeds;
-    ICI MAE then shorter L break ties. L=1 is the observed Dev selection.
+    ICI MAE then shorter L break ties. The winner is read from this run,
+    never imported from a historical tuned policy.
     Report means, between-seed SD, per-axis/year errors and descriptive
     differences from original L=12, without p-values or confidence intervals.
 
 INTERPRETATION
     Dev was already used to select Stage04's Structural formulation.
-    L=1 is a Dev-selected modeling policy, NOT independently validated
+    The selected L is a Dev-selected modeling policy, NOT independently validated
     predictive superiority. L=12 is retained only as the original reference.
     Downstream stages are not modified by this code.
 
 PROTOCOL — NO TRAIN CV, ROLLING, EXPANDING OR TRAIN-INTERNAL HOLDOUT
-    B-MTGNN Structural only; 10 matched seeds 2026–2035; the same
+    Stage04-selected B-MTGNN formulation; 10 matched seeds 2026–2035; the same
     67,190-parameter model and initialization across L; fixed 20-slot
     temporal core; 75 epochs and 30 MC-dropout draws. The same nine
     historical score features and economic prior remain for every L,
     so this compares raw feature-window length conditional on context,
     NOT the total amount of history available. Test is not accessed.
+
+    After freezing L on common support, refit just that L on all legally
+    available Train origins. This refit supplies Stage06's baseline and
+    never reselects L from its new Dev score.
 
     py Sources/05_input_lookback.py --analyze   # report/plots only; no fit
     py Sources/05_input_lookback.py --status
@@ -61,7 +66,6 @@ COMMON_TRAIN_ORIGINS=np.arange(20,56,dtype=int)
 DEV_ORIGINS=np.arange(56,68,dtype=int)
 SEEDS=tuple(range(2026,2036))
 MODEL="B-MTGNN"
-MODE="structural"
 CORE_LOOKBACK=max(LENGTHS)
 SCORE_NAMES=("profitability","productivity","growth")
 DEV_SELECTION_RULE="MIN_10_SEED_MEAN_THREE_AXIS_MAE_THEN_ICI_THEN_SHORTER_L"
@@ -99,6 +103,14 @@ def stage04():
     return mod
 
 
+def selected_mode():
+    """Consume Stage04's actual decision; never force Structural upstream."""
+    mode=json_read(RESULT04/"dev_selection.json")["selected_mode"]
+    if mode not in stage04().STAGE04_OUTPUT_MODES:
+        raise RuntimeError("Stage04 selected an unknown formulation")
+    return mode
+
+
 def upstream():
     """Validate exactly the current frozen B-MTGNN Stage04 Dev contract."""
     m=stage04()
@@ -115,9 +127,10 @@ def upstream():
             or manifest["contract"].get("reference_epoch")!=75
             or tuple(manifest["contract"].get("seeds",()))!=SEEDS
             or lock.get("model")!=MODEL
-            or lock.get("selected_mode")!=MODE
+            or lock.get("selected_mode") not in m.STAGE04_OUTPUT_MODES
             or lock.get("seed_count")!=len(SEEDS)
             or lock.get("source_sha256")!=manifest.get("training_source_sha256")
+            or manifest.get("training_source_sha256")!=sha(SOURCE04)
             or m.STAGE04_ACTIVE_EPOCHS!=75
             or panel.x.shape!=(68,59,157)
             or panel.train_count!=56):
@@ -163,11 +176,14 @@ class Inputs:
         # B-MTGNN learns its own graph; it does not take a fitted adjacency.
         self.graph=torch.eye(self.m.NODE_COUNT)
 
-    def fold(self,L):
+    def fold(self,L,*,full_train=False):
         if L not in LENGTHS:
             raise ValueError("Stage05 lookback is in [1,20]")
         p=self.panel
-        train=COMMON_TRAIN_ORIGINS
+        # Use common support while comparing lengths. Expand only AFTER
+        # L is selected, never let longer L compete on different targets.
+        train=(self.m.admissible_train_origins(L) if full_train
+               else COMMON_TRAIN_ORIGINS)
         dev=DEV_ORIGINS
         center,scale=self.m.fit_normalizer(p.x[:56],"standard")
         known=np.isfinite(p.x)
@@ -194,8 +210,9 @@ class Inputs:
             x_scale=scale.astype(np.float32),
             y_center=yc.astype(np.float32),
             y_scale=ys.astype(np.float32),
+            anchor_biases=self.m.train_anchor_biases(p,self.prior,train,yc,ys),
             train_origins=train.copy(),val_origins=dev.copy())
-        if (arrays["train_x"].shape!=(36,L,59,157)
+        if (arrays["train_x"].shape!=(len(train),L,59,157)
                 or arrays["val_x"].shape!=(12,L,59,157)
                 or not all(np.isfinite(v).all() for v in arrays.values())):
             raise RuntimeError("Stage05 Train/Dev array contract broken")
@@ -235,9 +252,9 @@ def instantiate(m,name,seed,L,z,mode):
     This L=12 comparator is a newly trained common-support Stage05 control,
     not the saved Stage04 L=12 checkpoint.
     """
-    if (name!=MODEL or mode!=MODE or L not in LENGTHS
+    if (name!=MODEL or mode not in m.STAGE04_OUTPUT_MODES or L not in LENGTHS
             or z["train_x"].shape[1]!=L):
-        raise ValueError("Stage05 requires B-MTGNN Structural and L=1..20")
+        raise ValueError("Stage05 requires a registered B-MTGNN formulation and L=1..20")
     m.seed_all(seed)
     model=m.ThreeAxisStructureGNN(
         name,z["x_center"],z["x_scale"],
@@ -246,13 +263,14 @@ def instantiate(m,name,seed,L,z,mode):
     model.base=m.ForecastModel(
         name,157,59,m.STAGE04_ACTIVE_WIDTH,CORE_LOOKBACK,m.HORIZON)
     model.base.core=FixedTemporalInput(model.base.core)
+    m.initialize_calibrated_model(model,z)
     return model
 
 
-def train_one(inputs,model_name,seed,L,device):
+def train_one(inputs,model_name,seed,L,device,*,full_train=False):
     m=inputs.m
-    z=inputs.fold(L)
-    net=instantiate(m,model_name,seed,L,z,"structural").to(device)
+    z=inputs.fold(L,full_train=full_train)
+    net=instantiate(m,model_name,seed,L,z,selected_mode()).to(device)
     graph=inputs.graph.to(device)
     ztorch={k:torch.as_tensor(z[k],device=device)
             for k in ("train_x","train_mask","train_y",
@@ -268,8 +286,7 @@ def train_one(inputs,model_name,seed,L,device):
         output=net(ztorch["train_x"],ztorch["train_mask"],graph,
                    ztorch["train_last"],ztorch["train_structure"],
                    ztorch["train_context"])
-        cost=m.three_axis_weighted_huber(
-            output,ztorch["train_y"],ztorch["train_last"],scale)
+        cost=m.joint_axis_ici_loss(output,ztorch["train_y"],scale)
         if not torch.isfinite(cost):
             raise RuntimeError("Stage05 nonfinite full-Train training loss")
         cost.backward()
@@ -280,12 +297,14 @@ def train_one(inputs,model_name,seed,L,device):
         estimate=m.mtgnn_bayesian_inference(
             net,ztorch,graph,model_name,seed,
             z["y_center"],z["y_scale"])["prediction"]
+    state=({key:value.detach().cpu().clone() for key,value in net.state_dict().items()}
+           if full_train else None)
     del net,optim,ztorch
     if str(device).startswith("cuda"):
         torch.cuda.empty_cache()
     if estimate.shape!=(12,59,3) or not np.isfinite(estimate).all():
         raise RuntimeError("Stage05 Dev prediction invalid")
-    return estimate
+    return estimate,state
 
 
 def run_contract(m,panel,lock,manifest):
@@ -297,7 +316,8 @@ def run_contract(m,panel,lock,manifest):
         stage04_selection_sha256=sha(RESULT04/"dev_selection.json"),
         stage04_trained_source_sha256=manifest["training_source_sha256"],
         original_train_dev_sources=panel.hashes,
-        model=MODEL,formulation=MODE,seeds=list(SEEDS),
+        model=MODEL,formulation=lock["selected_mode"],seeds=list(SEEDS),
+        learning_recipe=m.LEARNING_RECIPE,
         fixed_epochs=m.STAGE04_ACTIVE_EPOCHS,
         full_train_through="2019Q4",
         train_origin_count=36,
@@ -344,7 +364,7 @@ def score_results(root,policy_sig,panel):
                 raise RuntimeError(f"Malformed Dev forecast {stem}")
             residual=prediction-truth
             row=dict(input_quarters=L,seed=seed,model=MODEL,
-                     mode=MODE,axis_mae=float(np.abs(residual).mean()),
+                     mode=selected_mode(),axis_mae=float(np.abs(residual).mean()),
                      ici_mae=float(np.abs(residual.mean(-1)).mean()),
                      train_origin_count=36,dev_origin_count=12)
             for j,name in enumerate(SCORE_NAMES):
@@ -374,7 +394,7 @@ def summarize_seed_scores(seed_scores):
         if set(selected.index)!=set(baseline.index):
             raise RuntimeError("Unpaired seed set")
         row=dict(
-            input_quarters=L,model=MODEL,mode=MODE,
+            input_quarters=L,model=MODEL,mode=selected_mode(),
             seed_count=len(SEEDS),train_origin_count=36,
             dev_origin_count=12,train_internal_validation=False,
             epoch=75,operational_12q=(L==ORIGINAL_LOOKBACK))
@@ -484,7 +504,7 @@ def finalize(root,contract,digest,panel):
     save(fig,"S05_04_years_and_data_support.png")
 
     selection=dict(
-        model=MODEL,mode=MODE,
+        model=MODEL,mode=selected_mode(),
         selected_lookback_quarters=selected,
         reference_lookback_quarters=ORIGINAL_LOOKBACK,
         selection_data="DEV_2020Q1_2022Q4",
@@ -504,7 +524,7 @@ def finalize(root,contract,digest,panel):
         policy_selection="TEN_SEED_MEAN_DEV_THREE_AXIS_MAE",
         epoch_selection="NONE_FIXED_75",
         input_lengths=list(LENGTHS),
-        model=MODEL,mode=MODE,
+        model=MODEL,mode=selected_mode(),
         seed_count=len(SEEDS),
         operational_lookback_quarters=selected,
         original_reference_lookback_quarters=ORIGINAL_LOOKBACK,
@@ -560,7 +580,7 @@ def analyze_frozen_experiment():
             or original.get("status") not in (
                 "COMPLETE_DESCRIPTIVE","COMPLETE_MAIN_DEV_ANALYSIS")
             or contract.get("model")!=MODEL
-            or contract.get("formulation")!=MODE
+            or contract.get("formulation")!=selected_mode()
             or tuple(contract.get("seeds",()))!=SEEDS
             or contract.get("lookback_grid")!=list(LENGTHS)
             or contract.get("fixed_epochs")!=75
@@ -583,7 +603,97 @@ def analyze_frozen_experiment():
     return report
 
 
+def refit_selected(inputs,root,signature,device):
+    """Refit only the frozen winning L on every admissible Train origin.
+
+    Dev scores of this refit never reselect L. The common-support search
+    and the deployed full-Train model remain separately attributable.
+    The selected model files stay inside the existing Stage05 directory.
+    """
+    selection=json_read(root/"lookback_dev_selection.json")
+    length=int(selection["selected_lookback_quarters"])
+    mode=selection["mode"]
+    if mode!=selected_mode() or length not in LENGTHS:
+        raise RuntimeError("Stage05 selection and Stage04 mode disagree")
+    records=[]
+    for seed in SEEDS:
+        stem=f"selected_full__L{length:02d}__{MODEL}__s{seed}"
+        meta,binary,weights=(root/(stem+ext) for ext in (".json",".npz",".pt"))
+        if all(path.is_file() for path in (meta,binary,weights)):
+            record=json_read(meta)
+            if (record["signature"]!=signature or record["mode"]!=mode
+                    or record["L"]!=length or record["seed"]!=seed
+                    or record["prediction_sha256"]!=sha(binary)
+                    or record["checkpoint_sha256"]!=sha(weights)):
+                raise RuntimeError("Stage05 selected full-Train checkpoint changed")
+        elif any(path.exists() for path in (meta,binary,weights)):
+            raise RuntimeError("Incomplete Stage05 full-Train seed checkpoint")
+        else:
+            forecast,state=train_one(inputs,MODEL,seed,length,device,full_train=True)
+            temporary=weights.with_suffix(".pt.writing")
+            torch.save(dict(signature=signature,L=length,mode=mode,seed=seed,
+                            model_state_dict=state),temporary)
+            os.replace(temporary,weights)
+            save_npz(binary,prediction=forecast)
+            record=dict(signature=signature,L=length,mode=mode,seed=seed,
+                        prediction_sha256=sha(binary),checkpoint_sha256=sha(weights),
+                        epoch=inputs.m.STAGE04_ACTIVE_EPOCHS,test_opened=False)
+            json_write(meta,record)
+        records.append(dict(seed=seed,metadata=meta.name,prediction=binary.name,
+                            checkpoint=weights.name,metadata_sha256=sha(meta)))
+    seed_scores=[]
+    for member in records:
+        with np.load(root/member["prediction"],allow_pickle=False) as saved:
+            seed_scores.append(inputs.m.score_forecast(saved["prediction"],inputs.panel.y[56:68]))
+    refit=dict(status="LOCKED",signature=signature,L=length,mode=mode,
+               train_origins=inputs.m.admissible_train_origins(length).tolist(),
+               selection_sha256=sha(root/"lookback_dev_selection.json"),
+               seeds=list(SEEDS),members=records,test_opened=False,
+               common_support_dev=dict(
+                   axis_mae=selection["selected_dev_mean_three_axis_mae"],
+                   ici_mae=selection["selected_dev_mean_ici_mae"]),
+               full_train_dev={key:float(np.mean([row[key] for row in seed_scores]))
+                               for key in seed_scores[0]},
+               dev_used_to_reselect_lookback=False)
+    json_write(root/"full_train_refit.json",refit)
+    return refit
+
+
+def load_selected_refit(root,panel):
+    """Read-only canonical reference consumed by Stage06; no legacy reader."""
+    manifest=json_read(root/"run_manifest.json")
+    selected=json_read(root/"lookback_dev_selection.json")
+    refit=json_read(root/"full_train_refit.json")
+    if (refit["status"]!="LOCKED" or refit["signature"]!=manifest["signature"]
+            or refit["L"]!=selected["selected_lookback_quarters"]
+            or refit["mode"]!=selected["mode"] or refit["seeds"]!=list(SEEDS)
+            or refit["selection_sha256"]!=sha(root/"lookback_dev_selection.json")
+            or refit["train_origins"]!=stage04().admissible_train_origins(refit["L"]).tolist()
+            or len(refit["members"])!=len(SEEDS)):
+        raise RuntimeError("Stage05 full-Train refit is incomplete or stale")
+    forecasts=[]
+    for seed,member in zip(SEEDS,refit["members"]):
+        meta=root/member["metadata"]
+        record=json_read(meta)
+        prediction=root/member["prediction"]
+        if (member["seed"]!=seed or record["seed"]!=seed
+                or record["signature"]!=refit["signature"]
+                or record["L"]!=refit["L"] or record["mode"]!=refit["mode"]
+                or member["metadata_sha256"]!=sha(meta)
+                or record["prediction_sha256"]!=sha(prediction)
+                or record["checkpoint_sha256"]!=sha(root/member["checkpoint"])):
+            raise RuntimeError("Stage05 full-Train seed artifacts failed verification")
+        with np.load(prediction,allow_pickle=False) as saved:
+            forecasts.append(saved["prediction"].copy())
+    bank=np.stack(forecasts)
+    if bank.shape!=(len(SEEDS),12,59,3) or not np.isfinite(bank).all():
+        raise RuntimeError("Invalid Stage05 full-Train forecast bank")
+    return bank,refit
+
+
 def run(args):
+    if args.restart and not args.run:
+        raise ValueError("--restart requires --run")
     if args.status:
         state=(json_read(RESULTS/"run_manifest.json")
                if (RESULTS/"run_manifest.json").is_file() else None)
@@ -599,7 +709,7 @@ def run(args):
               "TRAIN TARGET ORIGINS 2011–2019 (36 COMMON)",
               "EVAL DEV 2020–2022 (12)",
               "FIXED_EPOCHS 75","L=1..20",
-              "BMTGNN_STRUCTURAL",
+              "BMTGNN_FORMULATION_FROM_STAGE04",
               "SEEDS 2026–2035 (10)",
               "TOTAL TRIALS 200",
               "CORE_CAPACITY 20 FOR EVERY L",
@@ -617,15 +727,15 @@ def run(args):
         raise ValueError("Use --dry-run, --status or --run")
     m,panel,lock,manifest=upstream()
     contract,digest=run_contract(m,panel,lock,manifest)
+    if args.restart:
+        m.reset_stage_results(RESULTS)
     dest=RESULTS/"run_manifest.json"
     previous=json_read(dest) if dest.is_file() else None
-    if previous and previous.get("completed_runs")==200:
-        raise RuntimeError(
-            "The 200 original Stage05 jobs are already complete; "
-            "use --analyze to refresh Dev selection and four plots, "
-            "never retrain or relabel their source provenance")
     if previous and previous.get("signature")!=digest:
         raise RuntimeError("New Stage05 run is inconsistent with saved data")
+    if previous and previous.get("completed_runs")==200 and (RESULTS/"full_train_refit.json").exists():
+        _,refit=load_selected_refit(RESULTS,panel)
+        return refit
     if args.device=="cuda" and not torch.cuda.is_available():
         raise RuntimeError("CUDA unavailable")
     RESULTS.mkdir(parents=True,exist_ok=True)
@@ -648,7 +758,7 @@ def run(args):
                 continue
             if meta.exists() or data.exists():
                 raise RuntimeError("Incomplete Stage05 job")
-            prediction=train_one(inp,MODEL,seed,L,device)
+            prediction,_=train_one(inp,MODEL,seed,L,device)
             save_npz(data,prediction=prediction)
             json_write(meta,dict(
                 signature=digest,L=L,model=MODEL,seed=seed,
@@ -657,7 +767,8 @@ def run(args):
                 trained_2006_2019_only=True,
                 train_internal_validation=False,test_opened=False))
             print("05_TRAIN_DEV",stem,flush=True)
-    return finalize(RESULTS,contract,digest,panel)
+    finalize(RESULTS,contract,digest,panel)
+    return refit_selected(inp,RESULTS,digest,device)
 
 
 def main():
@@ -666,6 +777,7 @@ def main():
     p.add_argument("--status",action="store_true")
     p.add_argument("--analyze",action="store_true")
     p.add_argument("--run",action="store_true")
+    p.add_argument("--restart",action="store_true")
     p.add_argument("--device",choices=("cpu","cuda"),
                    default="cuda" if torch.cuda.is_available() else "cpu")
     run(p.parse_args())

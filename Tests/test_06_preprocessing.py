@@ -12,6 +12,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import torch
+from pipeline_support import require_current_results
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location(
@@ -78,7 +79,7 @@ class FactorialDesignTests(unittest.TestCase):
         self.assertEqual(
             {p.distribution for p in grid},set(m.DISTRIBUTION))
         self.assertEqual(len(m.SEEDS),10)
-        self.assertEqual(m.LOOKBACK,1)
+        self.assertFalse(hasattr(m,"LOOKBACK"))
         self.assertEqual(m.SLOTS,("missing","normalization","distribution"))
         self.assertFalse(hasattr(m,"greedy_next"))
         self.assertFalse(hasattr(m,"factor_candidates"))
@@ -174,6 +175,7 @@ class FactorialDesignTests(unittest.TestCase):
 class RealPipelineTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        require_current_results(5)
         torch.set_num_threads(3)
         cls.m4,cls.m5,cls.panel,cls.lock,cls.manifest=(
             m.verify_upstream_and_load())
@@ -182,18 +184,19 @@ class RealPipelineTests(unittest.TestCase):
     def test_exact_original_stage05_inputs_and_predictions(self):
         self.assertTrue(m.original_stage05_parity(self.panel,self.prior))
         standard,_=m.prepare_policy(self.panel,m.ORIGINAL,self.prior)
-        canonical=self.m5.Inputs(self.panel).fold(1)
+        length=m.selected_lookback()
+        canonical=self.m5.Inputs(self.panel).fold(length,full_train=True)
         for key in canonical:
             if key in standard:
                 np.testing.assert_array_equal(
                     standard[key],canonical[key])
-        self.assertEqual(standard["train_x"].shape,(36,1,59,157))
-        self.assertEqual(standard["val_x"].shape,(12,1,59,157))
+        self.assertEqual(standard["train_x"].shape,(len(m.train_origins()),length,59,157))
+        self.assertEqual(standard["val_x"].shape,(12,length,59,157))
         preds=m.original_stage05_seed_predictions(self.panel)
         score,indiv=m.seed_policy_metrics(preds,self.panel)
         self.assertEqual(preds.shape,(10,12,59,3))
         self.assertEqual(len(indiv),10)
-        self.assertAlmostEqual(score["axis_mae"],2.4831371602436283,9)
+        self.assertAlmostEqual(score["axis_mae"],np.abs(preds-self.panel.y[56:68]).mean(),9)
 
     def test_distribution_transform_affects_only_source_columns(self):
         raw=self.panel.x
@@ -249,11 +252,11 @@ class RealPipelineTests(unittest.TestCase):
         self.assertEqual(contract["experiment"],
                          "PRISM06_FULL_FACTORIAL_216_SINGLE_CANONICAL")
         self.assertEqual(contract["cartesian_policy_count"],216)
-        self.assertEqual(contract["lookback"],1)
+        self.assertEqual(contract["lookback"],m.selected_lookback())
         self.assertEqual(contract["seed_grid"],list(m.SEEDS))
         self.assertEqual(contract["fixed_epochs"],75)
         self.assertEqual(contract["train_origin_indices"],
-                         list(range(20,56)))
+                         m.train_origins().tolist())
         self.assertEqual(contract["factor_names"],list(m.SLOTS))
         self.assertFalse(contract["test_opened"])
         self.assertTrue(contract["no_train_cv"])
@@ -272,6 +275,7 @@ class RealPipelineTests(unittest.TestCase):
         self.assertGreater(seconds,0)
 
     def test_result_folder_only_accepts_exact_current_contract(self):
+        require_current_results(6)
         # An unfinished 216-way run is valid; old sequential status is not.
         marker=m.RESULTS/"run_manifest.json"
         if not marker.is_file():

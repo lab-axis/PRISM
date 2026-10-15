@@ -11,6 +11,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import torch
+from pipeline_support import require_current_results
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location(
@@ -128,6 +129,7 @@ class BMTGNNDevTests(unittest.TestCase):
             a["predictive_mc_var"],a["predictive_mc_std"]**2)
 
     def test_frozen_results_are_exact_thirty_jobs(self):
+        require_current_results(4)
         root=m.RESULTS
         status=m._read_json(root/"run_manifest.json")
         self.assertEqual(status["status"],"DEV_FROZEN")
@@ -158,11 +160,14 @@ class BMTGNNDevTests(unittest.TestCase):
                 ("direct",2.0,1.3),("residual",1.6,1.4),
                 ("structural",1.6,1.2))])
         self.assertEqual(m.select_bmtgnn_mode(frame),"structural")
+        require_current_results(4)
         locked=m._read_json(m.RESULTS/"dev_selection.json")
         self.assertEqual(locked["seed_count"],10)
-        self.assertEqual(locked["selected_mode"],"structural")
+        summary=pd.read_csv(m.RESULTS/"dev_summary.csv")
+        self.assertEqual(locked["selected_mode"],m.select_bmtgnn_mode(summary))
 
     def test_epoch_predictions_and_mc_uncertainty_are_saved(self):
+        require_current_results(4)
         target=self.panel.y[56:68]
         for mode in m.STAGE04_OUTPUT_MODES:
             for seed in m.DEFAULT_SEEDS:
@@ -183,14 +188,16 @@ class BMTGNNDevTests(unittest.TestCase):
                             row["axis_mae"],places=8)
 
     def test_summarization_from_only_saved_bmtgnn(self):
+        require_current_results(4)
         locked=m.summarize_development()
-        self.assertEqual(locked["selected_mode"],"structural")
+        self.assertIn(locked["selected_mode"],m.STAGE04_OUTPUT_MODES)
         rows=pd.read_csv(m.RESULTS/"dev_summary.csv")
         self.assertEqual(set(rows.model),
                          {"B-MTGNN","EconomicPrior",*m.NAIVE_MODELS})
 
     def test_robustness_and_paired_method_scores_match_original_predictions(self):
         """Every reported year, seed and epoch comes from the original 3 axes."""
+        require_current_results(4)
         truth=self.panel.y[56:68]
         detail=pd.read_csv(m.RESULTS/"dev_scores.csv").set_index(
             ["mode","seed"])
@@ -243,6 +250,7 @@ class BMTGNNDevTests(unittest.TestCase):
         self.assertTrue(np.isfinite(difference.to_numpy()).all())
 
     def test_original_layout_and_added_robustness_plots(self):
+        require_current_results(4)
         from PIL import Image
         originals={
             "01_three_modes_model_selection.png",

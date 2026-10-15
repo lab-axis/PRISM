@@ -13,6 +13,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import torch
+from pipeline_support import require_current_results
 
 ROOT=Path(__file__).resolve().parents[1]
 SPEC=importlib.util.spec_from_file_location(
@@ -26,7 +27,7 @@ class DesignTests(unittest.TestCase):
     def test_single_model_ten_seeds_and_predeclared_common_support(self):
         self.assertEqual(m.RESULTS,ROOT/"Results/05_input_lookback")
         self.assertEqual(m.MODEL,"B-MTGNN")
-        self.assertEqual(m.MODE,"structural")
+        self.assertFalse(hasattr(m,"MODE"))
         self.assertEqual(m.SOURCE04,ROOT/"Sources/04_bmtgnn_benchmark.py")
         self.assertEqual(m.SEEDS,tuple(range(2026,2036)))
         self.assertEqual(m.LENGTHS,tuple(range(1,21)))
@@ -50,9 +51,10 @@ class DesignTests(unittest.TestCase):
             "conditional_quarterly_feature_window_not_total_history")
 
     def test_current_stage04_dev_freeze_and_ten_seed_lock(self):
+        require_current_results(4)
         m4,panel,selection,manifest=m.upstream()
         self.assertEqual(m4.GNN_MODELS,("B-MTGNN",))
-        self.assertEqual(selection["selected_mode"],m.MODE)
+        self.assertEqual(selection["selected_mode"],m.selected_mode())
         self.assertEqual(selection["seed_count"],10)
         self.assertEqual(manifest["status"],"DEV_FROZEN")
         self.assertEqual(manifest["completed_jobs"],30)
@@ -72,6 +74,7 @@ class DesignTests(unittest.TestCase):
 class InputsAndInitializationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        require_current_results(4)
         torch.set_num_threads(3)
         cls.m4,cls.panel,_,_=m.upstream()
         cls.inputs=m.Inputs(cls.panel)
@@ -150,7 +153,7 @@ class InputsAndInitializationTests(unittest.TestCase):
         for L in m.LENGTHS:
             with self.subTest(L=L):
                 data=self.inputs.fold(L)
-                net=m.instantiate(self.m4,m.MODEL,2026,L,data,m.MODE)
+                net=m.instantiate(self.m4,m.MODEL,2026,L,data,m.selected_mode())
                 state=net.state_dict()
                 rng=torch.get_rng_state().clone()
                 if baseline is None:
@@ -189,7 +192,7 @@ class InputsAndInitializationTests(unittest.TestCase):
             with self.subTest(L=length):
                 data=self.inputs.fold(length)
                 net=m.instantiate(
-                    self.m4,m.MODEL,2026,length,data,m.MODE)
+                    self.m4,m.MODEL,2026,length,data,m.selected_mode())
                 net.eval()
                 z={k:torch.as_tensor(data["val_"+k][:1])
                    for k in ("x","mask","last","structure","context")}
@@ -201,7 +204,7 @@ class InputsAndInitializationTests(unittest.TestCase):
 
     def test_one_epoch_training_smoke_has_valid_mc_prediction(self):
         with patch.object(self.m4,"STAGE04_ACTIVE_EPOCHS",1):
-            predicted=m.train_one(
+            predicted,_=m.train_one(
                 self.inputs,m.MODEL,2026,20,torch.device("cpu"))
         self.assertEqual(predicted.shape,(12,59,3))
         self.assertTrue(np.isfinite(predicted).all())
@@ -210,6 +213,7 @@ class InputsAndInitializationTests(unittest.TestCase):
 class SeedAggregationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        require_current_results(4)
         cls.panel=m.stage04().load_panel(ROOT)
 
     def test_errors_are_scored_before_seed_aggregation_and_paired(self):
@@ -219,7 +223,7 @@ class SeedAggregationTests(unittest.TestCase):
                 bias=(seed-2026-4.5)*.1+L*.001
                 v=abs(bias)
                 row=dict(input_quarters=L,seed=seed,model=m.MODEL,
-                         mode=m.MODE,axis_mae=v,ici_mae=v,
+                         mode=m.selected_mode(),axis_mae=v,ici_mae=v,
                          **{f"{axis}_mae":v for axis in m.SCORE_NAMES},
                          **{f"{year}_{metric}":v
                             for year in (2020,2021,2022)
@@ -302,8 +306,11 @@ class SeedAggregationTests(unittest.TestCase):
             self.assertFalse(report["test_opened"])
 
     def test_real_dev_selection_is_lookback_one_without_tests(self):
+        require_current_results(5)
         selected=m.json_read(m.RESULTS/"lookback_dev_selection.json")
-        self.assertEqual(selected["selected_lookback_quarters"],1)
+        table=pd.read_csv(m.RESULTS/"lookback_summary.csv")
+        winner=table.sort_values(["axis_mae","ici_mae","input_quarters"]).iloc[0]
+        self.assertEqual(selected["selected_lookback_quarters"],int(winner.input_quarters))
         self.assertEqual(selected["reference_lookback_quarters"],12)
         self.assertEqual(selected["selection_rule"],m.DEV_SELECTION_RULE)
         self.assertFalse(selected["result_is_independent_validation"])
