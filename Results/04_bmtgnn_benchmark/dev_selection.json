@@ -1,8 +1,0 @@
-{
-  "model": "B-MTGNN",
-  "selected_mode": "structural",
-  "selection_rule": "LOWEST_DEV_10_SEED_MEAN_THREE_AXIS_MAE_THEN_ICI",
-  "dev_mean_mae": 2.4929640932216266,
-  "source_sha256": "bbb348d0e6b6504c4bdc0f4b396799e141631f77850435eace0e6a056f9ba6ca",
-  "seed_count": 10
-}

@@ -1,7 +1,0 @@
-﻿threshold,label,total_features,kept_count,dropped_count,strong_within_role_edge_count,target_history_kept,industry_source_kept,global_source_kept
-none,no_removal,157,157,0,0,42,24,91
-0.995,greedy_0.995,157,147,10,16,36,23,88
-0.99,greedy_0.990,157,140,17,36,31,22,87
-0.98,greedy_0.980,157,134,23,60,31,22,81
-0.95,greedy_0.950,157,115,42,127,26,19,70
-0.9,greedy_0.900,157,98,59,223,25,15,58

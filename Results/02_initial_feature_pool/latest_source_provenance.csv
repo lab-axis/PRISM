@@ -1,9 +1,0 @@
-﻿source,series_requested,series_obtained,native_observations,origin
-ces_industry,394,394,101372,official_BLS_bulk_flat_file
-ppi_industry,27,27,7042,official_BLS_bulk_flat_file
-jolts,204,204,56304,official_BLS_bulk_flat_file
-cpi,7,7,1925,portable_official_source_cache_API_unavailable+current_FRED_CPI
-cps,7,7,1925,official_BLS_bulk_flat_file
-national_ces,5,5,1228,official_BLS_bulk_flat_file
-ppi_commodities,1,1,276,official_BLS_bulk_flat_file
-ppi_final_demand,6,6,1323,official_BLS_bulk_flat_file
